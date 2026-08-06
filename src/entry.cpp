@@ -55,13 +55,13 @@ extern "C" __declspec(dllexport) AddonDefinition_t* GetAddonDef()
 {
 	AddonDef.Signature = (uint32_t)-12345; // set to random unused negative integer
 	AddonDef.APIVersion = NEXUS_API_VERSION;
-	AddonDef.Name = "My First Nexus Addon";
-	AddonDef.Version.Major = 1;
-	AddonDef.Version.Minor = 0;
+	AddonDef.Name = "MetricHUD";
+	AddonDef.Version.Major = 0;
+	AddonDef.Version.Minor = 1;
 	AddonDef.Version.Build = 0;
 	AddonDef.Version.Revision = 1;
-	AddonDef.Author = "Me, Myself and I";
-	AddonDef.Description = "This is my first Nexus addon.";
+	AddonDef.Author = "Scott K";
+	AddonDef.Description = "A customizable combat metrics HUD for Guild Wars 2";
 	AddonDef.Load = AddonLoad;
 	AddonDef.Unload = AddonUnload;
 	AddonDef.Flags = AF_None;
@@ -92,7 +92,7 @@ void AddonLoad(AddonAPI_t* aApi)
 	APIDefs->GUI_Register(RT_Render, AddonRender);
 	APIDefs->GUI_Register(RT_OptionsRender, AddonOptions);
 
-	APIDefs->Log(LOGL_DEBUG, "My First addon", "My <c=#00ff00>first addon</c> was loaded.");
+	APIDefs->Log(LOGL_DEBUG, "MetricHUD", "My <c=#00ff00>first addon</c> loaded successfully.");
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void AddonUnload()
 	APIDefs->GUI_Deregister(AddonRender);
 	APIDefs->GUI_Deregister(AddonOptions);
 
-	APIDefs->Log(LOGL_DEBUG, "My First addon", "<c=#ff0000>Signing off</c>, it was an honor commander.");
+	APIDefs->Log(LOGL_DEBUG, "MetricHUD", "<c=#ff0000>Signing off</c>, it was an honor commander.");
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -117,9 +117,9 @@ void AddonRender()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	if (ImGui::Begin("MyFirstImGuiWindow"))
+	if (ImGui::Begin("MetricHUD"))
 	{
-		ImGui::Text("Hello Tyria!");
+		ImGui::Text("MetricHUD is running");
 		ImGui::Text("UI Tick: %u",
 			nullptr != MumbleLink
 			? MumbleLink->UITick
@@ -144,6 +144,6 @@ void AddonRender()
 void AddonOptions()
 {
 	ImGui::Separator();
-	ImGui::Text("My first Nexus addon");
-	ImGui::Checkbox("Some setting", &someSetting);
+	ImGui::Text("MetricHUD");
+	ImGui::Checkbox("Enable test setting", &someSetting);
 }
