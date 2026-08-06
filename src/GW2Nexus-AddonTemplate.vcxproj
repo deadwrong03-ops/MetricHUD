@@ -172,6 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\MetricRegistry.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_internal.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="nexus\Nexus.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\MetricRegistry.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />

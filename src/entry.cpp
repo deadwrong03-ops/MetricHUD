@@ -14,6 +14,7 @@
 #include "nexus/Nexus.h"
 #include "mumble/Mumble.h"
 #include "imgui/imgui.h"
+#include "Core/MetricRegistry.h"
 
 /* proto */
 void AddonLoad(AddonAPI_t* aApi);
@@ -27,8 +28,9 @@ HMODULE hSelf               = nullptr;
 AddonAPI_t* APIDefs         = nullptr;
 NexusLinkData_t* NexusLink  = nullptr;
 Mumble::Data* MumbleLink    = nullptr;
+MetricRegistry metricRegistry;
 
-bool someSetting         = false;
+
 
 ///----------------------------------------------------------------------------------------------------
 /// DllMain:
@@ -87,6 +89,7 @@ void AddonLoad(AddonAPI_t* aApi)
 
 	NexusLink = (NexusLinkData_t*)APIDefs->DataLink_Get("DL_NEXUS_LINK");
 	MumbleLink = (Mumble::Data*)APIDefs->DataLink_Get("DL_MUMBLE_LINK");
+	metricRegistry.Initialize();
 
 	// Add an options window and a regular render callback
 	APIDefs->GUI_Register(RT_Render, AddonRender);
@@ -101,6 +104,7 @@ void AddonLoad(AddonAPI_t* aApi)
 ///----------------------------------------------------------------------------------------------------
 void AddonUnload()
 {
+	metricRegistry.Shutdown();
 	/* let's clean up after ourselves */
 	APIDefs->GUI_Deregister(AddonRender);
 	APIDefs->GUI_Deregister(AddonOptions);
@@ -115,27 +119,16 @@ void AddonUnload()
 ///----------------------------------------------------------------------------------------------------
 void AddonRender()
 {
-	ImGuiIO& io = ImGui::GetIO();
-
 	if (ImGui::Begin("MetricHUD"))
 	{
-		ImGui::Text("MetricHUD is running");
-		ImGui::Text("UI Tick: %u",
-			nullptr != MumbleLink
-			? MumbleLink->UITick
-			: 0
-		);
-
-		ImGui::Text("%s",
-			nullptr != NexusLink
-			? NexusLink->IsMoving
-				? "Currently moving!"
-				: "Currently standing still."
-			: "We don't know whether we are standing or moving? NexusLink seems to be empty."
-		);
+		ImGui::Text("MetricHUD");
+		ImGui::Separator();
+		ImGui::Text("Version 0.1.0");
+		ImGui::TextDisabled("Development Build");
 	}
 	ImGui::End();
 }
+
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonOptions:
@@ -143,7 +136,8 @@ void AddonRender()
 ///----------------------------------------------------------------------------------------------------
 void AddonOptions()
 {
-	ImGui::Separator();
 	ImGui::Text("MetricHUD");
-	ImGui::Checkbox("Enable test setting", &someSetting);
+	ImGui::Separator();
+	ImGui::Text("Version 0.1.0");
+	ImGui::TextDisabled("Settings will be added during development.");
 }
