@@ -6,6 +6,10 @@
 
 
 
+
+
+
+
 MetricHUD
 
 A customizable combat metrics HUD for Guild Wars 2.
