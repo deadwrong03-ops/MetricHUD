@@ -14,6 +14,7 @@
 #include "nexus/Nexus.h"
 #include "mumble/Mumble.h"
 #include "imgui/imgui.h"
+#include "HUDWindow.h"
 #include "Core/MetricRegistry.h"
 
 /* proto */
@@ -29,7 +30,7 @@ AddonAPI_t* APIDefs         = nullptr;
 NexusLinkData_t* NexusLink  = nullptr;
 Mumble::Data* MumbleLink    = nullptr;
 MetricRegistry metricRegistry;
-
+HUDWindow hudWindow;
 
 
 ///----------------------------------------------------------------------------------------------------
@@ -119,14 +120,8 @@ void AddonUnload()
 ///----------------------------------------------------------------------------------------------------
 void AddonRender()
 {
-	if (ImGui::Begin("MetricHUD"))
-	{
-		ImGui::Text("MetricHUD");
-		ImGui::Separator();
-		ImGui::Text("Version 0.1.0");
-		ImGui::TextDisabled("Development Build");
-	}
-	ImGui::End();
+	hudWindow.Render();
+	
 }
 
 

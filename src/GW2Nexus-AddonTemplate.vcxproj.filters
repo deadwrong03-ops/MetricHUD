@@ -18,6 +18,7 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="Core\MetricRegistry.cpp" />
+    <ClCompile Include="HUDWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -41,6 +42,7 @@
     <ClInclude Include="nexus\Nexus.h" />
     <ClInclude Include="mumble\Mumble.h" />
     <ClInclude Include="Core\MetricRegistry.h" />
+    <ClInclude Include="HUDWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
