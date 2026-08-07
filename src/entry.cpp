@@ -10,6 +10,7 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include <Windows.h>
+#include "ConfigManager.h"
 
 #include "nexus/Nexus.h"
 #include "mumble/Mumble.h"
@@ -31,6 +32,7 @@ NexusLinkData_t* NexusLink  = nullptr;
 Mumble::Data* MumbleLink    = nullptr;
 MetricRegistry metricRegistry;
 HUDWindow hudWindow;
+ConfigManager configManager;
 
 
 ///----------------------------------------------------------------------------------------------------
@@ -91,6 +93,7 @@ void AddonLoad(AddonAPI_t* aApi)
 	NexusLink = (NexusLinkData_t*)APIDefs->DataLink_Get("DL_NEXUS_LINK");
 	MumbleLink = (Mumble::Data*)APIDefs->DataLink_Get("DL_MUMBLE_LINK");
 	metricRegistry.Initialize();
+	configManager.Initialize();
 
 	// Add an options window and a regular render callback
 	APIDefs->GUI_Register(RT_Render, AddonRender);
@@ -106,6 +109,7 @@ void AddonLoad(AddonAPI_t* aApi)
 void AddonUnload()
 {
 	metricRegistry.Shutdown();
+	configManager.Shutdown();
 	/* let's clean up after ourselves */
 	APIDefs->GUI_Deregister(AddonRender);
 	APIDefs->GUI_Deregister(AddonOptions);
