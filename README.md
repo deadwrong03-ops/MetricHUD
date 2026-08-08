@@ -1,58 +1,32 @@
-⚠️ Early Development Build
- MetricHUD is under active development and is not yet feature complete.
-
-
-
-
-
-Design Philosophy
-
-MetricHUD is built around three principles:
-
-- Precision over repetition.
-- Immediate feedback.
-- Stability before features.
-
-Every setting is designed to be understandable,
-every change should be visible immediately,
-and every release is tested before it ships.
-
-
-
-
-
-
-
 MetricHUD
-A customizable combat metrics HUD for Guild Wars 2.
 
-MetricHUD allows players to choose the combat information that matters most and display it in a clean, lightweight HUD.
+> ⚠️ **Early Development Build**
+>
+> MetricHUD is under active development and is not yet feature complete.
 
- 
- Planned Features
+## About
 
-- Custom metric selection
-- DPS
-- Combat timer
-- Death tracking
-- Boon uptime
-- Food & Utility timers
-- Squad metrics
-- Encounter summaries
-- World boss logging(Experimental)
+MetricHUD is a customizable combat metrics HUD for Guild Wars 2.
 
+The goal is to provide a lightweight, highly configurable HUD that displays only the information the player wants to see.
 
+---
 
-Project Philosophy
+## Design Philosophy
 
-MetricHUD is built around one simple idea:
-Show the information the player wants—and nothing they don't.
-Every metric should be optional.
-Every window should be movable.
-Every player should be able to create their own HUD.
+MetricHUD is built around five principles:
 
+- **Precision over repetition** – Direct input for configurable values whenever practical.
+- **Immediate feedback** – Changes should be reflected instantly whenever possible.
+- **Clarity** – A clean, self-explanatory interface with sensible defaults.
+- **Efficiency** – Minimize unnecessary clicks and repetitive actions.
+- **Stability before features** – Reliability always takes priority over new functionality.
 
-Planned Metrics
+---
+
+## Planned Features
+
+### Combat Metrics
 
 - DPS
 - Combat Timer
@@ -62,14 +36,14 @@ Planned Metrics
 - Boon Uptime
 - Food Timer
 - Utility Timer
-- Jade Bot Buffs(Experimental)
+- Jade Bot Buffs *(Experimental)*
 - Squad Statistics
 - Encounter Summary
-- World Boss Statistics(Experimental)
+- World Boss Statistics *(Experimental)*
 
+### Customization
 
-Planned Features
-
+- Custom metric selection
 - Draggable HUD windows
 - Saveable layouts
 - Multiple HUD profiles
