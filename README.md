@@ -1,10 +1,13 @@
 MetricHUD
 
 > ⚠️ **Early Development Build**
+> **Experimental**
+>
+> Features marked as *Experimental* rely on game events or APIs that may be incomplete, unreliable, or subject
 >
 > MetricHUD is under active development and is not yet feature complete.
 
-## About
+About
 
 MetricHUD is a customizable combat metrics HUD for Guild Wars 2.
 
