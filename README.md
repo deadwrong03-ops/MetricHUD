@@ -3,7 +3,7 @@ MetricHUD
 > ⚠️ **Early Development Build**
 > **Experimental**
 >
-> Features marked as *Experimental* rely on game events or APIs that may be incomplete, unreliable, or subject
+> Features marked as *Experimental* rely on game events or APIs that may be incomplete, unreliable, or subject to change. Accuracy is not guaranteed until they have been fully validated.
 >
 > MetricHUD is under active development and is not yet feature complete.
 
