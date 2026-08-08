@@ -52,3 +52,19 @@ MetricHUD is built around five principles:
 - Transparency controls
 - Metric categories
 - Plugin-style metric architecture
+
+
+
+
+
+Roadmap
+
+- [x] Project foundation
+- [x] Modular architecture
+- [x] Live HUD visibility toggle
+- [ ] Persistent configuration
+- [ ] Draggable HUD
+- [ ] Combat timer
+- [ ] DPS tracking
+- [ ] Metric customization
+- [ ] Version 1.0 Release
