@@ -4,6 +4,25 @@
 
 
 
+
+Design Philosophy
+
+MetricHUD is built around three principles:
+
+- Precision over repetition.
+- Immediate feedback.
+- Stability before features.
+
+Every setting is designed to be understandable,
+every change should be visible immediately,
+and every release is tested before it ships.
+
+
+
+
+
+
+
 MetricHUD
 A customizable combat metrics HUD for Guild Wars 2.
 
