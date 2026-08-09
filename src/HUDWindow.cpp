@@ -2,12 +2,14 @@
 
 #include "imgui/imgui.h"
 #include "ConfigManager.h"
+#include "Core/MetricRegistry.h"
 
 HUDWindow::HUDWindow()
+
 {
 }
 
-void HUDWindow::Render(ConfigManager& config)
+void HUDWindow::Render(ConfigManager& config, MetricRegistry& metrics)
 {
     ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
 
@@ -20,6 +22,9 @@ void HUDWindow::Render(ConfigManager& config)
     {
         ImGui::Text("MetricHUD");
         ImGui::Separator();
+
+        ImGui::Text("FPS: %.1f", metrics.GetFPS());
+
         ImGui::Text("Version 0.1.0");
         ImGui::TextDisabled("Development Build");
     }

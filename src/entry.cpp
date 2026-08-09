@@ -124,9 +124,11 @@ void AddonUnload()
 ///----------------------------------------------------------------------------------------------------
 void AddonRender()
 {
+	metricRegistry.SetFPS(ImGui::GetIO().Framerate);
+
 	if (configManager.ShowHUD())
 	{
-		hudWindow.Render(configManager);
+		hudWindow.Render(configManager, metricRegistry);
 	}
 }
 

@@ -7,4 +7,10 @@ public:
 
     void Initialize();
     void Shutdown();
+
+    void SetFPS(float value);
+    float GetFPS() const;
+
+private:
+    float fps = 0.0f;
 };
