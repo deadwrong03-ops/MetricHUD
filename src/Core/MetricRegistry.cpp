@@ -14,12 +14,14 @@ void MetricRegistry::Shutdown()
 
 void MetricRegistry::SetFPS(float value)
 {
-    fps = value;
+    
+    fpsMetric.value = value;
+
 }
 
 float MetricRegistry::GetFPS() const
 {
-    return fps;
+    return fpsMetric.value;
 }
 
 const MetricDefinition& MetricRegistry::GetFPSMetric() const

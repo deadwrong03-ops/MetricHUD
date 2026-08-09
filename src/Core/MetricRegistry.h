@@ -4,6 +4,7 @@ struct MetricDefinition
     const char* name;
     bool enabled;
     int order;
+    float value;
 };
 
 class MetricRegistry
@@ -21,6 +22,6 @@ public:
     
 
 private:
-    MetricDefinition fpsMetric = { "FPS", true, 0 };
-    float fps = 0.0f;
+    MetricDefinition fpsMetric = { "FPS", true, 0, 0.0f };
+    
 };
