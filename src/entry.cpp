@@ -153,6 +153,13 @@ void AddonOptions()
 		configManager.SetLocked(locked);
 	}
 
+	bool fpsEnabled = metricRegistry.GetFPSMetric().enabled;
+
+	if (ImGui::Checkbox("Show FPS", &fpsEnabled))
+	{
+		metricRegistry.SetFPSEnabled(fpsEnabled);
+	}
+
 	ImGui::Separator();
 
 	ImGui::Text("Version 0.1.0");

@@ -23,7 +23,10 @@ void HUDWindow::Render(ConfigManager& config, MetricRegistry& metrics)
         ImGui::Text("MetricHUD");
         ImGui::Separator();
 
-        ImGui::Text("FPS: %.1f", metrics.GetFPS());
+        if (metrics.GetFPSMetric().enabled)
+        {
+            ImGui::Text("FPS: %.1f", metrics.GetFPS());
+        }
 
         ImGui::Text("Version 0.1.0");
         ImGui::TextDisabled("Development Build");

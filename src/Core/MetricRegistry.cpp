@@ -21,3 +21,12 @@ float MetricRegistry::GetFPS() const
 {
     return fps;
 }
+
+const MetricDefinition& MetricRegistry::GetFPSMetric() const
+{
+    return fpsMetric;
+}
+void MetricRegistry::SetFPSEnabled(bool enabled)
+{
+    fpsMetric.enabled = enabled;
+}
