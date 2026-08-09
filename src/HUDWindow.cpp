@@ -1,14 +1,22 @@
 #include "HUDWindow.h"
 
 #include "imgui/imgui.h"
+#include "ConfigManager.h"
 
 HUDWindow::HUDWindow()
 {
 }
 
-void HUDWindow::Render()
+void HUDWindow::Render(ConfigManager& config)
 {
-    if (ImGui::Begin("MetricHUD"))
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
+
+    if (config.IsLocked())
+    {
+        windowFlags |= ImGuiWindowFlags_NoMove;
+    }
+
+    if (ImGui::Begin("MetricHUD", nullptr, windowFlags))
     {
         ImGui::Text("MetricHUD");
         ImGui::Separator();

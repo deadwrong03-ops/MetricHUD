@@ -124,8 +124,10 @@ void AddonUnload()
 ///----------------------------------------------------------------------------------------------------
 void AddonRender()
 {
-	hudWindow.Render();
-	
+	if (configManager.ShowHUD())
+	{
+		hudWindow.Render(configManager);
+	}
 }
 
 
@@ -137,6 +139,20 @@ void AddonOptions()
 {
 	ImGui::Text("MetricHUD");
 	ImGui::Separator();
+	bool showHUD = configManager.ShowHUD();
+	bool locked = configManager.IsLocked();
+	if (ImGui::Checkbox("Show HUD", &showHUD))
+	{
+		configManager.SetShowHUD(showHUD);
+	}
+
+	if (ImGui::Checkbox("Lock HUD Position", &locked))
+	{
+		configManager.SetLocked(locked);
+	}
+
+	ImGui::Separator();
+
 	ImGui::Text("Version 0.1.0");
 	ImGui::TextDisabled("Settings will be added during development.");
 }

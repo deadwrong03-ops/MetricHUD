@@ -1,9 +1,11 @@
 #pragma once
 
+class ConfigManager;
+
 class HUDWindow
 {
 public:
     HUDWindow();
 
-    void Render();
+    void Render(ConfigManager& config);
 };
