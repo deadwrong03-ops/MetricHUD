@@ -2,7 +2,16 @@
 #include <vector>
 enum class MetricID
 {
-    FPS
+    FPS,
+    Ping
+};
+enum class MetricFormat
+{
+    Float,
+    Integer,
+    Milliseconds,
+    Time,
+    Percent
 };
 struct MetricDefinition
 {
@@ -11,6 +20,7 @@ struct MetricDefinition
     bool enabled;
     int order;
     float value;
+    MetricFormat format;
 };
 
 class MetricRegistry
@@ -26,6 +36,9 @@ public:
     const MetricDefinition& GetFPSMetric() const;
     void SetFPSEnabled(bool enabled);
     const std::vector<MetricDefinition>& GetMetrics() const;
+    MetricDefinition* GetMetric(MetricID id);
+    void SetMetricValue(MetricID id, float value);
+    void SetMetricEnabled(MetricID id, bool enabled);
     
 
 private:
@@ -36,7 +49,8 @@ private:
         "FPS",
         true,
         0,
-        0.0f
+        0.0f,
+        MetricFormat::Float
     };
     
 };

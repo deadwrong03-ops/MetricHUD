@@ -141,8 +141,10 @@ void AddonOptions()
 {
 	ImGui::Text("MetricHUD");
 	ImGui::Separator();
+
 	bool showHUD = configManager.ShowHUD();
 	bool locked = configManager.IsLocked();
+
 	if (ImGui::Checkbox("Show HUD", &showHUD))
 	{
 		configManager.SetShowHUD(showHUD);
@@ -153,11 +155,27 @@ void AddonOptions()
 		configManager.SetLocked(locked);
 	}
 
-	bool fpsEnabled = metricRegistry.GetFPSMetric().enabled;
+	MetricDefinition* fpsMetric = metricRegistry.GetMetric(MetricID::FPS);
 
-	if (ImGui::Checkbox("Show FPS", &fpsEnabled))
+	if (fpsMetric != nullptr)
 	{
-		metricRegistry.SetFPSEnabled(fpsEnabled);
+		bool fpsEnabled = fpsMetric->enabled;
+
+		if (ImGui::Checkbox("Show FPS", &fpsEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::FPS, fpsEnabled);
+		}
+	}
+	MetricDefinition* pingMetric = metricRegistry.GetMetric(MetricID::Ping);
+
+	if (pingMetric != nullptr)
+	{
+		bool pingEnabled = pingMetric->enabled;
+
+		if (ImGui::Checkbox("Show Ping", &pingEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::Ping, pingEnabled);
+		}
 	}
 
 	ImGui::Separator();
