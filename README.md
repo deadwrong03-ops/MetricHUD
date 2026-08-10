@@ -1,10 +1,10 @@
- MetricHUD
+# MetricHUD
 
 > ⚠️ **Early Development Build**
 >
 > MetricHUD is under active development and is not yet feature complete.
 
-A lightweight, customizable metric HUD for **Guild Wars 2**.
+A lightweight, customizable metrics HUD for **Guild Wars 2**.
 
 The goal is simple:
 
@@ -14,27 +14,35 @@ The goal is simple:
 
 # Progress
 
-Current Version: **0.1.1**
+Current Version: **0.3.0**
 
 ## Completed
 
 - [x] Modular project architecture
 - [x] ConfigManager
-- [x] MetricRegistry foundation
-- [x] Generic MetricDefinition framework
+- [x] MetricRegistry
+- [x] Generic metric rendering
+- [x] Metric formatting system
+- [x] Metric ordering
 - [x] HUDWindow framework
 - [x] Live HUD visibility toggle
+- [x] Draggable HUD
 - [x] Lock HUD position
-- [x] Live FPS metric
-- [x] Individual metric enable/disable
+- [x] Persistent JSON configuration
 - [x] Organized options panel
+- [x] Reset Settings
+- [x] Individual metric visibility toggles
+- [x] Text metric support
+- [x] Mumble Link integration
 
-## In Progress
+## Current Metrics
 
-- [ ] Generic metric collection
-- [ ] Metric ordering
-- [ ] Window position persistence
-- [ ] Ping metric
+- [x] FPS
+- [x] Ping
+- [x] Combat Timer
+- [x] Map Name
+- [x] Map ID
+- [x] Character Name
 
 ---
 
@@ -42,22 +50,20 @@ Current Version: **0.1.1**
 
 MetricHUD is built around a few simple principles.
 
-- **Player choice first** – Show only the metrics the player wants.
+- **Precision over repetition** – Use direct input whenever practical.
 - **Immediate feedback** – Changes should be reflected instantly.
 - **Clarity** – A clean, self-explanatory interface.
 - **Efficiency** – Minimize unnecessary clicks.
-- **Modularity** – Every metric should be easy to add, remove, and customize.
 - **Stability before features** – Reliability always comes first.
 
 ---
 
 # Planned Metrics
 
-- FPS ✅
-- Ping
-- Combat Timer
-- Time in Combat
+- Player Speed
+- Player Position
 - DPS
+- Time in Combat
 - Downed Count
 - Death Count
 - Boon Uptime
@@ -79,8 +85,7 @@ MetricHUD is built around a few simple principles.
 ### HUD
 
 - Custom metric selection
-- Draggable HUD windows
-- Drag-and-drop metric ordering
+- Metric reordering
 - Saveable layouts
 - Multiple HUD profiles
 
@@ -92,10 +97,9 @@ MetricHUD is built around a few simple principles.
 
 ### Architecture
 
-- Generic metric registry
 - Plugin-style metric system
 - Metric categories
-- Persistent metric configuration
+- Expanded metric data sources
 
 ---
 
@@ -105,21 +109,31 @@ MetricHUD is built around a few simple principles.
 
 - [x] Core architecture
 - [x] Configuration system
+- [x] JSON persistence
 - [x] Metric registry
-- [x] Generic metric definitions
-- [x] First configurable metric (FPS)
+- [x] Generic metric rendering
+- [x] Metric formatting
+- [x] Metric ordering
 
 ## Phase 2 — HUD
 
+- [x] Draggable HUD
+- [x] Lock HUD position
+- [x] Metric visibility controls
 - [ ] Window position persistence
 - [ ] Layout customization
 - [ ] Appearance options
-- [ ] Metric ordering
 
 ## Phase 3 — Metrics
 
-- [ ] Ping
-- [ ] Combat Timer
+- [x] FPS
+- [x] Ping
+- [x] Combat Timer
+- [x] Map Name
+- [x] Map ID
+- [x] Character Name
+- [ ] Player Speed
+- [ ] Player Position
 - [ ] DPS
 - [ ] Boon Uptime
 - [ ] Squad Statistics
