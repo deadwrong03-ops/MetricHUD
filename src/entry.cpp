@@ -17,12 +17,16 @@
 #include "imgui/imgui.h"
 #include "HUDWindow.h"
 #include "Core/MetricRegistry.h"
+#include "ArcDPS.h"
+#include <string>
+
 
 /* proto */
 void AddonLoad(AddonAPI_t* aApi);
 void AddonUnload();
 void AddonRender();
 void AddonOptions();
+void OnArcDPSCombat(void* eventArgs);
 
 /* globals */
 AddonDefinition_t AddonDef  = {};
@@ -33,6 +37,7 @@ Mumble::Data* MumbleLink    = nullptr;
 MetricRegistry metricRegistry;
 HUDWindow hudWindow;
 ConfigManager configManager;
+static long long arcTotalDamage = 0;
 
 
 ///----------------------------------------------------------------------------------------------------
@@ -95,11 +100,53 @@ void AddonLoad(AddonAPI_t* aApi)
 	metricRegistry.Initialize();
 	configManager.Initialize();
 
+	APIDefs->Events_Subscribe(
+		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
+		OnArcDPSCombat
+	);
+
 	// Add an options window and a regular render callback
 	APIDefs->GUI_Register(RT_Render, AddonRender);
 	APIDefs->GUI_Register(RT_OptionsRender, AddonOptions);
 
 	APIDefs->Log(LOGL_DEBUG, "MetricHUD", "My <c=#00ff00>first addon</c> loaded successfully.");
+}
+
+void OnArcDPSCombat(void* eventArgs)
+{
+	EvCombatData* combatData = static_cast<EvCombatData*>(eventArgs);
+
+	if (combatData == nullptr || combatData->ev == nullptr)
+	{
+		return;
+	}
+
+	ArcDPS::CombatEvent* ev = combatData->ev;
+
+	if (combatData->src == nullptr)
+	{
+		return;
+	}
+
+	if (combatData->src->IsSelf == 0)
+	{
+		return;
+	}
+
+	if (ev->IsStatechange != 0)
+	{
+		return;
+	}
+
+	if (ev->Value > 0)
+	{
+		arcTotalDamage += ev->Value;
+	}
+
+	if (ev->BuffDamage > 0)
+	{
+		arcTotalDamage += ev->BuffDamage;
+	}
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -108,8 +155,14 @@ void AddonLoad(AddonAPI_t* aApi)
 ///----------------------------------------------------------------------------------------------------
 void AddonUnload()
 {
+	APIDefs->Events_Unsubscribe(
+		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
+		OnArcDPSCombat
+	);
+
 	metricRegistry.Shutdown();
 	configManager.Shutdown();
+
 	/* let's clean up after ourselves */
 	APIDefs->GUI_Deregister(AddonRender);
 	APIDefs->GUI_Deregister(AddonOptions);
@@ -122,6 +175,67 @@ void AddonUnload()
 /// 	Called every frame. Safe to render any ImGui.
 /// 	You can control visibility on loading screens with NexusLink->IsGameplay.
 ///----------------------------------------------------------------------------------------------------
+
+std::string WideToUTF8(const wchar_t* wideText)
+{
+	if (wideText == nullptr || wideText[0] == L'\0')
+	{
+		return "";
+	}
+
+	int sizeNeeded = WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		wideText,
+		-1,
+		nullptr,
+		0,
+		nullptr,
+		nullptr
+	);
+
+	if (sizeNeeded <= 0)
+	{
+		return "";
+	}
+
+	std::string result(sizeNeeded - 1, '\0');
+
+	WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		wideText,
+		-1,
+		&result[0],
+		sizeNeeded,
+		nullptr,
+		nullptr
+	);
+
+	return result;
+}
+std::string GetCharacterName(const std::string& identity)
+{
+	const std::string key = "\"name\":\"";
+
+	size_t start = identity.find(key);
+
+	if (start == std::string::npos)
+	{
+		return "Unknown";
+	}
+
+	start += key.length();
+
+	size_t end = identity.find('"', start);
+
+	if (end == std::string::npos)
+	{
+		return "Unknown";
+	}
+
+	return identity.substr(start, end - start);
+}
 void AddonRender()
 {
 	static float combatTime = 0.0f;
@@ -140,14 +254,17 @@ void AddonRender()
 	{
 		unsigned int mapID = MumbleLink->Context.MapID;
 
-		metricRegistry.SetMetricValue(
-			MetricID::MapID,
-			static_cast<float>(mapID)
-		);
-
 		metricRegistry.SetMetricText(
 			MetricID::MapName,
 			MapRegistry::GetMapName(mapID)
+		);
+
+		std::string identity = WideToUTF8(MumbleLink->Identity);
+		std::string characterName = GetCharacterName(identity);
+
+		metricRegistry.SetMetricText(
+			MetricID::CharacterName,
+			characterName.c_str()
 		);
 	}
 
@@ -227,6 +344,20 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(MetricID::MapID, mapIDEnabled);
 		}
 	}
+	MetricDefinition* characterMetric = metricRegistry.GetMetric(MetricID::CharacterName);
+
+	if (characterMetric != nullptr)
+	{
+		bool characterEnabled = characterMetric->enabled;
+
+		if (ImGui::Checkbox("Show Character Name", &characterEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::CharacterName,
+				characterEnabled
+			);
+		}
+	}
 	MetricDefinition* pingMetric = metricRegistry.GetMetric(MetricID::Ping);
 
 	if (pingMetric != nullptr)
@@ -239,6 +370,7 @@ void AddonOptions()
 		}
 	}
 
+	ImGui::Text("Arc Damage Debug: %lld", arcTotalDamage);
 	ImGui::Separator();
 
 	ImGui::Text("Version 0.1.0");

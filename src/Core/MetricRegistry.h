@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 enum class MetricID
 {
@@ -8,7 +9,8 @@ enum class MetricID
     Ping,
     CombatTime,
     MapName,
-    MapID
+    MapID,
+    CharacterName
 };
 
 enum class MetricFormat
@@ -27,7 +29,7 @@ struct MetricDefinition
     bool enabled;
     int order;
     float value;
-    const char* textValue;
+    std::string textValue;
     MetricFormat format;
 };
 
@@ -43,14 +45,12 @@ public:
     float GetFPS() const;
     const MetricDefinition& GetFPSMetric() const;
     void SetFPSEnabled(bool enabled);
+
     const std::vector<MetricDefinition>& GetMetrics() const;
     MetricDefinition* GetMetric(MetricID id);
     void SetMetricValue(MetricID id, float value);
     void SetMetricText(MetricID id, const char* text);
     void SetMetricEnabled(MetricID id, bool enabled);
-
-
-    
 
 private:
     std::vector<MetricDefinition> metrics;
@@ -62,7 +62,7 @@ private:
         true,
         1,
         0.0f,
-        nullptr,
+        "",
         MetricFormat::Float
     };
 };

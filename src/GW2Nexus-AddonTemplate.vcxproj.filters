@@ -47,6 +47,7 @@
     <ClInclude Include="HUDWindow.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="MapRegistry.h" />
+    <ClInclude Include="ArcDPS.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

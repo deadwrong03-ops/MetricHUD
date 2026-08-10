@@ -172,6 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ArcDPS.h" />
     <ClInclude Include="Core\MetricRegistry.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="HUDWindow.h" />

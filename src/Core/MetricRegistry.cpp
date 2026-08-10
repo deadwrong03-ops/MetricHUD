@@ -18,7 +18,7 @@ void MetricRegistry::Initialize()
             true,
             0,
             42.0f,
-            nullptr,
+            "",
             MetricFormat::Milliseconds
         });
 
@@ -29,9 +29,10 @@ void MetricRegistry::Initialize()
             true,
             2,
             0.0f,
-            nullptr,
+            "",
             MetricFormat::Time
         });
+
     metrics.push_back(
         {
             MetricID::MapName,
@@ -42,6 +43,7 @@ void MetricRegistry::Initialize()
             "Unknown",
             MetricFormat::Text
         });
+
     metrics.push_back(
         {
             MetricID::MapID,
@@ -49,10 +51,19 @@ void MetricRegistry::Initialize()
             true,
             4,
             0.0f,
-            nullptr,
+            "",
             MetricFormat::Integer
         });
-
+    metrics.push_back(
+        {
+            MetricID::CharacterName,
+            "Character",
+            true,
+            5,
+            0.0f,
+            "Unknown",
+            MetricFormat::Text
+        });
     std::sort(metrics.begin(), metrics.end(),
         [](const MetricDefinition& a, const MetricDefinition& b)
         {

@@ -33,7 +33,7 @@ static void DrawMetric(const MetricDefinition& metric)
         ImGui::Text("%s: %.0f%%", metric.name, metric.value);
         break;
     case MetricFormat::Text:
-        ImGui::Text("%s: %s", metric.name, metric.textValue != nullptr ? metric.textValue : "");
+        ImGui::Text("%s: %s", metric.name, metric.textValue.c_str());
         break;
     }
 }
