@@ -96,6 +96,10 @@ MetricHUD is built around a few simple principles.
 >
 > MetricHUD will not define a single "correct" rotation. Practice rotations will be configurable so players can train different builds, strategies, and skill priorities.
 
+> **Experimental**
+>
+> Experimental features rely on game events or APIs that are still being validated. Accuracy is not guaranteed until fully tested.
+
 ---
 
 # Planned Features
@@ -118,6 +122,9 @@ MetricHUD is built around a few simple principles.
 - Plugin-style metric system
 - Metric categories
 - Expanded metric data sources
+- Combat event collection system
+- Skill event history
+- Rotation analysis framework
 
 ---
 
@@ -142,7 +149,7 @@ MetricHUD is built around a few simple principles.
 - [ ] Layout customization
 - [ ] Appearance options
 
-## Phase 3 — Metrics
+## Phase 3 — Core Metrics
 
 - [x] FPS
 - [x] Ping
@@ -156,8 +163,49 @@ MetricHUD is built around a few simple principles.
 - [ ] Boon Uptime
 - [ ] Squad Statistics
 
-## Phase 4 — Release
+## Phase 4 — Combat Event System
+
+- [ ] arcdps combat-event integration
+- [ ] Player skill-event detection
+- [ ] Skill ID and skill-name tracking
+- [ ] Combat skill history
+- [ ] Skill usage statistics
+- [ ] Auto-attack filtering
+- [ ] Combat-session tracking
+
+## Phase 5 — Rotation Training
+
+- [ ] Live Skill Rotation Log
+- [ ] Rotation Timeline
+- [ ] User-Defined Practice Rotations
+- [ ] Expected vs. Actual Rotation
+- [ ] Skill Timing Analysis
+- [ ] Rotation Gap / Idle Time Detection
+- [ ] Missed or Delayed Skill Detection
+- [ ] Rotation Practice Score
+- [ ] Post-Combat Rotation Summary
+- [ ] Training Feedback
+
+## Phase 6 — Release
 
 - [ ] Optimization
 - [ ] Documentation
 - [ ] Version 1.0
+
+---
+
+# Long-Term Vision
+
+MetricHUD is intended to be more than a collection of numbers.
+
+Guild Wars 2 allows players to progress through much of the early game without requiring structured skill usage. As combat becomes more demanding, understanding skill priority, timing, cooldown management, weapon usage, and combat uptime becomes increasingly important.
+
+MetricHUD aims to bridge that gap.
+
+Rather than simply showing the player what happened during combat, MetricHUD's training tools are intended to help players understand **how they played** and identify areas where their execution can improve.
+
+The goal is not to tell players there is only one correct way to play.
+
+Instead, players will be able to define or select a practice rotation and use MetricHUD to compare that target against their actual combat performance.
+
+**arcdps provides the combat data. MetricHUD aims to help players learn from it.**
