@@ -124,7 +124,20 @@ void AddonUnload()
 ///----------------------------------------------------------------------------------------------------
 void AddonRender()
 {
+	static float combatTime = 0.0f;
+
 	metricRegistry.SetFPS(ImGui::GetIO().Framerate);
+
+	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
+	{
+		combatTime += ImGui::GetIO().DeltaTime;
+	}
+	else
+	{
+		combatTime = 0.0f;
+	}
+
+	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
 
 	if (configManager.ShowHUD())
 	{
@@ -164,6 +177,17 @@ void AddonOptions()
 		if (ImGui::Checkbox("Show FPS", &fpsEnabled))
 		{
 			metricRegistry.SetMetricEnabled(MetricID::FPS, fpsEnabled);
+		}
+	}
+	MetricDefinition* combatMetric = metricRegistry.GetMetric(MetricID::CombatTime);
+
+	if (combatMetric != nullptr)
+	{
+		bool combatEnabled = combatMetric->enabled;
+
+		if (ImGui::Checkbox("Show Combat Time", &combatEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::CombatTime, combatEnabled);
 		}
 	}
 	MetricDefinition* pingMetric = metricRegistry.GetMetric(MetricID::Ping);

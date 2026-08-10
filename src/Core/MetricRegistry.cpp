@@ -1,4 +1,5 @@
 #include "MetricRegistry.h"
+#include <algorithm>
 
 MetricRegistry::MetricRegistry()
 {
@@ -15,9 +16,25 @@ void MetricRegistry::Initialize()
             MetricID::Ping,
             "Ping",
             true,
-            1,
+            0,
             42.0f,
             MetricFormat::Milliseconds
+        });
+
+    metrics.push_back(
+        {
+            MetricID::CombatTime,
+            "Combat Time",
+            true,
+            2,
+            0.0f,
+            MetricFormat::Time
+        });
+
+    std::sort(metrics.begin(), metrics.end(),
+        [](const MetricDefinition& a, const MetricDefinition& b)
+        {
+            return a.order < b.order;
         });
 }
 

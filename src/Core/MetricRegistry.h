@@ -1,10 +1,14 @@
 #pragma once
+
 #include <vector>
+
 enum class MetricID
 {
     FPS,
-    Ping
+    Ping,
+    CombatTime
 };
+
 enum class MetricFormat
 {
     Float,
@@ -48,7 +52,7 @@ private:
         MetricID::FPS,
         "FPS",
         true,
-        0,
+        1,
         0.0f,
         MetricFormat::Float
     };

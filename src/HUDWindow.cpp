@@ -20,8 +20,14 @@ static void DrawMetric(const MetricDefinition& metric)
         break;
 
     case MetricFormat::Time:
-        ImGui::Text("%s: %.0f s", metric.name, metric.value);
+    {
+        int totalSeconds = static_cast<int>(metric.value);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+
+        ImGui::Text("%s: %02d:%02d", metric.name, minutes, seconds);
         break;
+    }
 
     case MetricFormat::Percent:
         ImGui::Text("%s: %.0f%%", metric.name, metric.value);
@@ -44,7 +50,7 @@ void HUDWindow::Render(ConfigManager& config, MetricRegistry& metrics)
 
     if (ImGui::Begin("MetricHUD", nullptr, windowFlags))
     {
-        ImGui::Text("MetricHUD");
+        
         ImGui::Separator();
 
         for (const auto& metric : metrics.GetMetrics())
