@@ -74,9 +74,27 @@ MetricHUD is built around a few simple principles.
 - Encounter Summary
 - World Boss Statistics *(Experimental)*
 
-> **Experimental**
+## Rotation & Combat Training
+
+- Skill Rotation Log
+- Live Skill History
+- Skill Usage Summary
+- Rotation Timeline
+- User-Defined Practice Rotations
+- Expected vs. Actual Rotation Comparison
+- Skill Timing Analysis
+- Rotation Gap / Idle Time Detection
+- Missed or Delayed Skill Detection
+- Auto-Attack Filtering
+- Rotation Practice Score
+- Post-Combat Rotation Summary
+- Training Feedback
+
+> **Rotation Training Goal**
 >
-> Experimental features rely on game events or APIs that are still being validated. Accuracy is not guaranteed until fully tested.
+> MetricHUD is intended to help players move beyond random skill usage and understand structured Guild Wars 2 combat. Rotation tools will focus on showing what the player actually did, comparing it against a user-selected practice rotation, and providing clear feedback about skill order, timing, and downtime.
+>
+> MetricHUD will not define a single "correct" rotation. Practice rotations will be configurable so players can train different builds, strategies, and skill priorities.
 
 ---
 
