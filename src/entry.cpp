@@ -11,7 +11,7 @@
 
 #include <Windows.h>
 #include "ConfigManager.h"
-
+#include "MapRegistry.h"
 #include "nexus/Nexus.h"
 #include "mumble/Mumble.h"
 #include "imgui/imgui.h"
@@ -136,6 +136,20 @@ void AddonRender()
 	{
 		combatTime = 0.0f;
 	}
+	if (MumbleLink != nullptr)
+	{
+		unsigned int mapID = MumbleLink->Context.MapID;
+
+		metricRegistry.SetMetricValue(
+			MetricID::MapID,
+			static_cast<float>(mapID)
+		);
+
+		metricRegistry.SetMetricText(
+			MetricID::MapName,
+			MapRegistry::GetMapName(mapID)
+		);
+	}
 
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
 
@@ -188,6 +202,29 @@ void AddonOptions()
 		if (ImGui::Checkbox("Show Combat Time", &combatEnabled))
 		{
 			metricRegistry.SetMetricEnabled(MetricID::CombatTime, combatEnabled);
+		}
+	}
+	MetricDefinition* mapNameMetric = metricRegistry.GetMetric(MetricID::MapName);
+
+	if (mapNameMetric != nullptr)
+	{
+		bool mapNameEnabled = mapNameMetric->enabled;
+
+		if (ImGui::Checkbox("Show Map Name", &mapNameEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::MapName, mapNameEnabled);
+		}
+	}
+
+	MetricDefinition* mapIDMetric = metricRegistry.GetMetric(MetricID::MapID);
+
+	if (mapIDMetric != nullptr)
+	{
+		bool mapIDEnabled = mapIDMetric->enabled;
+
+		if (ImGui::Checkbox("Show Map ID", &mapIDEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::MapID, mapIDEnabled);
 		}
 	}
 	MetricDefinition* pingMetric = metricRegistry.GetMetric(MetricID::Ping);

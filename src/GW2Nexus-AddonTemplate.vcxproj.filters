@@ -20,6 +20,7 @@
     <ClCompile Include="Core\MetricRegistry.cpp" />
     <ClCompile Include="HUDWindow.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="MapRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -45,6 +46,7 @@
     <ClInclude Include="Core\MetricRegistry.h" />
     <ClInclude Include="HUDWindow.h" />
     <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="MapRegistry.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

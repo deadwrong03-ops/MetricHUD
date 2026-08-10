@@ -6,7 +6,9 @@ enum class MetricID
 {
     FPS,
     Ping,
-    CombatTime
+    CombatTime,
+    MapName,
+    MapID
 };
 
 enum class MetricFormat
@@ -15,7 +17,8 @@ enum class MetricFormat
     Integer,
     Milliseconds,
     Time,
-    Percent
+    Percent,
+    Text
 };
 struct MetricDefinition
 {
@@ -24,6 +27,7 @@ struct MetricDefinition
     bool enabled;
     int order;
     float value;
+    const char* textValue;
     MetricFormat format;
 };
 
@@ -42,11 +46,15 @@ public:
     const std::vector<MetricDefinition>& GetMetrics() const;
     MetricDefinition* GetMetric(MetricID id);
     void SetMetricValue(MetricID id, float value);
+    void SetMetricText(MetricID id, const char* text);
     void SetMetricEnabled(MetricID id, bool enabled);
+
+
     
 
 private:
     std::vector<MetricDefinition> metrics;
+
     MetricDefinition fpsMetric =
     {
         MetricID::FPS,
@@ -54,7 +62,7 @@ private:
         true,
         1,
         0.0f,
+        nullptr,
         MetricFormat::Float
     };
-    
 };

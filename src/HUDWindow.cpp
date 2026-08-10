@@ -32,6 +32,9 @@ static void DrawMetric(const MetricDefinition& metric)
     case MetricFormat::Percent:
         ImGui::Text("%s: %.0f%%", metric.name, metric.value);
         break;
+    case MetricFormat::Text:
+        ImGui::Text("%s: %s", metric.name, metric.textValue != nullptr ? metric.textValue : "");
+        break;
     }
 }
 HUDWindow::HUDWindow()

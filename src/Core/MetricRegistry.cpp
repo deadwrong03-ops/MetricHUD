@@ -18,6 +18,7 @@ void MetricRegistry::Initialize()
             true,
             0,
             42.0f,
+            nullptr,
             MetricFormat::Milliseconds
         });
 
@@ -28,7 +29,28 @@ void MetricRegistry::Initialize()
             true,
             2,
             0.0f,
+            nullptr,
             MetricFormat::Time
+        });
+    metrics.push_back(
+        {
+            MetricID::MapName,
+            "Map",
+            true,
+            3,
+            0.0f,
+            "Unknown",
+            MetricFormat::Text
+        });
+    metrics.push_back(
+        {
+            MetricID::MapID,
+            "Map ID",
+            true,
+            4,
+            0.0f,
+            nullptr,
+            MetricFormat::Integer
         });
 
     std::sort(metrics.begin(), metrics.end(),
@@ -75,6 +97,15 @@ void MetricRegistry::SetMetricValue(MetricID id, float value)
     if (metric != nullptr)
     {
         metric->value = value;
+    }
+}
+void MetricRegistry::SetMetricText(MetricID id, const char* text)
+{
+    MetricDefinition* metric = GetMetric(id);
+
+    if (metric != nullptr)
+    {
+        metric->textValue = text;
     }
 }
 void MetricRegistry::SetMetricEnabled(MetricID id, bool enabled)
