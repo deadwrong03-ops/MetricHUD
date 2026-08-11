@@ -12,6 +12,23 @@ The goal is simple:
 
 ---
 
+
+## Privacy & Security
+
+MetricHUD is designed to operate without requiring access to your Guild Wars 2 account credentials.
+
+- MetricHUD does not request or store Guild Wars 2 API keys.
+- MetricHUD does not require account login information.
+- Combat analysis is based on locally available game/addon data.
+- Training profiles are selected or imported by the player.
+- No account credentials are required to use MetricHUD.
+
+If a future feature would require authenticated account access, it will be evaluated separately rather than being included as a requirement for the core addon.
+
+
+
+
+
 # Progress
 
 Current Version: **0.3.0**
