@@ -420,4 +420,12 @@ void AddonOptions()
 	ImGui::TextDisabled("Settings will be added during development.");
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
+	const auto& recentSkills = combatAnalyzer.GetRecentSkills();
+
+	ImGui::Text("Recent Skills:");
+
+	for (uint32_t skillID : recentSkills)
+	{
+		ImGui::Text("  %u", skillID);
+	}
 }
