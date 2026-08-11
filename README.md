@@ -1,10 +1,10 @@
- MetricHUD
+# MetricHUD
 
 > ⚠️ **Early Development Build**
 >
 > MetricHUD is under active development and is not yet feature complete.
 
-A lightweight, customizable metric HUD for **Guild Wars 2**.
+A lightweight, customizable metrics HUD for **Guild Wars 2**.
 
 The goal is simple:
 
@@ -12,29 +12,54 @@ The goal is simple:
 
 ---
 
+
+## Privacy & Security
+
+MetricHUD is designed to operate without requiring access to your Guild Wars 2 account credentials.
+
+- MetricHUD does not request or store Guild Wars 2 API keys.
+- MetricHUD does not require account login information.
+- Combat analysis is based on locally available game/addon data.
+- Training profiles are selected or imported by the player.
+- No account credentials are required to use MetricHUD.
+
+If a future feature would require authenticated account access, it will be evaluated separately rather than being included as a requirement for the core addon.
+
+
+
+
+
 # Progress
 
-Current Version: **0.1.1**
+Current Version: **0.3.0**
 
 ## Completed
 
 - [x] Modular project architecture
 - [x] ConfigManager
-- [x] MetricRegistry foundation
-- [x] Generic MetricDefinition framework
+- [x] MetricRegistry
+- [x] Generic metric rendering
+- [x] Metric formatting system
+- [x] Metric ordering
 - [x] HUDWindow framework
 - [x] Live HUD visibility toggle
+- [x] Draggable HUD
 - [x] Lock HUD position
-- [x] Live FPS metric
-- [x] Individual metric enable/disable
+- [x] Persistent JSON configuration
 - [x] Organized options panel
+- [x] Reset Settings
+- [x] Individual metric visibility toggles
+- [x] Text metric support
+- [x] Mumble Link integration
 
-## In Progress
+## Current Metrics
 
-- [ ] Generic metric collection
-- [ ] Metric ordering
-- [ ] Window position persistence
-- [ ] Ping metric
+- [x] FPS
+- [x] Ping
+- [x] Combat Timer
+- [x] Map Name
+- [x] Map ID
+- [x] Character Name
 
 ---
 
@@ -42,22 +67,20 @@ Current Version: **0.1.1**
 
 MetricHUD is built around a few simple principles.
 
-- **Player choice first** – Show only the metrics the player wants.
+- **Precision over repetition** – Use direct input whenever practical.
 - **Immediate feedback** – Changes should be reflected instantly.
 - **Clarity** – A clean, self-explanatory interface.
 - **Efficiency** – Minimize unnecessary clicks.
-- **Modularity** – Every metric should be easy to add, remove, and customize.
 - **Stability before features** – Reliability always comes first.
 
 ---
 
 # Planned Metrics
 
-- FPS ✅
-- Ping
-- Combat Timer
-- Time in Combat
+- Player Speed
+- Player Position
 - DPS
+- Time in Combat
 - Downed Count
 - Death Count
 - Boon Uptime
@@ -67,6 +90,28 @@ MetricHUD is built around a few simple principles.
 - Squad Statistics
 - Encounter Summary
 - World Boss Statistics *(Experimental)*
+
+## Rotation & Combat Training
+
+- Skill Rotation Log
+- Live Skill History
+- Skill Usage Summary
+- Rotation Timeline
+- User-Defined Practice Rotations
+- Expected vs. Actual Rotation Comparison
+- Skill Timing Analysis
+- Rotation Gap / Idle Time Detection
+- Missed or Delayed Skill Detection
+- Auto-Attack Filtering
+- Rotation Practice Score
+- Post-Combat Rotation Summary
+- Training Feedback
+
+> **Rotation Training Goal**
+>
+> MetricHUD is intended to help players move beyond random skill usage and understand structured Guild Wars 2 combat. Rotation tools will focus on showing what the player actually did, comparing it against a user-selected practice rotation, and providing clear feedback about skill order, timing, and downtime.
+>
+> MetricHUD will not define a single "correct" rotation. Practice rotations will be configurable so players can train different builds, strategies, and skill priorities.
 
 > **Experimental**
 >
@@ -79,8 +124,7 @@ MetricHUD is built around a few simple principles.
 ### HUD
 
 - Custom metric selection
-- Draggable HUD windows
-- Drag-and-drop metric ordering
+- Metric reordering
 - Saveable layouts
 - Multiple HUD profiles
 
@@ -92,10 +136,12 @@ MetricHUD is built around a few simple principles.
 
 ### Architecture
 
-- Generic metric registry
 - Plugin-style metric system
 - Metric categories
-- Persistent metric configuration
+- Expanded metric data sources
+- Combat event collection system
+- Skill event history
+- Rotation analysis framework
 
 ---
 
@@ -105,27 +151,78 @@ MetricHUD is built around a few simple principles.
 
 - [x] Core architecture
 - [x] Configuration system
+- [x] JSON persistence
 - [x] Metric registry
-- [x] Generic metric definitions
-- [x] First configurable metric (FPS)
+- [x] Generic metric rendering
+- [x] Metric formatting
+- [x] Metric ordering
 
 ## Phase 2 — HUD
 
+- [x] Draggable HUD
+- [x] Lock HUD position
+- [x] Metric visibility controls
 - [ ] Window position persistence
 - [ ] Layout customization
 - [ ] Appearance options
-- [ ] Metric ordering
 
-## Phase 3 — Metrics
+## Phase 3 — Core Metrics
 
-- [ ] Ping
-- [ ] Combat Timer
+- [x] FPS
+- [x] Ping
+- [x] Combat Timer
+- [x] Map Name
+- [x] Map ID
+- [x] Character Name
+- [ ] Player Speed
+- [ ] Player Position
 - [ ] DPS
 - [ ] Boon Uptime
 - [ ] Squad Statistics
 
-## Phase 4 — Release
+## Phase 4 — Combat Event System
+
+- [ ] arcdps combat-event integration
+- [ ] Player skill-event detection
+- [ ] Skill ID and skill-name tracking
+- [ ] Combat skill history
+- [ ] Skill usage statistics
+- [ ] Auto-attack filtering
+- [ ] Combat-session tracking
+
+## Phase 5 — Rotation Training
+
+- [ ] Live Skill Rotation Log
+- [ ] Rotation Timeline
+- [ ] User-Defined Practice Rotations
+- [ ] Expected vs. Actual Rotation
+- [ ] Skill Timing Analysis
+- [ ] Rotation Gap / Idle Time Detection
+- [ ] Missed or Delayed Skill Detection
+- [ ] Rotation Practice Score
+- [ ] Post-Combat Rotation Summary
+- [ ] Training Feedback
+
+## Phase 6 — Release
 
 - [ ] Optimization
 - [ ] Documentation
 - [ ] Version 1.0
+
+---
+
+# Long-Term Vision
+
+MetricHUD is intended to be more than a collection of numbers.
+
+Guild Wars 2 allows players to progress through much of the early game without requiring structured skill usage. As combat becomes more demanding, understanding skill priority, timing, cooldown management, weapon usage, and combat uptime becomes increasingly important.
+
+MetricHUD aims to bridge that gap.
+
+Rather than simply showing the player what happened during combat, MetricHUD's training tools are intended to help players understand **how they played** and identify areas where their execution can improve.
+
+The goal is not to tell players there is only one correct way to play.
+
+Instead, players will be able to define or select a practice rotation and use MetricHUD to compare that target against their actual combat performance.
+
+**arcdps provides the combat data. MetricHUD aims to help players learn from it.**
