@@ -20,6 +20,7 @@
 #include "ArcDPS.h"
 #include <string>
 #include <cmath>
+#include "CombatAnalyzer.h"
 
 
 /* proto */
@@ -38,6 +39,7 @@ Mumble::Data* MumbleLink    = nullptr;
 MetricRegistry metricRegistry;
 HUDWindow hudWindow;
 ConfigManager configManager;
+CombatAnalyzer combatAnalyzer;
 static long long arcTotalDamage = 0;
 
 
@@ -99,6 +101,7 @@ void AddonLoad(AddonAPI_t* aApi)
 	NexusLink = (NexusLinkData_t*)APIDefs->DataLink_Get("DL_NEXUS_LINK");
 	MumbleLink = (Mumble::Data*)APIDefs->DataLink_Get("DL_MUMBLE_LINK");
 	metricRegistry.Initialize();
+	combatAnalyzer.Initialize();
 	configManager.Initialize();
 
 	APIDefs->Events_Subscribe(
@@ -123,6 +126,7 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
+	combatAnalyzer.ProcessEvent(ev);
 
 	if (combatData->src == nullptr)
 	{
@@ -414,4 +418,5 @@ void AddonOptions()
 
 	ImGui::Text("Version 0.1.0");
 	ImGui::TextDisabled("Settings will be added during development.");
+	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 }

@@ -21,6 +21,7 @@
     <ClCompile Include="HUDWindow.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="MapRegistry.cpp" />
+    <ClCompile Include="CombatAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -48,6 +49,7 @@
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="MapRegistry.h" />
     <ClInclude Include="ArcDPS.h" />
+    <ClInclude Include="CombatAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
