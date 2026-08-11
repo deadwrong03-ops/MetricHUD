@@ -22,9 +22,19 @@ void CombatAnalyzer::ProcessEvent(const ArcDPS::CombatEvent* event)
     }
 
     eventCount++;
+
+    if (event->SkillID != 0)
+    {
+        lastSkillID = event->SkillID;
+    }
 }
 
 uint64_t CombatAnalyzer::GetEventCount() const
 {
     return eventCount;
+}
+
+uint32_t CombatAnalyzer::GetLastSkillID() const
+{
+    return lastSkillID;
 }

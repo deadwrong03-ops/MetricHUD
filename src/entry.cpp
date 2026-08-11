@@ -419,4 +419,5 @@ void AddonOptions()
 	ImGui::Text("Version 0.1.0");
 	ImGui::TextDisabled("Settings will be added during development.");
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
+	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 }
