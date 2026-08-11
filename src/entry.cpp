@@ -103,7 +103,6 @@ void AddonLoad(AddonAPI_t* aApi)
 	metricRegistry.Initialize();
 	combatAnalyzer.Initialize();
 	configManager.Initialize();
-
 	APIDefs->Events_Subscribe(
 		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
 		OnArcDPSCombat
@@ -419,7 +418,9 @@ void AddonOptions()
 	ImGui::Text("Version 0.1.0");
 	ImGui::TextDisabled("Settings will be added during development.");
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
+	ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
+	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());
 	const auto& recentSkills = combatAnalyzer.GetRecentSkills();
 
 	ImGui::Text("Recent Skills:");
@@ -427,5 +428,22 @@ void AddonOptions()
 	for (uint32_t skillID : recentSkills)
 	{
 		ImGui::Text("  %u", skillID);
+	}
+	const auto& recentRecords = combatAnalyzer.GetRecentRecords();
+
+	ImGui::Text("Recent Records:");
+
+	for (const CombatRecord& record : recentRecords)
+	{
+		ImGui::Text(
+			"ID:%u  Val:%d  Buff:%d  Act:%u  90:%u  50:%u  Move:%u",
+			record.skillID,
+			record.value,
+			record.buffDamage,
+			record.isActivation,
+			record.isNinety,
+			record.isFifty,
+			record.isMoving
+		);
 	}
 }
