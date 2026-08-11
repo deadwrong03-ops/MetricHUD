@@ -19,6 +19,7 @@
 #include "Core/MetricRegistry.h"
 #include "ArcDPS.h"
 #include <string>
+#include <cmath>
 
 
 /* proto */
@@ -239,6 +240,8 @@ std::string GetCharacterName(const std::string& identity)
 void AddonRender()
 {
 	static float combatTime = 0.0f;
+	static Vector2 previousPosition = { 0.0f, 0.0f };
+	static bool hasPreviousPosition = false;
 
 	metricRegistry.SetFPS(ImGui::GetIO().Framerate);
 
@@ -267,6 +270,28 @@ void AddonRender()
 			characterName.c_str()
 		);
 	}
+	Vector2 currentPosition = MumbleLink->Context.Compass.PlayerPosition;
+
+	float playerSpeed = 0.0f;
+
+	if (hasPreviousPosition)
+	{
+		float deltaX = currentPosition.X - previousPosition.X;
+		float deltaY = currentPosition.Y - previousPosition.Y;
+		float distance = sqrtf((deltaX * deltaX) + (deltaY * deltaY));
+
+		float deltaTime = ImGui::GetIO().DeltaTime;
+
+		if (deltaTime > 0.0f)
+		{
+			playerSpeed = distance / deltaTime;
+		}
+	}
+
+	previousPosition = currentPosition;
+	hasPreviousPosition = true;
+
+	metricRegistry.SetMetricValue(MetricID::PlayerSpeed, playerSpeed);
 
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
 
@@ -355,6 +380,20 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(
 				MetricID::CharacterName,
 				characterEnabled
+			);
+		}
+	}
+	MetricDefinition* speedMetric = metricRegistry.GetMetric(MetricID::PlayerSpeed);
+
+	if (speedMetric != nullptr)
+	{
+		bool speedEnabled = speedMetric->enabled;
+
+		if (ImGui::Checkbox("Show Player Speed", &speedEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::PlayerSpeed,
+				speedEnabled
 			);
 		}
 	}

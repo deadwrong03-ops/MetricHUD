@@ -10,7 +10,8 @@ enum class MetricID
     CombatTime,
     MapName,
     MapID,
-    CharacterName
+    CharacterName,
+    PlayerSpeed
 };
 
 enum class MetricFormat

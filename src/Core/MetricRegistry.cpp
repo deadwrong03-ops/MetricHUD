@@ -64,6 +64,16 @@ void MetricRegistry::Initialize()
             "Unknown",
             MetricFormat::Text
         });
+    metrics.push_back(
+        {
+            MetricID::PlayerSpeed,
+            "Speed",
+            true,
+            6,
+            0.0f,
+            "",
+            MetricFormat::Float
+        });
     std::sort(metrics.begin(), metrics.end(),
         [](const MetricDefinition& a, const MetricDefinition& b)
         {
