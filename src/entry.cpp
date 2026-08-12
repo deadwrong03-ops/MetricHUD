@@ -430,63 +430,69 @@ void AddonOptions()
 		}
 	}
 
-	ImGui::Text("Arc Damage Debug: %lld", arcTotalDamage);
-	ImGui::Separator();
+	if (ImGui::CollapsingHeader("Combat Analyzer Debug"))
 
-	ImGui::Text("Version 0.1.0");
-	ImGui::TextDisabled("Settings will be added during development.");
-	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
-	ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
-	ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 
-	ImGui::Text(
-		"Analyzer Combat Time: %.2f",
-		combatAnalyzer.GetCombatDurationSeconds()
-	);
-
-	ImGui::Text(
-		"Analyzer DPS: %.1f",
-		combatAnalyzer.GetDPS()
-	);
-
-	ImGui::Separator();
-
-	ImGui::Text("Last Fight Damage: %lld", combatAnalyzer.GetLastFightDamage());
-
-	ImGui::Text(
-		"Last Fight Time: %.2f",
-		combatAnalyzer.GetLastFightDurationSeconds()
-	);
-
-	ImGui::Text(
-		"Last Fight DPS: %.1f",
-		combatAnalyzer.GetLastFightDPS()
-	);
-	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
-	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());
-	const auto& recentSkills = combatAnalyzer.GetRecentSkills();
-
-	ImGui::Text("Recent Skills:");
-
-	for (uint32_t skillID : recentSkills)
 	{
-		ImGui::Text("  %u", skillID);
-	}
-	const auto& recentRecords = combatAnalyzer.GetRecentRecords();
+		ImGui::Text("Arc Damage Debug: %lld", arcTotalDamage);
+		ImGui::Separator();
 
-	ImGui::Text("Recent Records:");
+		ImGui::Text("Version 0.1.0");
+		ImGui::TextDisabled("Settings will be added during development.");
+		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
+		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
+		ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 
-	for (const CombatRecord& record : recentRecords)
-	{
 		ImGui::Text(
-			"ID:%u  Val:%d  Buff:%d  Act:%u  90:%u  50:%u  Move:%u",
-			record.skillID,
-			record.value,
-			record.buffDamage,
-			record.isActivation,
-			record.isNinety,
-			record.isFifty,
-			record.isMoving
+			"Analyzer Combat Time: %.2f",
+			combatAnalyzer.GetCombatDurationSeconds()
 		);
+
+		ImGui::Text(
+			"Analyzer DPS: %.1f",
+			combatAnalyzer.GetDPS()
+		);
+
+		ImGui::Separator();
+
+		ImGui::Text("Last Fight Damage: %lld", combatAnalyzer.GetLastFightDamage());
+
+		ImGui::Text(
+			"Last Fight Time: %.2f",
+			combatAnalyzer.GetLastFightDurationSeconds()
+		);
+
+		ImGui::Text(
+			"Last Fight DPS: %.1f",
+			combatAnalyzer.GetLastFightDPS()
+		);
+		ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
+		ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());
+		const auto& recentSkills = combatAnalyzer.GetRecentSkills();
+
+		ImGui::Text("Recent Skills:");
+
+		for (uint32_t skillID : recentSkills)
+		{
+			ImGui::Text("  %u", skillID);
+		}
+
+		const auto& recentRecords = combatAnalyzer.GetRecentRecords();
+
+		ImGui::Text("Recent Records:");
+
+		for (const CombatRecord& record : recentRecords)
+		{
+			ImGui::Text(
+				"ID:%u  Val:%d  Buff:%d  Act:%u  90:%u  50:%u  Move:%u",
+				record.skillID,
+				record.value,
+				record.buffDamage,
+				record.isActivation,
+				record.isNinety,
+				record.isFifty,
+				record.isMoving
+			);
+		}
 	}
 }
