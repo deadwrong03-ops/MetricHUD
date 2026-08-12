@@ -39,6 +39,10 @@ public:
     int64_t GetTotalDirectDamage() const;
     double GetCombatDurationSeconds() const;
     double GetDPS() const;
+    int64_t GetLastFightDamage() const;
+    double GetLastFightDurationSeconds() const;
+    double GetLastFightDPS() const;
+    void CaptureLastFight();
     uint32_t GetLastSkillID() const;
     uint8_t GetLastActivation() const;
     const std::vector<uint32_t>& GetRecentSkills() const;
@@ -50,6 +54,9 @@ private:
     int64_t totalDirectDamage = 0;
     uint64_t firstDamageTime = 0;
     uint64_t lastDamageTime = 0;
+    int64_t lastFightDamage = 0;
+    double lastFightDurationSeconds = 0.0;
+    double lastFightDPS = 0.0;
     uint32_t lastSkillID = 0;
     uint8_t lastActivation = 0;
     std::vector<uint32_t> recentSkills;

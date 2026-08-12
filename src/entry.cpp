@@ -257,6 +257,10 @@ void AddonRender()
 	{
 		combatAnalyzer.ResetSession();
 	}
+	if (!isInCombat && wasInCombat)
+	{
+		combatAnalyzer.CaptureLastFight();
+	}
 
 	if (isInCombat)
 	{
@@ -434,19 +438,29 @@ void AddonOptions()
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 	ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
 	ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
+
 	ImGui::Text(
 		"Analyzer Combat Time: %.2f",
 		combatAnalyzer.GetCombatDurationSeconds()
-
-
 	);
+
 	ImGui::Text(
 		"Analyzer DPS: %.1f",
 		combatAnalyzer.GetDPS()
 	);
+
+	ImGui::Separator();
+
+	ImGui::Text("Last Fight Damage: %lld", combatAnalyzer.GetLastFightDamage());
+
 	ImGui::Text(
-		"Registry DPS: %.1f",
-		metricRegistry.GetDPS()
+		"Last Fight Time: %.2f",
+		combatAnalyzer.GetLastFightDurationSeconds()
+	);
+
+	ImGui::Text(
+		"Last Fight DPS: %.1f",
+		combatAnalyzer.GetLastFightDPS()
 	);
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());

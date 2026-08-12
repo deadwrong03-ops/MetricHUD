@@ -29,6 +29,12 @@ void CombatAnalyzer::ResetSession()
     recentSkills.clear();
     recentRecords.clear();
 }
+void CombatAnalyzer::CaptureLastFight()
+{
+    lastFightDamage = totalDirectDamage;
+    lastFightDurationSeconds = GetCombatDurationSeconds();
+    lastFightDPS = GetDPS();
+}
 
 void CombatAnalyzer::Shutdown()
 {
@@ -123,6 +129,21 @@ double CombatAnalyzer::GetDPS() const
     }
 
     return static_cast<double>(totalDirectDamage) / duration;
+}
+
+int64_t CombatAnalyzer::GetLastFightDamage() const
+{
+    return lastFightDamage;
+}
+
+double CombatAnalyzer::GetLastFightDurationSeconds() const
+{
+    return lastFightDurationSeconds;
+}
+
+double CombatAnalyzer::GetLastFightDPS() const
+{
+    return lastFightDPS;
 }
 uint32_t CombatAnalyzer::GetLastSkillID() const
 {
