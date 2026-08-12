@@ -67,6 +67,10 @@ Current Version: **0.3.0**
 - [x] Character Name
 - [x] Player Speed
 
+      Known issue:
+Mumble-derived metrics may occasionally fall back to Unknown / 0
+(Map Name, Map ID, Character Name, Player Speed).
+
 ---
 
 # Design Philosophy
