@@ -35,6 +35,7 @@ public:
 
     uint64_t GetEventCount() const;
     uint64_t GetDamageEventCount() const;
+    int64_t GetTotalDirectDamage() const;
     uint32_t GetLastSkillID() const;
     uint8_t GetLastActivation() const;
     const std::vector<uint32_t>& GetRecentSkills() const;
@@ -43,6 +44,7 @@ public:
 private:
     uint64_t eventCount = 0;
     uint64_t damageEventCount = 0;
+    int64_t totalDirectDamage = 0;
     uint32_t lastSkillID = 0;
     uint8_t lastActivation = 0;
     std::vector<uint32_t> recentSkills;

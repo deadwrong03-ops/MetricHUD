@@ -419,6 +419,7 @@ void AddonOptions()
 	ImGui::TextDisabled("Settings will be added during development.");
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 	ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
+	ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());
 	const auto& recentSkills = combatAnalyzer.GetRecentSkills();
