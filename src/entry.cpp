@@ -423,6 +423,12 @@ void AddonOptions()
 	ImGui::Text(
 		"Analyzer Combat Time: %.2f",
 		combatAnalyzer.GetCombatDurationSeconds()
+
+
+	);
+	ImGui::Text(
+		"Analyzer DPS: %.1f",
+		combatAnalyzer.GetDPS()
 	);
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());

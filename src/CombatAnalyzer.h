@@ -37,6 +37,7 @@ public:
     uint64_t GetDamageEventCount() const;
     int64_t GetTotalDirectDamage() const;
     double GetCombatDurationSeconds() const;
+    double GetDPS() const;
     uint32_t GetLastSkillID() const;
     uint8_t GetLastActivation() const;
     const std::vector<uint32_t>& GetRecentSkills() const;

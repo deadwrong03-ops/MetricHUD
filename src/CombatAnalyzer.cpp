@@ -100,6 +100,17 @@ double CombatAnalyzer::GetCombatDurationSeconds() const
 
     return static_cast<double>(lastDamageTime - firstDamageTime) / 1000.0;
 }
+double CombatAnalyzer::GetDPS() const
+{
+    const double duration = GetCombatDurationSeconds();
+
+    if (duration <= 0.0)
+    {
+        return 0.0;
+    }
+
+    return static_cast<double>(totalDirectDamage) / duration;
+}
 uint32_t CombatAnalyzer::GetLastSkillID() const
 {
     return lastSkillID;
