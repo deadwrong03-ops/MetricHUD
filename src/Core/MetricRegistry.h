@@ -8,10 +8,12 @@ enum class MetricID
     FPS,
     Ping,
     CombatTime,
+    DPS,
     MapName,
     MapID,
     CharacterName,
     PlayerSpeed
+    
 };
 
 enum class MetricFormat

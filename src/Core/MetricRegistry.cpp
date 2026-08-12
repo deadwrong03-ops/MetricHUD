@@ -32,6 +32,16 @@ void MetricRegistry::Initialize()
             "",
             MetricFormat::Time
         });
+    metrics.push_back(
+        {
+            MetricID::DPS,
+            "DPS",
+            true,
+            3,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
 
     metrics.push_back(
         {
@@ -97,6 +107,7 @@ float MetricRegistry::GetFPS() const
 void MetricRegistry::SetDPS(double value)
 {
     dps = value;
+    SetMetricValue(MetricID::DPS, static_cast<float>(value));
 }
 
 double MetricRegistry::GetDPS() const

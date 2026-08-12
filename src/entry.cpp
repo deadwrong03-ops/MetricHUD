@@ -297,7 +297,14 @@ void AddonRender()
 	metricRegistry.SetMetricValue(MetricID::PlayerSpeed, playerSpeed);
 
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
-	metricRegistry.SetDPS(combatAnalyzer.GetDPS());
+	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
+	{
+		metricRegistry.SetDPS(combatAnalyzer.GetDPS());
+	}
+	else
+	{
+		metricRegistry.SetDPS(0.0);
+	}
 
 	if (configManager.ShowHUD())
 	{
@@ -328,17 +335,6 @@ void AddonOptions()
 		configManager.SetLocked(locked);
 	}
 
-	MetricDefinition* fpsMetric = metricRegistry.GetMetric(MetricID::FPS);
-
-	if (fpsMetric != nullptr)
-	{
-		bool fpsEnabled = fpsMetric->enabled;
-
-		if (ImGui::Checkbox("Show FPS", &fpsEnabled))
-		{
-			metricRegistry.SetMetricEnabled(MetricID::FPS, fpsEnabled);
-		}
-	}
 	MetricDefinition* combatMetric = metricRegistry.GetMetric(MetricID::CombatTime);
 
 	if (combatMetric != nullptr)
@@ -350,6 +346,19 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(MetricID::CombatTime, combatEnabled);
 		}
 	}
+
+	MetricDefinition* dpsMetric = metricRegistry.GetMetric(MetricID::DPS);
+
+	if (dpsMetric != nullptr)
+	{
+		bool dpsEnabled = dpsMetric->enabled;
+
+		if (ImGui::Checkbox("Show DPS", &dpsEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::DPS, dpsEnabled);
+		}
+	}
+
 	MetricDefinition* mapNameMetric = metricRegistry.GetMetric(MetricID::MapName);
 
 	if (mapNameMetric != nullptr)
@@ -373,6 +382,7 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(MetricID::MapID, mapIDEnabled);
 		}
 	}
+
 	MetricDefinition* characterMetric = metricRegistry.GetMetric(MetricID::CharacterName);
 
 	if (characterMetric != nullptr)
@@ -381,12 +391,10 @@ void AddonOptions()
 
 		if (ImGui::Checkbox("Show Character Name", &characterEnabled))
 		{
-			metricRegistry.SetMetricEnabled(
-				MetricID::CharacterName,
-				characterEnabled
-			);
+			metricRegistry.SetMetricEnabled(MetricID::CharacterName, characterEnabled);
 		}
 	}
+
 	MetricDefinition* speedMetric = metricRegistry.GetMetric(MetricID::PlayerSpeed);
 
 	if (speedMetric != nullptr)
@@ -395,12 +403,10 @@ void AddonOptions()
 
 		if (ImGui::Checkbox("Show Player Speed", &speedEnabled))
 		{
-			metricRegistry.SetMetricEnabled(
-				MetricID::PlayerSpeed,
-				speedEnabled
-			);
+			metricRegistry.SetMetricEnabled(MetricID::PlayerSpeed, speedEnabled);
 		}
 	}
+
 	MetricDefinition* pingMetric = metricRegistry.GetMetric(MetricID::Ping);
 
 	if (pingMetric != nullptr)
@@ -410,6 +416,18 @@ void AddonOptions()
 		if (ImGui::Checkbox("Show Ping", &pingEnabled))
 		{
 			metricRegistry.SetMetricEnabled(MetricID::Ping, pingEnabled);
+		}
+	}
+
+	MetricDefinition* fpsMetric = metricRegistry.GetMetric(MetricID::FPS);
+
+	if (fpsMetric != nullptr)
+	{
+		bool fpsEnabled = fpsMetric->enabled;
+
+		if (ImGui::Checkbox("Show FPS", &fpsEnabled))
+		{
+			metricRegistry.SetMetricEnabled(MetricID::FPS, fpsEnabled);
 		}
 	}
 
