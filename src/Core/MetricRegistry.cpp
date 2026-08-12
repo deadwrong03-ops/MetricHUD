@@ -94,6 +94,15 @@ float MetricRegistry::GetFPS() const
 {
     return fpsMetric.value;
 }
+void MetricRegistry::SetDPS(double value)
+{
+    dps = value;
+}
+
+double MetricRegistry::GetDPS() const
+{
+    return dps;
+}
 
 const MetricDefinition& MetricRegistry::GetFPSMetric() const
 {

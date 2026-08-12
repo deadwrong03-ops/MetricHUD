@@ -297,6 +297,7 @@ void AddonRender()
 	metricRegistry.SetMetricValue(MetricID::PlayerSpeed, playerSpeed);
 
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
+	metricRegistry.SetDPS(combatAnalyzer.GetDPS());
 
 	if (configManager.ShowHUD())
 	{
@@ -429,6 +430,10 @@ void AddonOptions()
 	ImGui::Text(
 		"Analyzer DPS: %.1f",
 		combatAnalyzer.GetDPS()
+	);
+	ImGui::Text(
+		"Registry DPS: %.1f",
+		metricRegistry.GetDPS()
 	);
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());

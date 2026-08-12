@@ -44,6 +44,8 @@ public:
 
     void SetFPS(float value);
     float GetFPS() const;
+    void SetDPS(double dps);
+    double GetDPS() const;
     const MetricDefinition& GetFPSMetric() const;
     void SetFPSEnabled(bool enabled);
 
@@ -55,6 +57,7 @@ public:
 
 private:
     std::vector<MetricDefinition> metrics;
+    double dps = 0.0;
 
     MetricDefinition fpsMetric =
     {
