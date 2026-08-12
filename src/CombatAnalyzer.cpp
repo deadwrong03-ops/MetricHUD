@@ -9,6 +9,8 @@ void CombatAnalyzer::Initialize()
     eventCount = 0;
     damageEventCount = 0;
     totalDirectDamage = 0;
+    firstDamageTime = 0;
+    lastDamageTime = 0;
     lastSkillID = 0;
     lastActivation = 0;
     recentSkills.clear();
@@ -51,6 +53,13 @@ void CombatAnalyzer::ProcessEvent(const ArcDPS::CombatEvent* event)
     {
         damageEventCount++;
         totalDirectDamage += -static_cast<int64_t>(event->Value);
+
+        if (firstDamageTime == 0)
+        {
+            firstDamageTime = event->Time;
+        }
+
+        lastDamageTime = event->Time;
     }
 
     if (event->IsActivation != 0)
@@ -81,6 +90,15 @@ uint64_t CombatAnalyzer::GetDamageEventCount() const
 int64_t CombatAnalyzer::GetTotalDirectDamage() const
 {
     return totalDirectDamage;
+}
+double CombatAnalyzer::GetCombatDurationSeconds() const
+{
+    if (firstDamageTime == 0 || lastDamageTime <= firstDamageTime)
+    {
+        return 0.0;
+    }
+
+    return static_cast<double>(lastDamageTime - firstDamageTime) / 1000.0;
 }
 uint32_t CombatAnalyzer::GetLastSkillID() const
 {

@@ -420,6 +420,10 @@ void AddonOptions()
 	ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 	ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
 	ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
+	ImGui::Text(
+		"Analyzer Combat Time: %.2f",
+		combatAnalyzer.GetCombatDurationSeconds()
+	);
 	ImGui::Text("Last Skill ID: %u", combatAnalyzer.GetLastSkillID());
 	ImGui::Text("Last Activation: %u", combatAnalyzer.GetLastActivation());
 	const auto& recentSkills = combatAnalyzer.GetRecentSkills();
