@@ -30,6 +30,7 @@ public:
 
     void Initialize();
     void Shutdown();
+    void ResetSession();
 
     void ProcessEvent(const ArcDPS::CombatEvent* event);
 

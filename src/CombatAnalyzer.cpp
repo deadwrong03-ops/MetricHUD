@@ -5,6 +5,19 @@ CombatAnalyzer::CombatAnalyzer()
 {
 }
 void CombatAnalyzer::Initialize()
+
+{
+    eventCount = 0;
+    damageEventCount = 0;
+    totalDirectDamage = 0;
+    firstDamageTime = 0;
+    lastDamageTime = 0;
+    lastSkillID = 0;
+    lastActivation = 0;
+    recentSkills.clear();
+    recentRecords.clear();
+}
+void CombatAnalyzer::ResetSession()
 {
     eventCount = 0;
     damageEventCount = 0;

@@ -243,12 +243,22 @@ std::string GetCharacterName(const std::string& identity)
 void AddonRender()
 {
 	static float combatTime = 0.0f;
+	static bool wasInCombat = false;
 	static Vector2 previousPosition = { 0.0f, 0.0f };
 	static bool hasPreviousPosition = false;
 
 	metricRegistry.SetFPS(ImGui::GetIO().Framerate);
 
-	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
+	bool isInCombat =
+		MumbleLink != nullptr &&
+		MumbleLink->Context.IsInCombat;
+
+	if (isInCombat && !wasInCombat)
+	{
+		combatAnalyzer.ResetSession();
+	}
+
+	if (isInCombat)
 	{
 		combatTime += ImGui::GetIO().DeltaTime;
 	}
@@ -256,23 +266,8 @@ void AddonRender()
 	{
 		combatTime = 0.0f;
 	}
-	if (MumbleLink != nullptr)
-	{
-		unsigned int mapID = MumbleLink->Context.MapID;
 
-		metricRegistry.SetMetricText(
-			MetricID::MapName,
-			MapRegistry::GetMapName(mapID)
-		);
-
-		std::string identity = WideToUTF8(MumbleLink->Identity);
-		std::string characterName = GetCharacterName(identity);
-
-		metricRegistry.SetMetricText(
-			MetricID::CharacterName,
-			characterName.c_str()
-		);
-	}
+	wasInCombat = isInCombat;
 	Vector2 currentPosition = MumbleLink->Context.Compass.PlayerPosition;
 
 	float playerSpeed = 0.0f;
