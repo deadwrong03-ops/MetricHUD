@@ -1,303 +1,761 @@
 # MetricHUD Development Log
 
-This file records major development checkpoints, successful tests, known issues,
-and the current development state of MetricHUD.
+This document tracks major MetricHUD development milestones, technical discoveries, tests, and current work.
 
-Its purpose is to make development recoverable if conversation history or other
-development notes are lost.
+MetricHUD is under active development.
 
 ---
 
-# Current Development State
+# Current Development Version
 
-## Latest Stable Checkpoint
+**0.3.0 Development Build**
 
-MetricHUD currently has a functioning Combat Analyzer, live DPS metric,
-per-encounter tracking, last-fight summary capture, and dynamic ArcDPS
-skill-name resolution.
+Current primary focus:
 
----
-
-## Combat Analyzer
-
-- Combat event reception working
-- Combat record tracking working
-- Damage event classification working
-- Direct damage accumulation working
-- Combat duration tracking working
-- DPS calculation working
-- Analyzer DPS successfully connected to MetricRegistry
-- Combat sessions reset when a new fight begins
-- Last-fight combat summary capture implemented
-- Recent skill history tracking implemented
-- Recent combat records tracking implemented
-- Collapsible Combat Analyzer debug panel implemented
-- Dynamic ArcDPS skill-name resolution implemented
-- Skill IDs are automatically associated with ArcDPS-provided skill names
-- Recent Skills debug display shows Skill Name + Skill ID
-- Skill-name mappings persist across combat sessions
-- No manually maintained skill-ID table required
+> Build a reliable player combat-event and skill-activation pipeline before implementing advanced combat analysis and training systems.
 
 ---
 
-## DPS Metric
+# Project Foundation
 
-- Live DPS metric implemented
-- DPS registered through MetricRegistry
-- Show DPS option implemented
-- DPS updates during combat
-- DPS resets to 0 when combat ends
-- New combat encounters begin with fresh analyzer data
-- Tested successfully across multiple separate fights
+## Core Architecture
 
----
+Completed:
 
-## Mumble Link Metrics
+- Modular source architecture
+- Nexus addon initialization
+- Nexus addon shutdown
+- Render callback
+- Options callback
+- ConfigManager
+- Persistent JSON configuration
+- Reset Settings
+- MetricRegistry
+- Generic metric rendering
+- Metric formatting
+- Metric ordering
+- HUDWindow
+- HUD visibility control
+- Draggable HUD
+- HUD position locking
+- Persistent settings
 
-- Mumble Link integration working
-- Map ID working
-- Map Name working
-- Character Name working
-- Player Speed working
+Status:
 
-A previous regression caused Map Name and Character Name to display "Unknown".
-
-This was fixed and verified in-game.
-
-Relevant Git commit:
-
-`Restore Mumble map and character metric updates`
-
-Commit: `618caa1`
+**PASS**
 
 ---
 
-# Current HUD Metrics
+# Initial Metrics
+
+Implemented:
 
 - FPS
 - Ping
-- Combat Timer
-- DPS
 - Map Name
 - Map ID
 - Character Name
 - Player Speed
+- Combat Time
+- DPS
 
----
-
-# Skill Tracking
-
-MetricHUD receives skill information through the ArcDPS combat event stream.
-
-Current functionality:
-
-- Skill IDs are captured from combat events
-- Recent skill history is maintained
-- ArcDPS-provided skill names are captured dynamically
-- Skill IDs are associated with their actual ArcDPS skill names
-- Debug display shows both skill name and skill ID
-- Skill-name mappings remain available between combat encounters
-
-Example verified output:
-
-- Screech (2855)
-- Life Rend (29442)
-- Soul Eater (30539)
-- Gravedigger (30163)
-
-This replaced the temporary hardcoded skill-ID resolver.
-
-The hardcoded approach was rejected because ArcDPS-reported IDs did not
-reliably match the manually assumed IDs and would not scale across professions,
-weapons, elite specializations, or future Guild Wars 2 changes.
-
----
-
-# Last-Fight Tracking
-
-MetricHUD captures information from the completed combat encounter before
-starting a new combat session.
-
-Currently captured:
-
-- Last Fight Damage
-- Last Fight Duration
-- Last Fight DPS
-
-This provides the foundation for future encounter summaries, self-comparison,
-and Training Mode analysis.
-
----
-
-# Testing Status
-
-Latest in-game testing confirmed:
-
-- MetricHUD loads successfully
-- No crash during normal combat testing
-- Combat Analyzer receives events
-- Direct damage tracking works
-- Combat duration works
-- DPS works
-- DPS resets after combat
-- Analyzer resets at the beginning of a new encounter
-- Second fight does not inherit first-fight analyzer data
-- Last-fight summary capture works
-- Metric visibility checkboxes work
-- Map Name resolves correctly
-- Character Name resolves correctly
-- Map ID works
-- Player Speed works
-- Dynamic skill-name resolution verified in-game
-- Multiple skills correctly display their ArcDPS-provided names
-- Repeated skill IDs consistently resolve to the same skill name
-- Recent Skills display shows Skill Name + Skill ID
-- No crash during dynamic skill-name testing
-
----
-
-# Important Recovery Notes
-
-If development context is lost:
-
-1. Check this file first.
-2. Check the latest Git commits.
-3. Treat the repository code as the source of truth.
-4. Do not rebuild features listed as completed here unless testing shows they
-   are broken.
-5. Resume development from the latest unfinished feature below.
-
----
-
-# Development Philosophy
-
-MetricHUD should provide useful information without overwhelming the player.
-
-Core principles:
-
-- Precision over repetition
-- Immediate useful feedback
-- Stability before features
-- Show the information the player wants and nothing they don't
-- Training feedback should be constructive rather than judgmental
-- Training should identify optimization opportunities rather than label player
-  actions as wrong
-- Player self-comparison is preferred over forcing elite benchmark comparison
-- Rotation coaching should understand priorities and encounter phases rather
-  than enforce one rigid sequence
-
----
-
-# Planned Training System
-
-The long-term Training Mode is intended to use MetricHUD's combat data to help
-players understand and improve their own gameplay.
-
-Planned concepts include:
-
-- Golem practice analysis
-- Guided Training Mode
-- Independent Training Mode
-- Benchmark Mode
-- Rotation and priority analysis
-- Phase-based rotation coaching
-- Execute-phase guidance
-- DPS coaching
-- Player-selected DPS goals
-- Build and gear analysis against the player's selected goal
-- Boon uptime analysis
-- Skill downtime analysis
-- Burst-window analysis
-- Consistency scoring
-- Survivability/downed context
-- Personal performance history
-- Self-comparison between encounters
-- Constructive optimization suggestions
-
----
-
-# Planned MetricHUD Features
-
-Future/non-training features include:
-
-- Expanded customizable HUD
-- Maximum visible metric limit to reduce clutter
-- Additional combat metrics
-- Downed count
-- Death count
-- Boon uptime
-- Food timer
-- Utility timer
-- Squad statistics
-- Encounter summary
-- World boss logging (experimental)
-- Jade Bot buff tracking (experimental)
-- Additional MetricRegistry metrics
-- Additional HUD customization
-- Persistent window positioning and layout improvements
-
----
-
-# Next Development Work
-
-Update this section whenever development stops.
-
-Current next feature:
-
-**Combat skill usage statistics**
-
-Goal:
-
-Use the skill IDs and dynamically resolved ArcDPS skill names already captured
-by CombatAnalyzer to calculate per-encounter skill usage counts.
-
-This will become a foundation for:
-
-- Skill frequency analysis
-- Rotation history
-- Priority analysis
-- Skill downtime analysis
-- Rotation consistency
-- Training Mode coaching
-
----
-
-# Development Procedure
-
-After completing and successfully testing a meaningful feature:
-
-1. Save All.
-2. Rebuild using Release | x64.
-3. Test one change at a time in Guild Wars 2.
-4. Confirm the feature works without crashes or regressions.
-5. Commit the working checkpoint.
-6. Push to GitHub.
-7. Update DEVELOPMENT_LOG.md with the new checkpoint.
-
-Never move several untested changes forward at once.
-
----
-
-# Latest Completed Development Milestone
-
-**Dynamic ArcDPS Skill Name Resolution**
-
-MetricHUD now receives the actual skill name supplied by ArcDPS alongside
-combat events.
-
-The Combat Analyzer dynamically associates each SkillID with its corresponding
-skill name.
-
-Verified in-game with multiple skills including:
-
-- Screech
-- Life Rend
-- Soul Eater
-- Gravedigger
-
-This eliminates the need for a manually maintained Guild Wars 2 skill-ID
-database for combat skill-name resolution.
+Metric visibility can be controlled through the MetricHUD options panel.
 
 Status:
 
-**BUILT — TESTED — COMMITTED — PUSHED**
+**PASS**
+
+---
+
+# Map and Player Information
+
+Implemented live game information through the available Nexus/Mumble data.
+
+Verified:
+
+- Map ID changes correctly when changing maps.
+- Map Name resolves correctly.
+- Character Name displays correctly.
+- Player Speed updates.
+- FPS updates.
+- Ping updates.
+
+Status:
+
+**PASS**
+
+---
+
+# ArcDPS Combat Analyzer Foundation
+
+A new `CombatAnalyzer` system was introduced to begin building MetricHUD's combat-analysis layer.
+
+Primary files involved:
+
+```text
+CombatAnalyzer.h
+CombatAnalyzer.cpp
+ArcDPS.h
+entry.cpp
+```
+
+The analyzer is currently exposed through a development/debug section in the Nexus options panel.
+
+---
+
+## ArcDPS Combat Event Subscription
+
+MetricHUD subscribes to:
+
+```text
+EV_ARCDPS_COMBATEVENT_LOCAL_RAW
+```
+
+Combat events are received by:
+
+```cpp
+OnArcDPSCombat(void* eventArgs)
+```
+
+and forwarded into:
+
+```cpp
+CombatAnalyzer::ProcessEvent(...)
+```
+
+Status:
+
+**PASS**
+
+---
+
+# CombatEvent Structure
+
+MetricHUD currently exposes the ArcDPS combat-event fields required for analysis.
+
+Fields investigated include:
+
+```text
+Time
+SourceAgent
+DestinationAgent
+Value
+BuffDamage
+OverstackValue
+SkillID
+SourceInstanceID
+DestinationInstanceID
+SrcMasterInstanceID
+DestinationMasterInstanceID
+IFF
+Buff
+Result
+IsActivation
+IsBuffRemove
+IsNinety
+IsFifty
+IsMoving
+IsStatechange
+IsFlanking
+IsShields
+IsOffcycle
+```
+
+This expanded structure allows MetricHUD to investigate differences between:
+
+- Damage events
+- Activation events
+- Buff events
+- Triggered effects
+- Player actions
+- State changes
+
+Status:
+
+**PASS**
+
+---
+
+# Skill Name Resolution
+
+Early CombatAnalyzer testing initially displayed many skills as:
+
+```text
+Unknown (SkillID)
+```
+
+Investigation confirmed that ArcDPS supplies the skill name through the combat callback.
+
+`ProcessEvent()` was expanded to receive:
+
+```cpp
+const char* skillName
+```
+
+The callback now forwards:
+
+```cpp
+combatAnalyzer.ProcessEvent(ev, combatData->skillname);
+```
+
+MetricHUD stores the relationship between:
+
+```text
+SkillID ? Skill Name
+```
+
+This eliminated the need to manually hardcode every Guild Wars 2 skill ID.
+
+Live testing successfully resolved skill names.
+
+Examples observed:
+
+```text
+Death Spiral
+Gravedigger
+Dusk Strike
+Life Rend
+Life Reap
+Life Slash
+Nightfall
+Grasping Darkness
+Fading Twilight
+Chilling Nova
+"Chilled to the Bone!"
+"You Are All Weaklings!"
+```
+
+Status:
+
+**PASS**
+
+---
+
+# Recent Skill Tracking
+
+The Combat Analyzer now maintains a recent-skills list.
+
+This provides a quick live view of skills appearing in the player's combat-event stream.
+
+Verified against ArcDPS during live combat.
+
+Status:
+
+**PASS**
+
+---
+
+# Raw Skill Usage Counter
+
+A skill usage/debug counter was introduced.
+
+Initial logic tracks events by SkillID and applies basic timing suppression to avoid extremely rapid duplicate events.
+
+Example internal concept:
+
+```cpp
+skillUseCounts[event->SkillID]++;
+```
+
+Live testing showed that this system is useful for inspecting combat behavior but does NOT yet represent true player button presses.
+
+Status:
+
+**PARTIAL / INVESTIGATION**
+
+---
+
+# Critical Finding: Combat Events Are Not Skill Activations
+
+Live testing demonstrated that:
+
+> One player skill activation can generate multiple ArcDPS combat events.
+
+Example:
+
+A player may activate a skill once while MetricHUD receives several events associated with that SkillID.
+
+During testing, **Death's Charge** was a clear example of this behavior.
+
+Therefore:
+
+```text
+Raw Skill Events != Player Skill Uses
+```
+
+This means raw event counting cannot be used directly for rotation analysis.
+
+This finding changes the architecture of future skill tracking.
+
+MetricHUD must derive a separate **skill activation stream**.
+
+---
+
+# Triggered Skills / Proc Investigation
+
+Testing also identified skills/effects that appear in the combat stream without being directly pressed by the player.
+
+Example:
+
+```text
+Chilling Nova
+```
+
+Chilling Nova appeared alongside manually activated skills during Necromancer testing.
+
+This confirms that future rotation analysis must distinguish:
+
+```text
+Manual Skill Activation
+```
+
+from:
+
+```text
+Triggered / Proc Effect
+```
+
+Hardcoding individual triggered skills is not considered a desirable long-term solution.
+
+The preferred solution is classification using ArcDPS event metadata.
+
+Status:
+
+**UNDER INVESTIGATION**
+
+---
+
+# Activation Event Investigation
+
+The debug panel was expanded to expose activation-related ArcDPS data.
+
+Fields currently being inspected include:
+
+```text
+SkillID
+Value
+BuffDamage
+IsActivation
+SourceInstanceID
+SrcMasterInstanceID
+IsStatechange
+IsMoving
+Time
+```
+
+This allows controlled comparisons between:
+
+- manually pressed skills
+- damage events
+- triggered effects
+- multi-hit skills
+- activation events
+
+Status:
+
+**ACTIVE DEVELOPMENT**
+
+---
+
+# Player / Self Filtering
+
+Combat events were initially forwarded into CombatAnalyzer before confirming whether they belonged to the player.
+
+This risked NPC/enemy events entering MetricHUD's player skill stream.
+
+`OnArcDPSCombat()` was changed so the analyzer is called only after validating the source.
+
+Current processing order:
+
+```cpp
+if (combatData->src == nullptr)
+{
+    return;
+}
+
+if (combatData->src->IsSelf == 0)
+{
+    return;
+}
+
+if (ev->IsStatechange != 0)
+{
+    return;
+}
+
+combatAnalyzer.ProcessEvent(ev, combatData->skillname);
+```
+
+This means CombatAnalyzer receives:
+
+```text
+Valid source
+?
+Player/self source
+?
+Non-statechange event
+?
+ProcessEvent
+```
+
+Live testing confirmed that obvious NPC/enemy abilities no longer contaminate the player's skill list.
+
+Status:
+
+**PASS**
+
+---
+
+# Self-Filter Regression Test
+
+A live regression test was performed after introducing player-source filtering.
+
+Verified:
+
+- Combat Analyzer continued receiving events.
+- DPS continued updating.
+- Recent Skills continued working.
+- Skill names remained correct.
+- Skill Usage continued working.
+- Activation Events continued being captured.
+- No obvious enemy/NPC skills appeared in the player skill list.
+- No crash occurred.
+
+Status:
+
+**PASS**
+
+Checkpoint committed and pushed.
+
+---
+
+# DPS Foundation
+
+CombatAnalyzer currently tracks:
+
+```text
+Combat Events
+Damage Events
+Direct Damage
+Combat Time
+DPS
+Last Fight Damage
+Last Fight Time
+Last Fight DPS
+```
+
+The system is still experimental and will require additional refinement as encounter boundaries and combat-state detection improve.
+
+Status:
+
+**WORKING DEVELOPMENT FOUNDATION**
+
+---
+
+# Combat Analyzer Debug Panel
+
+The current debug interface exposes development information including:
+
+```text
+Combat Events
+Damage Events
+Direct Damage
+Analyzer Combat Time
+Analyzer DPS
+Last Fight Damage
+Last Fight Time
+Last Fight DPS
+Last Skill ID
+Last Activation
+Recent Skills
+Skill Usage (Raw Events)
+Recent Records
+Activation Events
+```
+
+This interface is intentionally verbose.
+
+It exists to understand the ArcDPS event stream and is not intended to represent the final MetricHUD user interface.
+
+---
+
+# Current Technical Model
+
+MetricHUD's combat pipeline currently resembles:
+
+```text
+ArcDPS
+   ?
+EV_ARCDPS_COMBATEVENT_LOCAL_RAW
+   ?
+OnArcDPSCombat()
+   ?
+Validate event
+   ?
+Validate source
+   ?
+Require IsSelf
+   ?
+Ignore state-change events
+   ?
+CombatAnalyzer::ProcessEvent()
+   ?
+Skill-name mapping
+   ?
+Combat records
+   ?
+Raw skill events
+   ?
+Activation-event investigation
+   ?
+Future reliable player-action stream
+```
+
+---
+
+# Next Development Target
+
+## Reliable Skill Activation Counting
+
+The next major task is to determine when a player actually activates a skill.
+
+The desired result is:
+
+```text
+Death Spiral
+Gravedigger
+Nightfall
+Grasping Darkness
+```
+
+representing actual player actions.
+
+The system must avoid interpreting this:
+
+```text
+Death's Charge
+Death's Charge
+Death's Charge
+Death's Charge
+Death's Charge
+```
+
+as five player presses when those events were generated by one activation.
+
+---
+
+## Data To Investigate
+
+Continue comparing:
+
+```text
+SkillID
+IsActivation
+SourceInstanceID
+SrcMasterInstanceID
+Time
+Value
+BuffDamage
+IsStatechange
+IsMoving
+```
+
+between controlled skill activations.
+
+Particular attention should be given to:
+
+- normal weapon skills
+- multi-hit skills
+- movement skills
+- channeled skills
+- utility skills
+- elite skills
+- auto attacks
+- triggered/proc effects
+
+---
+
+# Planned CombatAnalyzer Architecture
+
+Long-term separation should likely become:
+
+```text
+RAW COMBAT EVENTS
+        ?
+EVENT CLASSIFICATION
+        ?
+PLAYER ACTION / ACTIVATION STREAM
+        ?
+COMBAT METRICS
+        ?
+ROTATION ANALYSIS
+        ?
+TRAINING SYSTEM
+```
+
+Raw events should remain available for debugging and advanced analysis.
+
+Player actions should be maintained separately.
+
+---
+
+# Future Combat Features
+
+Once reliable activation tracking exists, development can expand toward:
+
+- Skill rotation history
+- Rotation timing
+- Skill downtime
+- Burst-window detection
+- Rotation consistency
+- DPS phase analysis
+- Execute-phase analysis
+- Personal benchmark comparison
+- Player-selected performance goals
+
+---
+
+# Training System Concepts
+
+Planned training concepts currently include:
+
+- Rotation / priority coaching
+- Player skill rotation log
+- Phase coaching
+- DPS coaching
+- Build/gear goal-based optimization
+- Boon uptime goals
+- Skill downtime analysis
+- Burst windows
+- Execute phase
+- Consistency scoring
+- Survivability/downed context
+- Personal self-comparison
+- Player-selected goals
+
+Potential modes:
+
+```text
+Guided
+Independent
+Benchmark
+```
+
+These remain future-development concepts and are not currently implemented.
+
+---
+
+# Other Planned MetricHUD Features
+
+Planned non-training features include:
+
+- Customizable HUD
+- Approximately five visible metrics at once
+- Improved DPS
+- Combat Timer
+- Time in Combat
+- Downed Count
+- Death Count
+- Boon Uptime
+- Food Timer
+- Utility Timer
+- Squad Statistics
+- Encounter Summary
+- World Boss Logging (experimental)
+- Jade Bot Buff Tracking (experimental)
+- Personal encounter history
+- Player-selected metric goals
+
+---
+
+# Development Principles
+
+MetricHUD development follows several core rules.
+
+## Precision Over Repetition
+
+Do not count something simply because ArcDPS emitted an event.
+
+Determine what that event actually represents.
+
+## Stability Before Features
+
+New foundations are tested before additional systems are built on top of them.
+
+## Controlled Testing
+
+When event behavior is unclear, use controlled tests with known skill activations.
+
+## Small Checkpoints
+
+Development should proceed through:
+
+```text
+Code
+?
+Save
+?
+Build
+?
+Live Test
+?
+Verify
+?
+Commit
+?
+Push
+```
+
+Avoid stacking multiple unverified changes.
+
+---
+
+# Current Stable Checkpoint
+
+At the end of the current development session:
+
+```text
+Build: PASS
+ArcDPS callback: PASS
+Skill names: PASS
+Recent skills: PASS
+Self-only filtering: PASS
+State-change filtering: PASS
+DPS regression test: PASS
+Activation-event capture: PASS
+Live combat stability: PASS
+Git commit: COMPLETE
+Git push: COMPLETE
+```
+
+No unfinished code change is intentionally being left between checkpoints.
+
+---
+
+# Resume Here
+
+**NEXT SESSION STARTING POINT**
+
+Do not begin by changing the HUD or adding another metric.
+
+Resume inside the CombatAnalyzer work.
+
+Primary objective:
+
+> Convert the currently observed ArcDPS event stream into a reliable representation of actual player skill activations.
+
+Start with controlled testing of individual skill presses and compare activation metadata.
+
+Once a reliable rule can distinguish actual player activations from repeated damage/proc events, implement that logic separately from the existing raw-event counter.
+
+The raw counter should remain available for debugging until the activation system is verified.
+
+---
+
+# Last Verified State
+
+MetricHUD builds successfully and runs in Guild Wars 2 without a known crash from the current CombatAnalyzer changes.
+
+The latest verified CombatAnalyzer pipeline filters events to the local player before processing and preserves skill names supplied by ArcDPS.
+
+**Safe stopping point reached.**
