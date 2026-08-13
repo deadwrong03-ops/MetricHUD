@@ -176,6 +176,7 @@
     <ClInclude Include="CombatAnalyzer.h" />
     <ClInclude Include="Core\MetricRegistry.h" />
     <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="EVTCAnalyzer.h" />
     <ClInclude Include="HUDWindow.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="CombatAnalyzer.cpp" />
     <ClCompile Include="Core\MetricRegistry.cpp" />
     <ClCompile Include="entry.cpp" />
+    <ClCompile Include="EVTCAnalyzer.cpp" />
     <ClCompile Include="HUDWindow.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
