@@ -643,6 +643,25 @@ void AddonOptions()
 			"Parsed Skills: %u",
 			static_cast<unsigned int>(evtcSkills.size())
 		);
+		if (!evtcSkills.empty())
+		{
+			ImGui::Text("First Skills:");
+
+			const size_t displaySkillCount =
+				evtcSkills.size() < 8 ? evtcSkills.size() : 8;
+
+			for (size_t i = 0; i < displaySkillCount; ++i)
+			{
+				const EVTCSkill& skill = evtcSkills[i];
+
+				ImGui::Text(
+					"%u: %s (%u)",
+					static_cast<unsigned int>(i),
+					skill.name.c_str(),
+					static_cast<unsigned int>(skill.id)
+				);
+			}
+		}
 
 		if (!evtcSkills.empty())
 		{

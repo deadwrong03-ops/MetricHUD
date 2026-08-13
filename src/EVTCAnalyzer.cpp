@@ -146,48 +146,59 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
             (static_cast<uint32_t>(data[skillCountOffset + 1]) << 8) |
             (static_cast<uint32_t>(data[skillCountOffset + 2]) << 16) |
             (static_cast<uint32_t>(data[skillCountOffset + 3]) << 24);
-
-        // Parse first EVTC skill record for validation.
- // Skill table begins immediately after the 4-byte skill count.
- // Each skill record is 68 bytes:
- // 4-byte skill ID + 64-byte UTF-8 name.
+        // Parse all EVTC skill records.
+        // Each skill record is 68 bytes:
+        // 4-byte skill ID + 64-byte UTF-8 name.
 
         const size_t skillRecordSize = 68;
         const size_t skillSectionOffset = skillCountOffset + 4;
+
         header.skillSectionOffset =
             static_cast<uint64_t>(skillSectionOffset);
 
-        if (header.skillCount > 0 &&
-            extractedSize >= skillSectionOffset + skillRecordSize)
+        if (header.skillCount > 0)
         {
-            const unsigned char* skillData =
-                data + skillSectionOffset;
+            const size_t requiredSkillSize =
+                skillSectionOffset +
+                (static_cast<size_t>(header.skillCount) * skillRecordSize);
 
-            EVTCSkill skill;
-
-            std::memcpy(
-                &skill.id,
-                skillData + 0,
-                4
-            );
-
-            const char* skillNameData =
-                reinterpret_cast<const char*>(skillData + 4);
-
-            size_t skillNameLength = 0;
-
-            while (skillNameLength < 64 &&
-                skillNameData[skillNameLength] != '\0')
+            if (extractedSize >= requiredSkillSize)
             {
-                ++skillNameLength;
+                skills.reserve(header.skillCount);
+
+                for (uint32_t i = 0; i < header.skillCount; ++i)
+                {
+                    const unsigned char* skillData =
+                        data + skillSectionOffset +
+                        (static_cast<size_t>(i) * skillRecordSize);
+
+                    EVTCSkill skill;
+
+                    std::memcpy(
+                        &skill.id,
+                        skillData,
+                        4
+                    );
+
+                    const char* skillNameData =
+                        reinterpret_cast<const char*>(skillData + 4);
+
+                    size_t skillNameLength = 0;
+
+                    while (skillNameLength < 64 &&
+                        skillNameData[skillNameLength] != '\0')
+                    {
+                        ++skillNameLength;
+                    }
+
+                    skill.name.assign(
+                        skillNameData,
+                        skillNameLength
+                    );
+
+                    skills.push_back(skill);
+                }
             }
-
-            skill.name.assign(
-                skillNameData,
-                skillNameLength
-            );
-
-            skills.push_back(skill);
         }
         
         mz_free(extractedData);
