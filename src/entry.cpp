@@ -504,6 +504,25 @@ void AddonOptions()
 				skillID
 			);
 		}
+		ImGui::Separator();
+
+		ImGui::Text("Skill Usage:");
+
+		const auto& skillUseCounts = combatAnalyzer.GetSkillUseCounts();
+
+		for (const auto& entry : skillUseCounts)
+		{
+			const uint32_t skillID = entry.first;
+			const uint32_t count = entry.second;
+			const std::string skillName = combatAnalyzer.GetSkillName(skillID);
+
+			ImGui::Text(
+				"  %s (%u): %u",
+				skillName.c_str(),
+				skillID,
+				count
+			);
+		}
 
 		const auto& recentRecords = combatAnalyzer.GetRecentRecords();
 
@@ -512,7 +531,8 @@ void AddonOptions()
 		for (const CombatRecord& record : recentRecords)
 		{
 			ImGui::Text(
-				"ID:%u  Val:%d  Buff:%d  Act:%u  90:%u  50:%u  Move:%u",
+				"Time:%llu ID:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
+				record.time,
 				record.skillID,
 				record.value,
 				record.buffDamage,
@@ -521,6 +541,24 @@ void AddonOptions()
 				record.isFifty,
 				record.isMoving
 			);
+			ImGui::Separator();
+			ImGui::Text("Activation Events:");
+
+			for (const CombatRecord& record : recentRecords)
+			{
+				if (record.isActivation != 0)
+				{
+					const std::string skillName =
+						combatAnalyzer.GetSkillName(record.skillID);
+
+					ImGui::Text(
+						"  %s (%u) Act:%u",
+						skillName.c_str(),
+						record.skillID,
+						record.isActivation
+					);
+				}
+			}
 		}
 	}
 }

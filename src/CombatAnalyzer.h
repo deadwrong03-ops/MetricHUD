@@ -50,6 +50,7 @@ public:
     const std::vector<uint32_t>& GetRecentSkills() const;
     const std::vector<CombatRecord>& GetRecentRecords() const;
     std::string GetSkillName(uint32_t skillID) const;
+    const std::unordered_map<uint32_t, uint32_t>& GetSkillUseCounts() const;
 
 private:
     uint64_t eventCount = 0;
@@ -65,4 +66,6 @@ private:
     std::vector<uint32_t> recentSkills;
     std::vector<CombatRecord> recentRecords;
     std::unordered_map<uint32_t, std::string> skillNames;
+    std::unordered_map<uint32_t, uint32_t> skillUseCounts;
+    std::unordered_map<uint32_t, uint64_t> lastSkillEventTimes;
 };

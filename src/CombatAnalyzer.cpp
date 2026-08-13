@@ -28,6 +28,8 @@ void CombatAnalyzer::ResetSession()
     lastActivation = 0;
     recentSkills.clear();
     recentRecords.clear();
+    skillUseCounts.clear();
+    lastSkillEventTimes.clear();
 }
 void CombatAnalyzer::CaptureLastFight()
 {
@@ -54,6 +56,18 @@ void CombatAnalyzer::ProcessEvent(
         skillName[0] != '\0')
     {
         skillNames[event->SkillID] = skillName;
+    }
+    if (event->SkillID != 0)
+    {
+        const uint64_t currentTime = event->Time;
+        const uint64_t lastTime = lastSkillEventTimes[event->SkillID];
+
+        if (lastTime == 0 || currentTime - lastTime > 50)
+        {
+            skillUseCounts[event->SkillID]++;
+        }
+
+        lastSkillEventTimes[event->SkillID] = currentTime;
     }
 
     // existing eventCount / damage / record code continues here
@@ -185,4 +199,8 @@ std::string CombatAnalyzer::GetSkillName(uint32_t skillID) const
     }
 
     return "Unknown";
+}
+const std::unordered_map<uint32_t, uint32_t>& CombatAnalyzer::GetSkillUseCounts() const
+{
+    return skillUseCounts;
 }
