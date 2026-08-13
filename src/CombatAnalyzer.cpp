@@ -76,6 +76,9 @@ void CombatAnalyzer::ProcessEvent(
 
     record.time = event->Time;
     record.skillID = event->SkillID;
+    record.sourceAgent = event->SourceAgent;
+    record.sourceInstanceID = event->SourceInstanceID;
+    record.sourceMasterInstanceID = event->SrcMasterInstanceID;
     record.value = event->Value;
     record.buffDamage = event->BuffDamage;
     record.isActivation = event->IsActivation;

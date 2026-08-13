@@ -125,7 +125,7 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
-	combatAnalyzer.ProcessEvent(ev, combatData->skillname);
+	
 
 	if (combatData->src == nullptr)
 	{
@@ -141,6 +141,7 @@ void OnArcDPSCombat(void* eventArgs)
 	{
 		return;
 	}
+	combatAnalyzer.ProcessEvent(ev, combatData->skillname);
 
 	if (ev->Value > 0)
 	{
@@ -531,9 +532,12 @@ void AddonOptions()
 		for (const CombatRecord& record : recentRecords)
 		{
 			ImGui::Text(
-				"Time:%llu ID:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
+				"Time:%llu ID:%u Src:%llu SrcInst:%u Master:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
 				record.time,
 				record.skillID,
+				record.sourceAgent,
+				record.sourceInstanceID,
+				record.sourceMasterInstanceID,
 				record.value,
 				record.buffDamage,
 				record.isActivation,

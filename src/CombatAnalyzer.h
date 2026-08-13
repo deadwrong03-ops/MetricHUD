@@ -15,6 +15,9 @@ struct CombatRecord
 {
     uint64_t time = 0;
     uint32_t skillID = 0;
+    uint64_t sourceAgent = 0;
+    uint16_t sourceInstanceID = 0;
+    uint16_t sourceMasterInstanceID = 0;
     int32_t value = 0;
     int32_t buffDamage = 0;
     uint8_t isActivation = 0;
