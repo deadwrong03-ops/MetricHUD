@@ -16,6 +16,7 @@ void CombatAnalyzer::Initialize()
     lastActivation = 0;
     recentSkills.clear();
     recentRecords.clear();
+   
 }
 void CombatAnalyzer::ResetSession()
 {
@@ -30,6 +31,9 @@ void CombatAnalyzer::ResetSession()
     recentRecords.clear();
     skillUseCounts.clear();
     lastSkillEventTimes.clear();
+    
+    
+    
 }
 void CombatAnalyzer::CaptureLastFight()
 {
@@ -44,7 +48,8 @@ void CombatAnalyzer::Shutdown()
 
 void CombatAnalyzer::ProcessEvent(
     const ArcDPS::CombatEvent* event,
-    const char* skillName)
+    const char* skillName,
+    uint64_t eventID)
 {
     if (event == nullptr)
     {
@@ -70,15 +75,25 @@ void CombatAnalyzer::ProcessEvent(
         lastSkillEventTimes[event->SkillID] = currentTime;
     }
 
+   
+    if (event->SkillID != 0 && event->IsActivation == 1)
+    {
+     
+    }
+    
+
     // existing eventCount / damage / record code continues here
 
     CombatRecord record;
 
     record.time = event->Time;
+    record.eventID = eventID;
     record.skillID = event->SkillID;
     record.sourceAgent = event->SourceAgent;
     record.sourceInstanceID = event->SourceInstanceID;
     record.sourceMasterInstanceID = event->SrcMasterInstanceID;
+    record.destinationAgent = event->DestinationAgent;
+    record.destinationInstanceID = event->DestinationInstanceID;
     record.value = event->Value;
     record.buffDamage = event->BuffDamage;
     record.isActivation = event->IsActivation;
@@ -207,3 +222,4 @@ const std::unordered_map<uint32_t, uint32_t>& CombatAnalyzer::GetSkillUseCounts(
 {
     return skillUseCounts;
 }
+

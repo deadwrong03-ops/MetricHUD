@@ -14,10 +14,13 @@ namespace ArcDPS
 struct CombatRecord
 {
     uint64_t time = 0;
+    uint64_t eventID = 0;
     uint32_t skillID = 0;
     uint64_t sourceAgent = 0;
     uint16_t sourceInstanceID = 0;
     uint16_t sourceMasterInstanceID = 0;
+    uint64_t destinationAgent = 0;
+    uint16_t destinationInstanceID = 0;
     int32_t value = 0;
     int32_t buffDamage = 0;
     uint8_t isActivation = 0;
@@ -37,9 +40,14 @@ public:
     void Shutdown();
     void ResetSession();
 
-    void ProcessEvent(const ArcDPS::CombatEvent* event, const char* skillName);
+    void ProcessEvent(
+        const ArcDPS::CombatEvent* event,
+        const char* skillName,
+        uint64_t eventID
+    );
 
     uint64_t GetEventCount() const;
+   
     uint64_t GetDamageEventCount() const;
     int64_t GetTotalDirectDamage() const;
     double GetCombatDurationSeconds() const;
@@ -54,6 +62,8 @@ public:
     const std::vector<CombatRecord>& GetRecentRecords() const;
     std::string GetSkillName(uint32_t skillID) const;
     const std::unordered_map<uint32_t, uint32_t>& GetSkillUseCounts() const;
+    
+    
 
 private:
     uint64_t eventCount = 0;
@@ -66,9 +76,13 @@ private:
     double lastFightDPS = 0.0;
     uint32_t lastSkillID = 0;
     uint8_t lastActivation = 0;
+    
     std::vector<uint32_t> recentSkills;
     std::vector<CombatRecord> recentRecords;
     std::unordered_map<uint32_t, std::string> skillNames;
     std::unordered_map<uint32_t, uint32_t> skillUseCounts;
     std::unordered_map<uint32_t, uint64_t> lastSkillEventTimes;
+    
+   
+  
 };

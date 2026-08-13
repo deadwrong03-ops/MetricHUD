@@ -34,6 +34,7 @@ namespace ArcDPS
         uint8_t PAD63;
         uint8_t PAD64;
     };
+   
 
     struct Agent
     {

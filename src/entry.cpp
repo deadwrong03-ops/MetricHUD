@@ -141,7 +141,13 @@ void OnArcDPSCombat(void* eventArgs)
 	{
 		return;
 	}
-	combatAnalyzer.ProcessEvent(ev, combatData->skillname);
+
+	combatAnalyzer.ProcessEvent(
+		ev,
+		combatData->skillname,
+		combatData->id
+
+	);
 
 	if (ev->Value > 0)
 	{
@@ -464,6 +470,7 @@ void AddonOptions()
 		ImGui::TextDisabled("Settings will be added during development.");
 		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
+		
 		ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 
 		ImGui::Text(
@@ -510,6 +517,8 @@ void AddonOptions()
 		ImGui::Text("Skill Usage:");
 
 		const auto& skillUseCounts = combatAnalyzer.GetSkillUseCounts();
+		
+		
 
 		for (const auto& entry : skillUseCounts)
 		{
@@ -532,11 +541,14 @@ void AddonOptions()
 		for (const CombatRecord& record : recentRecords)
 		{
 			ImGui::Text(
-				"Time:%llu ID:%u Src:%llu SrcInst:%u Master:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
+				"Time:%llu Event:%llu ID:%u Src:%llu SrcInst:%u Dst:%llu DstInst:%u Master:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
 				record.time,
+				record.eventID,
 				record.skillID,
 				record.sourceAgent,
 				record.sourceInstanceID,
+				record.destinationAgent,
+				record.destinationInstanceID,
 				record.sourceMasterInstanceID,
 				record.value,
 				record.buffDamage,
