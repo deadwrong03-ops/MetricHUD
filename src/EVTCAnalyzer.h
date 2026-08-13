@@ -10,6 +10,7 @@ struct EVTCHeader
     uint8_t revision = 0;
     uint16_t encounterID = 0;
     uint32_t agentCount = 0;
+    uint32_t skillCount = 0;
 };
 struct EVTCAgent
 {

@@ -127,7 +127,24 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
                 }
             }
         }
+        // Skill table begins immediately after the agent table.
+        const size_t skillCountOffset =
+            agentSectionOffset +
+            (static_cast<size_t>(header.agentCount) * agentRecordSize);
 
+        // Need at least 4 bytes for the skill count.
+        if (extractedSize < skillCountOffset + 4)
+        {
+            mz_free(extractedData);
+            mz_zip_reader_end(&zipArchive);
+            return false;
+        }
+
+        header.skillCount =
+            static_cast<uint32_t>(data[skillCountOffset + 0]) |
+            (static_cast<uint32_t>(data[skillCountOffset + 1]) << 8) |
+            (static_cast<uint32_t>(data[skillCountOffset + 2]) << 16) |
+            (static_cast<uint32_t>(data[skillCountOffset + 3]) << 24);
         mz_free(extractedData);
         mz_zip_reader_end(&zipArchive);
 

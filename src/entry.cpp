@@ -624,6 +624,10 @@ void AddonOptions()
 			static_cast<unsigned int>(evtcHeader.agentCount)
 		);
 		const auto& evtcAgents = evtcAnalyzer.GetAgents();
+		ImGui::Text(
+			"EVTC Skill Count: %u",
+			static_cast<unsigned int>(evtcHeader.skillCount)
+		);
 
 		ImGui::Text(
 			"Parsed Agents: %u",
