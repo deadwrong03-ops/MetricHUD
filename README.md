@@ -1,4 +1,4 @@
-# MetricHUD
+ MetricHUD
 
 > ⚠️ **Early Development Build**
 >
@@ -12,7 +12,6 @@ The goal is simple:
 
 ---
 
-
 ## Privacy & Security
 
 MetricHUD is designed to operate without requiring access to your Guild Wars 2 account credentials.
@@ -25,9 +24,7 @@ MetricHUD is designed to operate without requiring access to your Guild Wars 2 a
 
 If a future feature would require authenticated account access, it will be evaluated separately rather than being included as a requirement for the core addon.
 
-
-
-
+---
 
 # Progress
 
@@ -51,15 +48,28 @@ Current Version: **0.3.0**
 - [x] Individual metric visibility toggles
 - [x] Text metric support
 - [x] Mumble Link integration
+- [x] arcdps combat-event integration
+- [x] Combat event collection
+- [x] Combat-session tracking
+- [x] Combat DPS calculation
+- [x] Combat-session reset
+- [x] Recent skill ID tracking
+- [x] Combat Analyzer debug panel
 
 ## Current Metrics
 
 - [x] FPS
 - [x] Ping
 - [x] Combat Timer
+- [x] DPS
 - [x] Map Name
 - [x] Map ID
 - [x] Character Name
+- [x] Player Speed
+
+      Known issue:
+Mumble-derived metrics may occasionally fall back to Unknown / 0
+(Map Name, Map ID, Character Name, Player Speed).
 
 ---
 
@@ -77,9 +87,7 @@ MetricHUD is built around a few simple principles.
 
 # Planned Metrics
 
-- Player Speed
 - Player Position
-- DPS
 - Time in Combat
 - Downed Count
 - Death Count
@@ -139,7 +147,6 @@ MetricHUD is built around a few simple principles.
 - Plugin-style metric system
 - Metric categories
 - Expanded metric data sources
-- Combat event collection system
 - Skill event history
 - Rotation analysis framework
 
@@ -171,24 +178,29 @@ MetricHUD is built around a few simple principles.
 - [x] FPS
 - [x] Ping
 - [x] Combat Timer
+- [x] DPS
 - [x] Map Name
 - [x] Map ID
 - [x] Character Name
-- [ ] Player Speed
+- [x] Player Speed
 - [ ] Player Position
-- [ ] DPS
 - [ ] Boon Uptime
 - [ ] Squad Statistics
 
 ## Phase 4 — Combat Event System
 
-- [ ] arcdps combat-event integration
-- [ ] Player skill-event detection
-- [ ] Skill ID and skill-name tracking
-- [ ] Combat skill history
+- [x] arcdps combat-event integration
+- [x] Player combat-event detection
+- [x] Skill ID tracking
+- [x] Recent skill history
+- [x] Combat-session tracking
+- [x] Combat DPS calculation
+- [x] Combat-session reset
+- [x] Last-fight statistics capture
+- [ ] Skill-name resolution
+- [ ] Full combat skill history
 - [ ] Skill usage statistics
 - [ ] Auto-attack filtering
-- [ ] Combat-session tracking
 
 ## Phase 5 — Rotation Training
 
