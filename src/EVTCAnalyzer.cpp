@@ -8,8 +8,6 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
 
     // ---------------------------------------------------------
     // Compressed ArcDPS EVTC log (.zevtc)
-    // For now, only verify that miniz can open the archive.
-    // Actual extraction/parsing comes next.
     // ---------------------------------------------------------
     if (filePath.size() >= 6 &&
         filePath.compare(filePath.size() - 6, 6, ".zevtc") == 0)
@@ -43,7 +41,7 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
                 0
             );
 
-        if (extractedData == nullptr || extractedSize < 16)
+        if (extractedData == nullptr || extractedSize < 20)
         {
             if (extractedData != nullptr)
             {
@@ -71,6 +69,15 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
             static_cast<uint16_t>(data[13]) |
             (static_cast<uint16_t>(data[14]) << 8);
 
+        // Byte 15 is reserved/padding.
+
+        // Bytes 16-19 = agent count.
+        header.agentCount =
+            static_cast<uint32_t>(data[16]) |
+            (static_cast<uint32_t>(data[17]) << 8) |
+            (static_cast<uint32_t>(data[18]) << 16) |
+            (static_cast<uint32_t>(data[19]) << 24);
+
         mz_free(extractedData);
         mz_zip_reader_end(&zipArchive);
 
@@ -87,7 +94,6 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
         return false;
     }
 
-    // EVTC version string is 12 bytes.
     char versionBuffer[12] = {};
 
     file.read(versionBuffer, 12);
@@ -99,16 +105,22 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
 
     header.version.assign(versionBuffer, 12);
 
-    // Revision
     file.read(
         reinterpret_cast<char*>(&header.revision),
         sizeof(header.revision)
     );
 
-    // Encounter ID
     file.read(
         reinterpret_cast<char*>(&header.encounterID),
         sizeof(header.encounterID)
+    );
+
+    // Skip the reserved/padding byte at offset 15.
+    file.seekg(1, std::ios::cur);
+
+    file.read(
+        reinterpret_cast<char*>(&header.agentCount),
+        sizeof(header.agentCount)
     );
 
     if (!file)
@@ -125,6 +137,11 @@ const EVTCHeader& EVTCAnalyzer::GetHeader() const
     return header;
 }
 
+const std::vector<EVTCAgent>& EVTCAnalyzer::GetAgents() const
+{
+    return agents;
+}
+
 const std::vector<EVTCSkillCast>& EVTCAnalyzer::GetSkillCasts() const
 {
     return skillCasts;
@@ -133,5 +150,6 @@ const std::vector<EVTCSkillCast>& EVTCAnalyzer::GetSkillCasts() const
 void EVTCAnalyzer::Clear()
 {
     header = EVTCHeader{};
+    agents.clear();
     skillCasts.clear();
 }

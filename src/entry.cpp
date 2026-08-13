@@ -619,6 +619,10 @@ void AddonOptions()
 			"EVTC Encounter ID: %u",
 			static_cast<unsigned int>(evtcHeader.encounterID)
 		);
+		ImGui::Text(
+			"EVTC Agent Count: %u",
+			static_cast<unsigned int>(evtcHeader.agentCount)
+		);
 				}
 			}
 		
