@@ -294,6 +294,28 @@ void AddonRender()
 	hasPreviousPosition = true;
 
 	metricRegistry.SetMetricValue(MetricID::PlayerSpeed, playerSpeed);
+	if (MumbleLink != nullptr)
+	{
+		unsigned int mapID = MumbleLink->Context.MapID;
+
+		metricRegistry.SetMetricValue(
+			MetricID::MapID,
+			static_cast<float>(mapID)
+		);
+
+		metricRegistry.SetMetricText(
+			MetricID::MapName,
+			MapRegistry::GetMapName(mapID)
+		);
+
+		std::string identity = WideToUTF8(MumbleLink->Identity);
+		std::string characterName = GetCharacterName(identity);
+
+		metricRegistry.SetMetricText(
+			MetricID::CharacterName,
+			characterName.c_str()
+		);
+	}
 
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
 	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
