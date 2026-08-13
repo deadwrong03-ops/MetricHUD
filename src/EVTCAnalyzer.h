@@ -11,6 +11,8 @@ struct EVTCHeader
     uint16_t encounterID = 0;
     uint32_t agentCount = 0;
     uint32_t skillCount = 0;
+    uint64_t extractedSize = 0;
+    uint64_t skillSectionOffset = 0;
 };
 struct EVTCAgent
 {
@@ -23,6 +25,11 @@ struct EVTCAgent
     uint16_t hitboxWidth = 0;
     int16_t condition = 0;
     uint16_t reserved = 0;
+    std::string name;
+};
+struct EVTCSkill
+{
+    uint32_t id = 0;
     std::string name;
 };
 struct EVTCSkillCast
@@ -41,6 +48,7 @@ public:
     const EVTCHeader& GetHeader() const;
 
     const std::vector<EVTCAgent>& GetAgents() const;
+    const std::vector<EVTCSkill>& GetSkills() const;
     const std::vector<EVTCSkillCast>& GetSkillCasts() const;
 
     void Clear();
@@ -50,6 +58,7 @@ public:
 private:
     EVTCHeader header;
     std::vector<EVTCAgent> agents;
+    std::vector<EVTCSkill> skills;
     std::vector<EVTCSkillCast> skillCasts;
 
 };

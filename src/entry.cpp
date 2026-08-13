@@ -628,7 +628,32 @@ void AddonOptions()
 			"EVTC Skill Count: %u",
 			static_cast<unsigned int>(evtcHeader.skillCount)
 		);
+		ImGui::Text(
+			"EVTC Extracted Size: %llu",
+			static_cast<unsigned long long>(evtcHeader.extractedSize)
+		);
 
+		ImGui::Text(
+			"EVTC Skill Section Offset: %llu",
+			static_cast<unsigned long long>(evtcHeader.skillSectionOffset)
+		);
+		const auto& evtcSkills = evtcAnalyzer.GetSkills();
+
+		ImGui::Text(
+			"Parsed Skills: %u",
+			static_cast<unsigned int>(evtcSkills.size())
+		);
+
+		if (!evtcSkills.empty())
+		{
+			const EVTCSkill& skill = evtcSkills.front();
+
+			ImGui::Text(
+				"First Skill: %s (%u)",
+				skill.name.c_str(),
+				skill.id
+			);
+		}
 		ImGui::Text(
 			"Parsed Agents: %u",
 			static_cast<unsigned int>(evtcAgents.size())

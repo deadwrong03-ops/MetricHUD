@@ -55,6 +55,8 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
 
         const unsigned char* data =
             static_cast<const unsigned char*>(extractedData);
+        header.extractedSize =
+            static_cast<uint64_t>(extractedSize);
 
         // First 12 bytes = EVTC version string.
         header.version.assign(
@@ -139,12 +141,55 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
             mz_zip_reader_end(&zipArchive);
             return false;
         }
-
         header.skillCount =
             static_cast<uint32_t>(data[skillCountOffset + 0]) |
             (static_cast<uint32_t>(data[skillCountOffset + 1]) << 8) |
             (static_cast<uint32_t>(data[skillCountOffset + 2]) << 16) |
             (static_cast<uint32_t>(data[skillCountOffset + 3]) << 24);
+
+        // Parse first EVTC skill record for validation.
+ // Skill table begins immediately after the 4-byte skill count.
+ // Each skill record is 68 bytes:
+ // 4-byte skill ID + 64-byte UTF-8 name.
+
+        const size_t skillRecordSize = 68;
+        const size_t skillSectionOffset = skillCountOffset + 4;
+        header.skillSectionOffset =
+            static_cast<uint64_t>(skillSectionOffset);
+
+        if (header.skillCount > 0 &&
+            extractedSize >= skillSectionOffset + skillRecordSize)
+        {
+            const unsigned char* skillData =
+                data + skillSectionOffset;
+
+            EVTCSkill skill;
+
+            std::memcpy(
+                &skill.id,
+                skillData + 0,
+                4
+            );
+
+            const char* skillNameData =
+                reinterpret_cast<const char*>(skillData + 4);
+
+            size_t skillNameLength = 0;
+
+            while (skillNameLength < 64 &&
+                skillNameData[skillNameLength] != '\0')
+            {
+                ++skillNameLength;
+            }
+
+            skill.name.assign(
+                skillNameData,
+                skillNameLength
+            );
+
+            skills.push_back(skill);
+        }
+        
         mz_free(extractedData);
         mz_zip_reader_end(&zipArchive);
 
@@ -208,6 +253,10 @@ const std::vector<EVTCAgent>& EVTCAnalyzer::GetAgents() const
 {
     return agents;
 }
+const std::vector<EVTCSkill>& EVTCAnalyzer::GetSkills() const
+{
+    return skills;
+}
 
 const std::vector<EVTCSkillCast>& EVTCAnalyzer::GetSkillCasts() const
 {
@@ -219,4 +268,5 @@ void EVTCAnalyzer::Clear()
     header = EVTCHeader{};
     agents.clear();
     skillCasts.clear();
+    skills.clear();
 }
