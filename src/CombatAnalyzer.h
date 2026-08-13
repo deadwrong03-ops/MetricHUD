@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "ArcDPS.h"
 #include <vector>
+#include <string>
+#include <unordered_map>
 
 namespace ArcDPS
 {
@@ -32,7 +34,7 @@ public:
     void Shutdown();
     void ResetSession();
 
-    void ProcessEvent(const ArcDPS::CombatEvent* event);
+    void ProcessEvent(const ArcDPS::CombatEvent* event, const char* skillName);
 
     uint64_t GetEventCount() const;
     uint64_t GetDamageEventCount() const;
@@ -47,6 +49,7 @@ public:
     uint8_t GetLastActivation() const;
     const std::vector<uint32_t>& GetRecentSkills() const;
     const std::vector<CombatRecord>& GetRecentRecords() const;
+    std::string GetSkillName(uint32_t skillID) const;
 
 private:
     uint64_t eventCount = 0;
@@ -61,4 +64,5 @@ private:
     uint8_t lastActivation = 0;
     std::vector<uint32_t> recentSkills;
     std::vector<CombatRecord> recentRecords;
+    std::unordered_map<uint32_t, std::string> skillNames;
 };

@@ -40,12 +40,23 @@ void CombatAnalyzer::Shutdown()
 {
 }
 
-void CombatAnalyzer::ProcessEvent(const ArcDPS::CombatEvent* event)
+void CombatAnalyzer::ProcessEvent(
+    const ArcDPS::CombatEvent* event,
+    const char* skillName)
 {
     if (event == nullptr)
     {
         return;
     }
+
+    if (event->SkillID != 0 &&
+        skillName != nullptr &&
+        skillName[0] != '\0')
+    {
+        skillNames[event->SkillID] = skillName;
+    }
+
+    // existing eventCount / damage / record code continues here
 
     CombatRecord record;
 
@@ -162,4 +173,16 @@ const std::vector<uint32_t>& CombatAnalyzer::GetRecentSkills() const
 const std::vector<CombatRecord>& CombatAnalyzer::GetRecentRecords() const
 {
     return recentRecords;
+
+}
+std::string CombatAnalyzer::GetSkillName(uint32_t skillID) const
+{
+    auto it = skillNames.find(skillID);
+
+    if (it != skillNames.end())
+    {
+        return it->second;
+    }
+
+    return "Unknown";
 }

@@ -125,7 +125,7 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
-	combatAnalyzer.ProcessEvent(ev);
+	combatAnalyzer.ProcessEvent(ev, combatData->skillname);
 
 	if (combatData->src == nullptr)
 	{
@@ -496,7 +496,13 @@ void AddonOptions()
 
 		for (uint32_t skillID : recentSkills)
 		{
-			ImGui::Text("  %u", skillID);
+			const std::string skillName = combatAnalyzer.GetSkillName(skillID);
+
+			ImGui::Text(
+				"  %s (%u)",
+				skillName.c_str(),
+				skillID
+			);
 		}
 
 		const auto& recentRecords = combatAnalyzer.GetRecentRecords();
