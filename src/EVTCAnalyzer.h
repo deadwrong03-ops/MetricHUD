@@ -16,12 +16,12 @@ struct EVTCAgent
     uint64_t address = 0;
     uint32_t profession = 0;
     uint32_t elite = 0;
-    uint16_t toughness = 0;
-    uint16_t concentration = 0;
-    uint16_t healing = 0;
+    int16_t toughness = 0;
+    int16_t concentration = 0;
+    int16_t healing = 0;
     uint16_t hitboxWidth = 0;
-    uint16_t condition = 0;
-    uint16_t hitboxHeight = 0;
+    int16_t condition = 0;
+    uint16_t reserved = 0;
     std::string name;
 };
 struct EVTCSkillCast

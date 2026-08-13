@@ -623,6 +623,62 @@ void AddonOptions()
 			"EVTC Agent Count: %u",
 			static_cast<unsigned int>(evtcHeader.agentCount)
 		);
+		const auto& evtcAgents = evtcAnalyzer.GetAgents();
+
+		ImGui::Text(
+			"Parsed Agents: %u",
+			static_cast<unsigned int>(evtcAgents.size())
+		);
+
+		if (!evtcAgents.empty())
+		{
+			const EVTCAgent& agent = evtcAgents.front();
+
+			ImGui::Text(
+				"First Agent: %s",
+				agent.name.c_str()
+			);
+
+			ImGui::Text(
+				"Address: %llu",
+				static_cast<unsigned long long>(agent.address)
+			);
+
+			ImGui::Text(
+				"Profession: %u",
+				agent.profession
+			);
+
+			ImGui::Text(
+				"Elite: %u",
+				agent.elite
+			);
+
+			ImGui::Text(
+				"Toughness: %d",
+				static_cast<int>(agent.toughness)
+			);
+
+			ImGui::Text(
+				"Concentration: %d",
+				static_cast<int>(agent.concentration)
+			);
+
+			ImGui::Text(
+				"Healing: %d",
+				static_cast<int>(agent.healing)
+			);
+
+			ImGui::Text(
+				"Condition: %d",
+				static_cast<int>(agent.condition)
+			);
+
+			ImGui::Text(
+				"Hitbox Width: %u",
+				static_cast<unsigned int>(agent.hitboxWidth)
+			);
+		}
 				}
 			}
 		

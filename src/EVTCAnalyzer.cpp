@@ -1,6 +1,7 @@
 #include "EVTCAnalyzer.h"
 #include <fstream>
 #include "miniz.h"
+#include <cstring>
 
 bool EVTCAnalyzer::LoadFile(const std::string& filePath)
 {
@@ -77,6 +78,39 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
             (static_cast<uint32_t>(data[17]) << 8) |
             (static_cast<uint32_t>(data[18]) << 16) |
             (static_cast<uint32_t>(data[19]) << 24);
+        // Parse first EVTC agent for validation.
+// Header is 20 bytes. Each agent record is 96 bytes.
+        if (header.agentCount > 0 && extractedSize >= 20 + 96)
+        {
+            const unsigned char* agentData = data + 20;
+
+            EVTCAgent agent;
+
+            std::memcpy(&agent.address, agentData + 0, 8);
+            std::memcpy(&agent.profession, agentData + 8, 4);
+            std::memcpy(&agent.elite, agentData + 12, 4);
+            std::memcpy(&agent.toughness, agentData + 16, 2);
+            std::memcpy(&agent.concentration, agentData + 18, 2);
+            std::memcpy(&agent.healing, agentData + 20, 2);
+            std::memcpy(&agent.hitboxWidth, agentData + 22, 2);
+            std::memcpy(&agent.condition, agentData + 24, 2);
+            std::memcpy(&agent.reserved, agentData + 26, 2);
+
+            // Agent name occupies the final 64 bytes.
+            const char* nameData =
+                reinterpret_cast<const char*>(agentData + 28);
+
+            size_t nameLength = 0;
+
+            while (nameLength < 64 && nameData[nameLength] != '\0')
+            {
+                ++nameLength;
+            }
+
+            agent.name.assign(nameData, nameLength);
+
+            agents.push_back(agent);
+        }
 
         mz_free(extractedData);
         mz_zip_reader_end(&zipArchive);
