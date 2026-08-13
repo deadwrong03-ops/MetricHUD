@@ -23,6 +23,7 @@
     <ClCompile Include="MapRegistry.cpp" />
     <ClCompile Include="CombatAnalyzer.cpp" />
     <ClCompile Include="EVTCAnalyzer.cpp" />
+    <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -52,6 +53,7 @@
     <ClInclude Include="ArcDPS.h" />
     <ClInclude Include="CombatAnalyzer.h" />
     <ClInclude Include="EVTCAnalyzer.h" />
+    <ClInclude Include="miniz.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

@@ -185,6 +185,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="MapRegistry.h" />
+    <ClInclude Include="miniz.h" />
     <ClInclude Include="mumble\Mumble.h" />
     <ClInclude Include="nexus\Nexus.h" />
   </ItemGroup>
@@ -201,6 +202,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="MapRegistry.cpp" />
+    <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DEVELOPMENT_LOG.md" />

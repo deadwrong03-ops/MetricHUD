@@ -21,6 +21,7 @@
 #include <string>
 #include <cmath>
 #include "CombatAnalyzer.h"
+#include "EVTCAnalyzer.h"
 
 
 /* proto */
@@ -40,6 +41,7 @@ MetricRegistry metricRegistry;
 HUDWindow hudWindow;
 ConfigManager configManager;
 CombatAnalyzer combatAnalyzer;
+EVTCAnalyzer evtcAnalyzer;
 static long long arcTotalDamage = 0;
 
 
@@ -504,7 +506,8 @@ void AddonOptions()
 
 		for (uint32_t skillID : recentSkills)
 		{
-			const std::string skillName = combatAnalyzer.GetSkillName(skillID);
+			const std::string skillName =
+				combatAnalyzer.GetSkillName(skillID);
 
 			ImGui::Text(
 				"  %s (%u)",
@@ -512,19 +515,21 @@ void AddonOptions()
 				skillID
 			);
 		}
+
 		ImGui::Separator();
 
 		ImGui::Text("Skill Usage:");
 
-		const auto& skillUseCounts = combatAnalyzer.GetSkillUseCounts();
-		
-		
+		const auto& skillUseCounts =
+			combatAnalyzer.GetSkillUseCounts();
 
 		for (const auto& entry : skillUseCounts)
 		{
 			const uint32_t skillID = entry.first;
 			const uint32_t count = entry.second;
-			const std::string skillName = combatAnalyzer.GetSkillName(skillID);
+
+			const std::string skillName =
+				combatAnalyzer.GetSkillName(skillID);
 
 			ImGui::Text(
 				"  %s (%u): %u",
@@ -534,8 +539,10 @@ void AddonOptions()
 			);
 		}
 
-		const auto& recentRecords = combatAnalyzer.GetRecentRecords();
+		const auto& recentRecords =
+			combatAnalyzer.GetRecentRecords();
 
+		ImGui::Separator();
 		ImGui::Text("Recent Records:");
 
 		for (const CombatRecord& record : recentRecords)
@@ -557,24 +564,62 @@ void AddonOptions()
 				record.isFifty,
 				record.isMoving
 			);
-			ImGui::Separator();
-			ImGui::Text("Activation Events:");
+		}
 
-			for (const CombatRecord& record : recentRecords)
+		ImGui::Separator();
+		ImGui::Text("Activation Events:");
+
+		for (const CombatRecord& record : recentRecords)
+		{
+			if (record.isActivation != 0)
 			{
-				if (record.isActivation != 0)
-				{
-					const std::string skillName =
-						combatAnalyzer.GetSkillName(record.skillID);
+				const std::string skillName =
+					combatAnalyzer.GetSkillName(record.skillID);
 
-					ImGui::Text(
-						"  %s (%u) Act:%u",
-						skillName.c_str(),
-						record.skillID,
-						record.isActivation
-					);
-				}
+				ImGui::Text(
+					"  %s (%u) Act:%u",
+					skillName.c_str(),
+					record.skillID,
+					record.isActivation
+				);
 			}
 		}
-	}
-}
+
+		ImGui::Separator();
+		ImGui::Text("EVTC Analyzer Test:");
+
+		static bool evtcLoaded = false;
+
+		if (!evtcLoaded)
+		{
+			evtcLoaded = evtcAnalyzer.LoadFile(
+				R"(C:\Users\deadw\OneDrive\Documents\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\Standard Kitty Golem (16199)\20260813-132221.zevtc)"
+			);
+		}
+
+		ImGui::Text(
+			"EVTC Load: %s",
+			evtcLoaded ? "PASS" : "FAIL"
+		);
+
+		const EVTCHeader& evtcHeader =
+			evtcAnalyzer.GetHeader();
+
+		ImGui::Text(
+			"EVTC Version: %s",
+			evtcHeader.version.c_str()
+		);
+
+		ImGui::Text(
+			"EVTC Revision: %u",
+			static_cast<unsigned int>(evtcHeader.revision)
+		);
+
+		ImGui::Text(
+			"EVTC Encounter ID: %u",
+			static_cast<unsigned int>(evtcHeader.encounterID)
+		);
+				}
+			}
+		
+	
