@@ -56,4 +56,7 @@
       <UniqueIdentifier>{b8dcb93b-2947-498a-8c72-51bb322b9742}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DEVELOPMENT_LOG.md" />
+  </ItemGroup>
 </Project>
