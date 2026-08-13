@@ -632,22 +632,29 @@ void AddonOptions()
 
 		if (!evtcAgents.empty())
 		{
-			ImGui::Text("First Agents:");
+			ImGui::Text("Player Agents:");
 
-			const size_t displayCount =
-				evtcAgents.size() < 8 ? evtcAgents.size() : 8;
+			unsigned int playerIndex = 0;
 
-			for (size_t i = 0; i < displayCount; ++i)
+			for (const EVTCAgent& agent : evtcAgents)
 			{
-				const EVTCAgent& agent = evtcAgents[i];
+				// EVTC rule:
+				// elite == 0xFFFFFFFF = NPC/gadget
+				// anything else = player
+				if (agent.elite == 0xFFFFFFFF)
+				{
+					continue;
+				}
 
 				ImGui::Text(
 					"%u: %s | Prof:%u | Elite:%u",
-					static_cast<unsigned int>(i),
+					playerIndex,
 					agent.name.c_str(),
 					agent.profession,
 					agent.elite
 				);
+
+				++playerIndex;
 			}
 		}
 			}
