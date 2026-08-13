@@ -632,54 +632,23 @@ void AddonOptions()
 
 		if (!evtcAgents.empty())
 		{
-			const EVTCAgent& agent = evtcAgents.front();
+			ImGui::Text("First Agents:");
 
-			ImGui::Text(
-				"First Agent: %s",
-				agent.name.c_str()
-			);
+			const size_t displayCount =
+				evtcAgents.size() < 8 ? evtcAgents.size() : 8;
 
-			ImGui::Text(
-				"Address: %llu",
-				static_cast<unsigned long long>(agent.address)
-			);
+			for (size_t i = 0; i < displayCount; ++i)
+			{
+				const EVTCAgent& agent = evtcAgents[i];
 
-			ImGui::Text(
-				"Profession: %u",
-				agent.profession
-			);
-
-			ImGui::Text(
-				"Elite: %u",
-				agent.elite
-			);
-
-			ImGui::Text(
-				"Toughness: %d",
-				static_cast<int>(agent.toughness)
-			);
-
-			ImGui::Text(
-				"Concentration: %d",
-				static_cast<int>(agent.concentration)
-			);
-
-			ImGui::Text(
-				"Healing: %d",
-				static_cast<int>(agent.healing)
-			);
-
-			ImGui::Text(
-				"Condition: %d",
-				static_cast<int>(agent.condition)
-			);
-
-			ImGui::Text(
-				"Hitbox Width: %u",
-				static_cast<unsigned int>(agent.hitboxWidth)
-			);
-		}
-				}
+				ImGui::Text(
+					"%u: %s | Prof:%u | Elite:%u",
+					static_cast<unsigned int>(i),
+					agent.name.c_str(),
+					agent.profession,
+					agent.elite
+				);
 			}
-		
-	
+		}
+			}
+}
