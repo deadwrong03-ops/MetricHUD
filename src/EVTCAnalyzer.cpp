@@ -200,61 +200,141 @@ bool EVTCAnalyzer::LoadFile(const std::string& filePath)
                 }
             }
         }
-        
-        mz_free(extractedData);
-        mz_zip_reader_end(&zipArchive);
+        // Combat events begin immediately after the complete skill table.
+        const size_t combatEventOffset =
+            skillSectionOffset +
+            (static_cast<size_t>(header.skillCount) * skillRecordSize);
 
-        return true;
+        header.combatEventOffset =
+            static_cast<uint64_t>(combatEventOffset);
+        // EVTC combat-event records are 64 bytes each.
+        const size_t combatEventRecordSize = 64;
+
+        if (extractedSize >= combatEventOffset)
+        {
+            const size_t combatEventBytes =
+                extractedSize - combatEventOffset;
+
+            header.combatEventCount =
+                static_cast<uint64_t>(
+                    combatEventBytes / combatEventRecordSize
+                    );
+            // Parse all EVTC combat events.
+// Each combat event record is 64 bytes.
+            if (header.combatEventCount > 0)
+            {
+                combatEvents.reserve(
+                    static_cast<size_t>(header.combatEventCount)
+                );
+
+                for (uint64_t i = 0; i < header.combatEventCount; ++i)
+                {
+                    const size_t eventOffset =
+                        static_cast<size_t>(header.combatEventOffset) +
+                        (static_cast<size_t>(i) * combatEventRecordSize);
+
+                    if (eventOffset + combatEventRecordSize > extractedSize)
+                    {
+                        break;
+                    }
+
+                    const unsigned char* eventData =
+                        data + eventOffset;
+
+                    EVTCCombatEvent event;
+
+                    std::memcpy(&event.time, eventData + 0, 8);
+                    std::memcpy(&event.srcAgent, eventData + 8, 8);
+                    std::memcpy(&event.dstAgent, eventData + 16, 8);
+                    std::memcpy(&event.value, eventData + 24, 4);
+                    std::memcpy(&event.buffDmg, eventData + 28, 4);
+                    std::memcpy(&event.overstackValue, eventData + 32, 4);
+                    std::memcpy(&event.skillID, eventData + 36, 4);
+
+                    std::memcpy(&event.srcInstid, eventData + 40, 2);
+                    std::memcpy(&event.dstInstid, eventData + 42, 2);
+                    std::memcpy(&event.srcMasterInstid, eventData + 44, 2);
+                    std::memcpy(&event.dstMasterInstid, eventData + 46, 2);
+
+                    event.iff = eventData[48];
+                    event.buff = eventData[49];
+                    event.result = eventData[50];
+                    event.isActivation = eventData[51];
+                    event.isBuffRemove = eventData[52];
+                    event.isNinety = eventData[53];
+                    event.isFifty = eventData[54];
+                    event.isMoving = eventData[55];
+                    event.isStateChange = eventData[56];
+                    event.isFlanking = eventData[57];
+                    event.isShields = eventData[58];
+                    event.isOffcycle = eventData[59];
+
+                    event.pad61 = eventData[60];
+                    event.pad62 = eventData[61];
+                    event.pad63 = eventData[62];
+                    event.pad64 = eventData[63];
+
+                    combatEvents.push_back(event);
+                }
+
+
+
+
+                mz_free(extractedData);
+                mz_zip_reader_end(&zipArchive);
+
+                return true;
+            }
+        }
+
+            // ---------------------------------------------------------
+            // Raw EVTC log (.evtc)
+            // ---------------------------------------------------------
+            std::ifstream file(filePath, std::ios::binary);
+
+            if (!file.is_open())
+            {
+                return false;
+            }
+
+            char versionBuffer[12] = {};
+
+            file.read(versionBuffer, 12);
+
+            if (!file)
+            {
+                return false;
+            }
+
+            header.version.assign(versionBuffer, 12);
+
+            file.read(
+                reinterpret_cast<char*>(&header.revision),
+                sizeof(header.revision)
+            );
+
+            file.read(
+                reinterpret_cast<char*>(&header.encounterID),
+                sizeof(header.encounterID)
+            );
+
+            // Skip the reserved/padding byte at offset 15.
+            file.seekg(1, std::ios::cur);
+
+            file.read(
+                reinterpret_cast<char*>(&header.agentCount),
+                sizeof(header.agentCount)
+            );
+
+            if (!file)
+            {
+                Clear();
+                return false;
+            }
+
+            return true;
+        }
     }
-
-    // ---------------------------------------------------------
-    // Raw EVTC log (.evtc)
-    // ---------------------------------------------------------
-    std::ifstream file(filePath, std::ios::binary);
-
-    if (!file.is_open())
-    {
-        return false;
-    }
-
-    char versionBuffer[12] = {};
-
-    file.read(versionBuffer, 12);
-
-    if (!file)
-    {
-        return false;
-    }
-
-    header.version.assign(versionBuffer, 12);
-
-    file.read(
-        reinterpret_cast<char*>(&header.revision),
-        sizeof(header.revision)
-    );
-
-    file.read(
-        reinterpret_cast<char*>(&header.encounterID),
-        sizeof(header.encounterID)
-    );
-
-    // Skip the reserved/padding byte at offset 15.
-    file.seekg(1, std::ios::cur);
-
-    file.read(
-        reinterpret_cast<char*>(&header.agentCount),
-        sizeof(header.agentCount)
-    );
-
-    if (!file)
-    {
-        Clear();
-        return false;
-    }
-
-    return true;
-}
-
 const EVTCHeader& EVTCAnalyzer::GetHeader() const
 {
     return header;
@@ -268,6 +348,10 @@ const std::vector<EVTCSkill>& EVTCAnalyzer::GetSkills() const
 {
     return skills;
 }
+const std::vector<EVTCCombatEvent>& EVTCAnalyzer::GetCombatEvents() const
+{
+    return combatEvents;
+}
 
 const std::vector<EVTCSkillCast>& EVTCAnalyzer::GetSkillCasts() const
 {
@@ -279,5 +363,6 @@ void EVTCAnalyzer::Clear()
     header = EVTCHeader{};
     agents.clear();
     skillCasts.clear();
+    combatEvents.clear();
     skills.clear();
 }

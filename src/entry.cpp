@@ -634,15 +634,237 @@ void AddonOptions()
 		);
 
 		ImGui::Text(
-			"EVTC Skill Section Offset: %llu",
-			static_cast<unsigned long long>(evtcHeader.skillSectionOffset)
+			"EVTC Combat Event Offset: %llu",
+			static_cast<unsigned long long>(evtcHeader.combatEventOffset)
 		);
+
+		ImGui::Text(
+			"EVTC Combat Event Count: %llu",
+			static_cast<unsigned long long>(evtcHeader.combatEventCount)
+		);
+		const auto& evtcCombatEvents = evtcAnalyzer.GetCombatEvents();
+
+		ImGui::Text(
+			"Parsed Combat Events: %u",
+			static_cast<unsigned int>(evtcCombatEvents.size())
+		);
+		
+
+		
+		// STEP 140 - Count damage-looking combat events.
+		size_t damageEventCount = 0;
+
+		for (const EVTCCombatEvent& event : evtcCombatEvents)
+		{
+			if (event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buff == 0 &&
+				event.value > 0)
+			{
+				++damageEventCount;
+			}
+		}
+
+		ImGui::Text(
+			"Damage Combat Events: %u",
+			static_cast<unsigned int>(damageEventCount)
+		);
+	
+
+		size_t shownDamageEvents = 0;
+
+		for (const EVTCCombatEvent& event : evtcCombatEvents)
+		{
+			if (event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buff == 0 &&
+				event.value > 0)
+			{
+				ImGui::Text(
+					"DMG %u: Src:%llu Dst:%llu Skill:%u Value:%d",
+					static_cast<unsigned int>(shownDamageEvents),
+					static_cast<unsigned long long>(event.srcAgent),
+					static_cast<unsigned long long>(event.dstAgent),
+					static_cast<unsigned int>(event.skillID),
+					event.value
+				);
+
+				++shownDamageEvents;
+
+				if (shownDamageEvents >= 8)
+				{
+					break;
+				}
+			}
+		}
+
+		ImGui::Text("Damage Source Lookup:");
+
+		if (!evtcCombatEvents.empty())
+		{
+			uint64_t damageSource = 0;
+
+			for (const EVTCCombatEvent& event : evtcCombatEvents)
+			{
+				if (event.isStateChange == 0 &&
+					event.isActivation == 0 &&
+					event.buff == 0 &&
+					event.value > 0)
+				{
+					damageSource = event.srcAgent;
+					break;
+				}
+			}
+
+			for (const EVTCAgent& agent : evtcAgents)
+			{
+				if (agent.address == damageSource)
+				{
+					ImGui::Text(
+						"Src %llu = %s | Prof:%u Elite:%u",
+						static_cast<unsigned long long>(damageSource),
+						agent.name.c_str(),
+						static_cast<unsigned int>(agent.profession),
+						static_cast<unsigned int>(agent.elite)
+					);
+
+					break;
+				}
+			}
+		}
+		uint64_t playerAgentAddress = 0;
+
+		for (const EVTCAgent& agent : evtcAgents)
+		{
+			if (agent.elite == 0xFFFFFFFF)
+			{
+				continue;
+			}
+
+			playerAgentAddress = agent.address;
+			break;
+		}
+		uint64_t playerDamage = 0;
+		size_t playerDamageEvents = 0;
+		uint64_t firstPlayerDamageTime = 0;
+		uint64_t lastPlayerDamageTime = 0;
+
+		for (const EVTCCombatEvent& event : evtcCombatEvents)
+		{
+			if (event.srcAgent == playerAgentAddress &&
+				event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buff == 0 &&
+				event.value > 0)
+			{
+				playerDamage += static_cast<uint64_t>(event.value);
+				++playerDamageEvents;
+				if (firstPlayerDamageTime == 0)
+				{
+					firstPlayerDamageTime = event.time;
+				}
+
+				lastPlayerDamageTime = event.time;
+			}
+		}
+
+		ImGui::Text(
+			"Player Direct Damage: %llu",
+			static_cast<unsigned long long>(playerDamage)
+		);
+
+		ImGui::Text(
+			"Player Direct Damage Events: %u",
+			static_cast<unsigned int>(playerDamageEvents)
+		);
+			
+		ImGui::Text(
+				"First Player Damage Time: %llu",
+				static_cast<unsigned long long>(firstPlayerDamageTime)
+			);
+
+		ImGui::Text(
+			"Last Player Damage Time: %llu",
+			static_cast<unsigned long long>(lastPlayerDamageTime)
+		);
+
+		uint64_t playerDamageDuration = 0;
+
+		if (lastPlayerDamageTime >= firstPlayerDamageTime &&
+			firstPlayerDamageTime > 0)
+		{
+			playerDamageDuration =
+				lastPlayerDamageTime - firstPlayerDamageTime;
+		}
+
+		ImGui::Text(
+			"Player Damage Duration: %llu",
+			static_cast<unsigned long long>(playerDamageDuration)
+		);
+		double playerEVTCDPS = 0.0;
+
+		if (playerDamageDuration > 0)
+		{
+			const double durationSeconds =
+				static_cast<double>(playerDamageDuration) / 1000.0;
+
+			playerEVTCDPS =
+				static_cast<double>(playerDamage) / durationSeconds;
+		}
+
+		ImGui::Text(
+			"Player EVTC DPS: %.1f",
+			playerEVTCDPS
+		);
+
+		if (!evtcCombatEvents.empty())
+		
+		{
+			const EVTCCombatEvent& event = evtcCombatEvents.front();
+
+			ImGui::Text(
+				"First Event Time: %llu",
+				static_cast<unsigned long long>(event.time)
+			);
+
+			ImGui::Text(
+				"First Event Src: %llu",
+				static_cast<unsigned long long>(event.srcAgent)
+			);
+
+			ImGui::Text(
+				"First Event Dst: %llu",
+				static_cast<unsigned long long>(event.dstAgent)
+			);
+
+			ImGui::Text(
+				"First Event Value: %d",
+				event.value
+			);
+
+			ImGui::Text(
+				"First Event Skill ID: %u",
+				static_cast<unsigned int>(event.skillID)
+			);
+
+			ImGui::Text(
+				"First Event StateChange: %u",
+				static_cast<unsigned int>(event.isStateChange)
+			);
+
+			ImGui::Text(
+				"First Event Activation: %u",
+				static_cast<unsigned int>(event.isActivation)
+			);
+		}
+
 		const auto& evtcSkills = evtcAnalyzer.GetSkills();
 
 		ImGui::Text(
 			"Parsed Skills: %u",
 			static_cast<unsigned int>(evtcSkills.size())
 		);
+		
 		if (!evtcSkills.empty())
 		{
 			ImGui::Text("First Skills:");

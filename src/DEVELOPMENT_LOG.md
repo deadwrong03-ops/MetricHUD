@@ -1,126 +1,101 @@
-# MetricHUD Development Log
+﻿---
 
-This document tracks major MetricHUD development milestones, technical discoveries, tests, and current work.
+# EVTC Offline Combat Analysis
 
-MetricHUD is under active development.
+Development expanded beyond the live ArcDPS callback pipeline into direct parsing of ArcDPS EVTC combat-log files.
 
----
+The purpose of this work is to give MetricHUD access to complete encounter data independently of the live HUD event stream.
 
-# Current Development Version
-
-**0.3.0 Development Build**
-
-Current primary focus:
-
-> Build a reliable player combat-event and skill-activation pipeline before implementing advanced combat analysis and training systems.
-
----
-
-# Project Foundation
-
-## Core Architecture
-
-Completed:
-
-- Modular source architecture
-- Nexus addon initialization
-- Nexus addon shutdown
-- Render callback
-- Options callback
-- ConfigManager
-- Persistent JSON configuration
-- Reset Settings
-- MetricRegistry
-- Generic metric rendering
-- Metric formatting
-- Metric ordering
-- HUDWindow
-- HUD visibility control
-- Draggable HUD
-- HUD position locking
-- Persistent settings
-
-Status:
-
-**PASS**
-
----
-
-# Initial Metrics
-
-Implemented:
-
-- FPS
-- Ping
-- Map Name
-- Map ID
-- Character Name
-- Player Speed
-- Combat Time
-- DPS
-
-Metric visibility can be controlled through the MetricHUD options panel.
-
-Status:
-
-**PASS**
-
----
-
-# Map and Player Information
-
-Implemented live game information through the available Nexus/Mumble data.
-
-Verified:
-
-- Map ID changes correctly when changing maps.
-- Map Name resolves correctly.
-- Character Name displays correctly.
-- Player Speed updates.
-- FPS updates.
-- Ping updates.
-
-Status:
-
-**PASS**
-
----
-
-# ArcDPS Combat Analyzer Foundation
-
-A new `CombatAnalyzer` system was introduced to begin building MetricHUD's combat-analysis layer.
-
-Primary files involved:
+This creates a second combat-analysis path:
 
 ```text
-CombatAnalyzer.h
-CombatAnalyzer.cpp
-ArcDPS.h
-entry.cpp
+Live ArcDPS Events
+        +
+Saved EVTC Combat Logs
 ```
 
-The analyzer is currently exposed through a development/debug section in the Nexus options panel.
+The EVTC path is intended to support:
+
+- Encounter reconstruction
+- Player damage calculation
+- DPS calculation
+- Skill usage analysis
+- Rotation reconstruction
+- Historical encounter analysis
+- Training-system data
+
+Status:
+
+**ACTIVE DEVELOPMENT / MAJOR FOUNDATION WORKING**
 
 ---
 
-## ArcDPS Combat Event Subscription
+# EVTCAnalyzer
 
-MetricHUD subscribes to:
+A dedicated EVTC analysis system was added.
+
+Primary files:
 
 ```text
-EV_ARCDPS_COMBATEVENT_LOCAL_RAW
+EVTCAnalyzer.h
+EVTCAnalyzer.cpp
 ```
 
-Combat events are received by:
+The analyzer is responsible for loading and interpreting ArcDPS EVTC combat-log files.
 
-```cpp
-OnArcDPSCombat(void* eventArgs)
+The initial goal was not to implement the complete EVTC specification.
+
+Instead, development proceeded incrementally:
+
+```text
+Load File
+    ↓
+Validate Header
+    ↓
+Locate EVTC Sections
+    ↓
+Parse Agents
+    ↓
+Parse Skills
+    ↓
+Parse Combat Events
+    ↓
+Identify Player
+    ↓
+Filter Player Damage
+    ↓
+Calculate Time Span
+    ↓
+Calculate DPS
 ```
 
-and forwarded into:
+This incremental approach allowed each assumption about the EVTC format to be verified against an actual combat log before building additional analysis on top of it.
 
-```cpp
-CombatAnalyzer::ProcessEvent(...)
+---
+
+# EVTC File Loading
+
+MetricHUD successfully loads a real ArcDPS EVTC combat-log file.
+
+Debug validation confirmed:
+
+```text
+EVTC Load: PASS
+```
+
+The loaded file was recognized as:
+
+```text
+EVTC20260811
+```
+
+The EVTC revision was also successfully extracted.
+
+Example verified runtime data:
+
+```text
+EVTC Version: EVTC20260811
+EVTC Revision: 1
 ```
 
 Status:
@@ -129,46 +104,123 @@ Status:
 
 ---
 
-# CombatEvent Structure
+# EVTC Encounter Identification
 
-MetricHUD currently exposes the ArcDPS combat-event fields required for analysis.
+The parser successfully reads the encounter identifier from the EVTC header.
 
-Fields investigated include:
+Verified example:
 
 ```text
-Time
-SourceAgent
-DestinationAgent
-Value
-BuffDamage
-OverstackValue
+EVTC Encounter ID: 16199
+```
+
+This establishes that MetricHUD can identify the encounter represented by the EVTC file.
+
+Status:
+
+**PASS**
+
+---
+
+# EVTC Agent Table Parsing
+
+The EVTC agent table is now parsed.
+
+Verified test file:
+
+```text
+EVTC Agent Count: 28
+```
+
+The parser extracts agent information including:
+
+```text
+Agent Address
+Name
+Profession
+Elite Specialization
+```
+
+This is critical because combat events identify actors using agent addresses rather than character names.
+
+Status:
+
+**PASS**
+
+---
+
+# EVTC Skill Table Parsing
+
+The EVTC skill table is now parsed.
+
+Verified test file:
+
+```text
+EVTC Skill Count: 125
+```
+
+This provides the mapping required to convert EVTC SkillIDs into readable Guild Wars 2 skill names.
+
+This is separate from the live ArcDPS callback skill-name mapping and allows saved combat logs to be analyzed independently.
+
+Status:
+
+**PASS**
+
+---
+
+# EVTC Combat Event Extraction
+
+MetricHUD successfully located the combat-event section of the EVTC file.
+
+Verified test values:
+
+```text
+EVTC Extracted Size: 102348
+EVTC Combat Event Offset: 11212
+EVTC Combat Event Count: 1424
+Parsed Combat Events: 1424
+```
+
+The calculated combat-event count matched the number of events successfully parsed.
+
+This was an important structural validation of the EVTC parser.
+
+Status:
+
+**PASS**
+
+---
+
+# EVTC Damage Event Identification
+
+Initial EVTC debugging inspected the parsed combat events for damage-like records.
+
+The initial filter used fields including:
+
+```text
+IsStatechange == 0
+IsActivation == 0
+Buff == 0
+Value > 0
+```
+
+The test encounter produced:
+
+```text
+Damage Combat Events: 16
+```
+
+Sample parsed records showed values such as:
+
+```text
+Src
+Dst
 SkillID
-SourceInstanceID
-DestinationInstanceID
-SrcMasterInstanceID
-DestinationMasterInstanceID
-IFF
-Buff
-Result
-IsActivation
-IsBuffRemove
-IsNinety
-IsFifty
-IsMoving
-IsStatechange
-IsFlanking
-IsShields
-IsOffcycle
+Value
 ```
 
-This expanded structure allows MetricHUD to investigate differences between:
-
-- Damage events
-- Activation events
-- Buff events
-- Triggered effects
-- Player actions
-- State changes
+This demonstrated that MetricHUD was correctly reaching real damage records inside the EVTC event stream.
 
 Status:
 
@@ -176,53 +228,30 @@ Status:
 
 ---
 
-# Skill Name Resolution
+# EVTC Damage Source Resolution
 
-Early CombatAnalyzer testing initially displayed many skills as:
+The next step was determining which agent generated the observed damage events.
 
-```text
-Unknown (SkillID)
-```
+A source-agent lookup was added.
 
-Investigation confirmed that ArcDPS supplies the skill name through the combat callback.
-
-`ProcessEvent()` was expanded to receive:
-
-```cpp
-const char* skillName
-```
-
-The callback now forwards:
-
-```cpp
-combatAnalyzer.ProcessEvent(ev, combatData->skillname);
-```
-
-MetricHUD stores the relationship between:
+The damage events resolved to:
 
 ```text
-SkillID ? Skill Name
+Src 2000 = Sheirina Nightfall
+Profession: 8
+Elite: 34
 ```
 
-This eliminated the need to manually hardcode every Guild Wars 2 skill ID.
+This confirmed that the source address used by the damage events corresponded to the player's character.
 
-Live testing successfully resolved skill names.
-
-Examples observed:
+This was the first direct link between:
 
 ```text
-Death Spiral
-Gravedigger
-Dusk Strike
-Life Rend
-Life Reap
-Life Slash
-Nightfall
-Grasping Darkness
-Fading Twilight
-Chilling Nova
-"Chilled to the Bone!"
-"You Are All Weaklings!"
+EVTC Combat Event
+        ↓
+Source Agent Address
+        ↓
+Player Character
 ```
 
 Status:
@@ -231,13 +260,41 @@ Status:
 
 ---
 
-# Recent Skill Tracking
+# Dynamic Player Identification
 
-The Combat Analyzer now maintains a recent-skills list.
+The first player-damage test temporarily used the observed source address:
 
-This provides a quick live view of skills appearing in the player's combat-event stream.
+```text
+2000
+```
 
-Verified against ArcDPS during live combat.
+This was useful only as a controlled diagnostic.
+
+It was NOT acceptable as permanent logic because EVTC agent addresses can differ between logs.
+
+The hard-coded source was therefore replaced with dynamic player-agent identification using the parsed EVTC agent table.
+
+The player character was successfully identified as:
+
+```text
+Sheirina Nightfall
+```
+
+The damage filter now uses the resolved player agent address rather than assuming a fixed address.
+
+Architecture:
+
+```text
+EVTC Agent Table
+        ↓
+Identify Player Agent
+        ↓
+Retrieve Agent Address
+        ↓
+Filter Combat Events
+        ↓
+Player Damage Events
+```
 
 Status:
 
@@ -245,517 +302,388 @@ Status:
 
 ---
 
-# Raw Skill Usage Counter
+# EVTC Player Direct Damage
 
-A skill usage/debug counter was introduced.
+After resolving the player dynamically, MetricHUD filtered damage events to the player's outgoing direct damage.
 
-Initial logic tracks events by SkillID and applies basic timing suppression to avoid extremely rapid duplicate events.
+Verified test result:
 
-Example internal concept:
-
-```cpp
-skillUseCounts[event->SkillID]++;
+```text
+Player Direct Damage: 27551
+Player Direct Damage Events: 15
 ```
 
-Live testing showed that this system is useful for inspecting combat behavior but does NOT yet represent true player button presses.
+The values remained identical after replacing the temporary hard-coded player address with dynamic player identification.
+
+This confirmed that dynamic player resolution was functioning correctly.
 
 Status:
 
-**PARTIAL / INVESTIGATION**
+**PASS**
 
 ---
 
-# Critical Finding: Combat Events Are Not Skill Activations
+# Player Damage Timestamp Tracking
 
-Live testing demonstrated that:
+The EVTC player-damage loop was expanded to record the timestamps of the first and last qualifying player damage events.
 
-> One player skill activation can generate multiple ArcDPS combat events.
+New tracked values:
 
-Example:
+```text
+First Player Damage Time
+Last Player Damage Time
+Player Damage Duration
+```
 
-A player may activate a skill once while MetricHUD receives several events associated with that SkillID.
+Verified runtime values:
 
-During testing, **Death's Charge** was a clear example of this behavior.
+```text
+First Player Damage Time: 46410217
+Last Player Damage Time: 46419174
+Player Damage Duration: 8957
+```
+
+The duration is therefore:
+
+```text
+8957 ms
+```
+
+or:
+
+```text
+8.957 seconds
+```
+
+This provided the time component required for the first independent EVTC DPS calculation.
+
+Status:
+
+**PASS**
+
+---
+
+# First EVTC-Derived Player DPS
+
+Using:
+
+```text
+Player Direct Damage: 27551
+Player Damage Duration: 8957 ms
+```
+
+MetricHUD calculated:
+
+```text
+Player EVTC DPS: 3075.9
+```
+
+The calculation is:
+
+```text
+DPS = Damage / (Duration / 1000)
+```
+
+For the verified test:
+
+```text
+27551 / 8.957 ≈ 3075.9 DPS
+```
+
+This represents the first successfully calculated DPS value produced directly from parsed EVTC player combat data.
+
+The value is not yet intended to represent MetricHUD's final encounter-DPS model.
+
+It currently measures the player's qualifying direct damage across the observed first-to-last player-damage interval.
+
+Status:
+
+**PASS — FIRST EVTC DPS CALCULATION VERIFIED**
+
+---
+
+# Important EVTC DPS Limitation
+
+The current EVTC DPS calculation uses:
+
+```text
+Direct player damage
+```
+
+and:
+
+```text
+First qualifying player damage event
+        ↓
+Last qualifying player damage event
+```
+
+This is an intentionally simple validation model.
+
+It does NOT yet account for every component required for final production DPS reporting.
+
+Future refinement may need to consider:
+
+- Condition damage
+- Buff damage
+- Player-owned minions/pets
+- Encounter start/end boundaries
+- Invulnerability phases
+- Target filtering
+- Multiple targets
+- Downed-state behavior
+- Encounter-specific mechanics
+- Damage generated through player-owned agents
 
 Therefore:
 
 ```text
-Raw Skill Events != Player Skill Uses
+Current EVTC DPS
+    =
+Verified parsing/calculation foundation
+
+NOT
+
+Final production DPS model
 ```
-
-This means raw event counting cannot be used directly for rotation analysis.
-
-This finding changes the architecture of future skill tracking.
-
-MetricHUD must derive a separate **skill activation stream**.
 
 ---
 
-# Triggered Skills / Proc Investigation
+# EVTC Debug Interface
 
-Testing also identified skills/effects that appear in the combat stream without being directly pressed by the player.
-
-Example:
+The Combat Analyzer Debug section currently exposes EVTC diagnostic information including:
 
 ```text
-Chilling Nova
+EVTC Load Status
+EVTC Version
+EVTC Revision
+EVTC Encounter ID
+EVTC Agent Count
+EVTC Skill Count
+EVTC Extracted Size
+EVTC Combat Event Offset
+EVTC Combat Event Count
+Parsed Combat Events
+Damage Combat Events
+Sample Damage Events
+Damage Source Lookup
+Player Direct Damage
+Player Direct Damage Events
+First Player Damage Time
+Last Player Damage Time
+Player Damage Duration
+Player EVTC DPS
+First Event Information
+First Skill Information
+Parsed Agent Information
 ```
 
-Chilling Nova appeared alongside manually activated skills during Necromancer testing.
+This interface remains intentionally verbose.
 
-This confirms that future rotation analysis must distinguish:
+Its purpose is to validate EVTC parsing and combat-analysis assumptions before those systems are exposed through the normal MetricHUD interface.
+
+---
+
+# Current Dual Combat-Analysis Architecture
+
+MetricHUD now has two developing sources of combat information.
 
 ```text
-Manual Skill Activation
+                    MetricHUD
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+   LIVE ARCDPS EVENTS          EVTC LOG FILE
+          │                         │
+OnArcDPSCombat()                EVTCAnalyzer
+          │                         │
+CombatAnalyzer              Parse Header
+          │                         │
+Live Metrics               Parse Agents
+          │                         │
+Live Skills                Parse Skills
+          │                         │
+Activation Research        Parse Events
+                                    │
+                              Identify Player
+                                    │
+                              Player Damage
+                                    │
+                              Damage Duration
+                                    │
+                                  DPS
 ```
 
-from:
+The two systems are complementary.
+
+The live ArcDPS pipeline is intended for immediate HUD feedback.
+
+The EVTC pipeline is intended for deeper encounter reconstruction, historical analysis, rotation analysis, and training data.
+
+---
+
+# Major Technical Milestone
+
+MetricHUD can now independently perform the following operations on an ArcDPS EVTC combat log:
 
 ```text
-Triggered / Proc Effect
+Load EVTC file
+    ↓
+Validate EVTC header
+    ↓
+Read encounter information
+    ↓
+Parse agent table
+    ↓
+Parse skill table
+    ↓
+Locate combat-event section
+    ↓
+Parse combat events
+    ↓
+Identify damage events
+    ↓
+Resolve damage source
+    ↓
+Identify player dynamically
+    ↓
+Filter player's direct damage
+    ↓
+Measure player damage duration
+    ↓
+Calculate player DPS
 ```
 
-Hardcoding individual triggered skills is not considered a desirable long-term solution.
+Every stage above has been validated against the current test EVTC file.
 
-The preferred solution is classification using ArcDPS event metadata.
-
-Status:
-
-**UNDER INVESTIGATION**
+This establishes the first working end-to-end EVTC combat-analysis pipeline in MetricHUD.
 
 ---
 
-# Activation Event Investigation
+# Current Stable Checkpoint — EVTC Analyzer
 
-The debug panel was expanded to expose activation-related ArcDPS data.
-
-Fields currently being inspected include:
-
-```text
-SkillID
-Value
-BuffDamage
-IsActivation
-SourceInstanceID
-SrcMasterInstanceID
-IsStatechange
-IsMoving
-Time
-```
-
-This allows controlled comparisons between:
-
-- manually pressed skills
-- damage events
-- triggered effects
-- multi-hit skills
-- activation events
-
-Status:
-
-**ACTIVE DEVELOPMENT**
-
----
-
-# Player / Self Filtering
-
-Combat events were initially forwarded into CombatAnalyzer before confirming whether they belonged to the player.
-
-This risked NPC/enemy events entering MetricHUD's player skill stream.
-
-`OnArcDPSCombat()` was changed so the analyzer is called only after validating the source.
-
-Current processing order:
-
-```cpp
-if (combatData->src == nullptr)
-{
-    return;
-}
-
-if (combatData->src->IsSelf == 0)
-{
-    return;
-}
-
-if (ev->IsStatechange != 0)
-{
-    return;
-}
-
-combatAnalyzer.ProcessEvent(ev, combatData->skillname);
-```
-
-This means CombatAnalyzer receives:
-
-```text
-Valid source
-?
-Player/self source
-?
-Non-statechange event
-?
-ProcessEvent
-```
-
-Live testing confirmed that obvious NPC/enemy abilities no longer contaminate the player's skill list.
-
-Status:
-
-**PASS**
-
----
-
-# Self-Filter Regression Test
-
-A live regression test was performed after introducing player-source filtering.
-
-Verified:
-
-- Combat Analyzer continued receiving events.
-- DPS continued updating.
-- Recent Skills continued working.
-- Skill names remained correct.
-- Skill Usage continued working.
-- Activation Events continued being captured.
-- No obvious enemy/NPC skills appeared in the player skill list.
-- No crash occurred.
-
-Status:
-
-**PASS**
-
-Checkpoint committed and pushed.
-
----
-
-# DPS Foundation
-
-CombatAnalyzer currently tracks:
-
-```text
-Combat Events
-Damage Events
-Direct Damage
-Combat Time
-DPS
-Last Fight Damage
-Last Fight Time
-Last Fight DPS
-```
-
-The system is still experimental and will require additional refinement as encounter boundaries and combat-state detection improve.
-
-Status:
-
-**WORKING DEVELOPMENT FOUNDATION**
-
----
-
-# Combat Analyzer Debug Panel
-
-The current debug interface exposes development information including:
-
-```text
-Combat Events
-Damage Events
-Direct Damage
-Analyzer Combat Time
-Analyzer DPS
-Last Fight Damage
-Last Fight Time
-Last Fight DPS
-Last Skill ID
-Last Activation
-Recent Skills
-Skill Usage (Raw Events)
-Recent Records
-Activation Events
-```
-
-This interface is intentionally verbose.
-
-It exists to understand the ArcDPS event stream and is not intended to represent the final MetricHUD user interface.
-
----
-
-# Current Technical Model
-
-MetricHUD's combat pipeline currently resembles:
-
-```text
-ArcDPS
-   ?
-EV_ARCDPS_COMBATEVENT_LOCAL_RAW
-   ?
-OnArcDPSCombat()
-   ?
-Validate event
-   ?
-Validate source
-   ?
-Require IsSelf
-   ?
-Ignore state-change events
-   ?
-CombatAnalyzer::ProcessEvent()
-   ?
-Skill-name mapping
-   ?
-Combat records
-   ?
-Raw skill events
-   ?
-Activation-event investigation
-   ?
-Future reliable player-action stream
-```
-
----
-
-# Next Development Target
-
-## Reliable Skill Activation Counting
-
-The next major task is to determine when a player actually activates a skill.
-
-The desired result is:
-
-```text
-Death Spiral
-Gravedigger
-Nightfall
-Grasping Darkness
-```
-
-representing actual player actions.
-
-The system must avoid interpreting this:
-
-```text
-Death's Charge
-Death's Charge
-Death's Charge
-Death's Charge
-Death's Charge
-```
-
-as five player presses when those events were generated by one activation.
-
----
-
-## Data To Investigate
-
-Continue comparing:
-
-```text
-SkillID
-IsActivation
-SourceInstanceID
-SrcMasterInstanceID
-Time
-Value
-BuffDamage
-IsStatechange
-IsMoving
-```
-
-between controlled skill activations.
-
-Particular attention should be given to:
-
-- normal weapon skills
-- multi-hit skills
-- movement skills
-- channeled skills
-- utility skills
-- elite skills
-- auto attacks
-- triggered/proc effects
-
----
-
-# Planned CombatAnalyzer Architecture
-
-Long-term separation should likely become:
-
-```text
-RAW COMBAT EVENTS
-        ?
-EVENT CLASSIFICATION
-        ?
-PLAYER ACTION / ACTIVATION STREAM
-        ?
-COMBAT METRICS
-        ?
-ROTATION ANALYSIS
-        ?
-TRAINING SYSTEM
-```
-
-Raw events should remain available for debugging and advanced analysis.
-
-Player actions should be maintained separately.
-
----
-
-# Future Combat Features
-
-Once reliable activation tracking exists, development can expand toward:
-
-- Skill rotation history
-- Rotation timing
-- Skill downtime
-- Burst-window detection
-- Rotation consistency
-- DPS phase analysis
-- Execute-phase analysis
-- Personal benchmark comparison
-- Player-selected performance goals
-
----
-
-# Training System Concepts
-
-Planned training concepts currently include:
-
-- Rotation / priority coaching
-- Player skill rotation log
-- Phase coaching
-- DPS coaching
-- Build/gear goal-based optimization
-- Boon uptime goals
-- Skill downtime analysis
-- Burst windows
-- Execute phase
-- Consistency scoring
-- Survivability/downed context
-- Personal self-comparison
-- Player-selected goals
-
-Potential modes:
-
-```text
-Guided
-Independent
-Benchmark
-```
-
-These remain future-development concepts and are not currently implemented.
-
----
-
-# Other Planned MetricHUD Features
-
-Planned non-training features include:
-
-- Customizable HUD
-- Approximately five visible metrics at once
-- Improved DPS
-- Combat Timer
-- Time in Combat
-- Downed Count
-- Death Count
-- Boon Uptime
-- Food Timer
-- Utility Timer
-- Squad Statistics
-- Encounter Summary
-- World Boss Logging (experimental)
-- Jade Bot Buff Tracking (experimental)
-- Personal encounter history
-- Player-selected metric goals
-
----
-
-# Development Principles
-
-MetricHUD development follows several core rules.
-
-## Precision Over Repetition
-
-Do not count something simply because ArcDPS emitted an event.
-
-Determine what that event actually represents.
-
-## Stability Before Features
-
-New foundations are tested before additional systems are built on top of them.
-
-## Controlled Testing
-
-When event behavior is unclear, use controlled tests with known skill activations.
-
-## Small Checkpoints
-
-Development should proceed through:
-
-```text
-Code
-?
-Save
-?
-Build
-?
-Live Test
-?
-Verify
-?
-Commit
-?
-Push
-```
-
-Avoid stacking multiple unverified changes.
-
----
-
-# Current Stable Checkpoint
-
-At the end of the current development session:
+At the end of this development checkpoint:
 
 ```text
 Build: PASS
-ArcDPS callback: PASS
-Skill names: PASS
-Recent skills: PASS
-Self-only filtering: PASS
-State-change filtering: PASS
-DPS regression test: PASS
-Activation-event capture: PASS
-Live combat stability: PASS
-Git commit: COMPLETE
-Git push: COMPLETE
+
+EVTC File Load: PASS
+EVTC Header Parsing: PASS
+EVTC Version: PASS
+EVTC Revision: PASS
+Encounter ID: PASS
+
+Agent Table Parsing: PASS
+Skill Table Parsing: PASS
+Combat Event Extraction: PASS
+Combat Event Parsing: PASS
+
+Damage Event Detection: PASS
+Damage Source Resolution: PASS
+Dynamic Player Identification: PASS
+
+Player Direct Damage: PASS
+Player Damage Event Count: PASS
+First Damage Timestamp: PASS
+Last Damage Timestamp: PASS
+Damage Duration: PASS
+
+First EVTC Player DPS Calculation: PASS
+
+Runtime Stability: PASS
 ```
 
-No unfinished code change is intentionally being left between checkpoints.
+Verified test values:
+
+```text
+Character: Sheirina Nightfall
+
+EVTC Version: EVTC20260811
+EVTC Revision: 1
+Encounter ID: 16199
+
+Agents: 28
+Skills: 125
+Parsed Combat Events: 1424
+Damage Combat Events: 16
+
+Player Direct Damage: 27551
+Player Direct Damage Events: 15
+
+First Player Damage Time: 46410217
+Last Player Damage Time: 46419174
+Player Damage Duration: 8957 ms
+
+Player EVTC DPS: 3075.9
+```
 
 ---
 
-# Resume Here
+# Resume Here — EVTC DPS Refinement
 
-**NEXT SESSION STARTING POINT**
+**NEXT DEVELOPMENT STARTING POINT**
 
-Do not begin by changing the HUD or adding another metric.
+Do not rebuild the EVTC parser from scratch.
 
-Resume inside the CombatAnalyzer work.
+The current parser has successfully demonstrated:
 
-Primary objective:
+```text
+EVTC file
+    ↓
+Agents
+    ↓
+Skills
+    ↓
+Combat Events
+    ↓
+Player
+    ↓
+Player Damage
+    ↓
+Time Span
+    ↓
+DPS
+```
 
-> Convert the currently observed ArcDPS event stream into a reliable representation of actual player skill activations.
+The next objective is to refine the damage model beyond the current direct-damage-only calculation.
 
-Start with controlled testing of individual skill presses and compare activation metadata.
+Primary question:
 
-Once a reliable rule can distinguish actual player activations from repeated damage/proc events, implement that logic separately from the existing raw-event counter.
+> Which EVTC events must be attributed to the player to produce an accurate Guild Wars 2 DPS value?
 
-The raw counter should remain available for debugging until the activation system is verified.
+Investigate the distinction between:
+
+```text
+Direct Damage
+Condition / Buff Damage
+Player-Owned Agent Damage
+Triggered Damage
+Other Combat Events
+```
+
+Do this incrementally.
+
+Preserve the current verified direct-damage calculation as a baseline while additional damage categories are investigated.
+
+Do not remove the EVTC debug output until the expanded damage model has been validated.
 
 ---
 
-# Last Verified State
+# Latest Verified State
 
-MetricHUD builds successfully and runs in Guild Wars 2 without a known crash from the current CombatAnalyzer changes.
+MetricHUD now has a working end-to-end EVTC parsing foundation.
 
-The latest verified CombatAnalyzer pipeline filters events to the local player before processing and preserves skill names supplied by ArcDPS.
+A real ArcDPS EVTC log has been successfully loaded, its agent/skill/combat-event structures parsed, the player's character dynamically identified, outgoing direct damage isolated, the first/last player-damage timestamps measured, and an independent player DPS value calculated from those records.
 
-**Safe stopping point reached.**
+The latest verified test produced:
+
+```text
+27551 player direct damage
+15 player direct-damage events
+8957 ms damage interval
+3075.9 EVTC-derived DPS
+```
+
+This is the current recovery point if development context is lost.
+
+**Safe EVTC checkpoint reached.**
