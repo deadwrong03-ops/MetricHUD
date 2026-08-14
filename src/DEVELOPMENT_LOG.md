@@ -687,3 +687,146 @@ The latest verified test produced:
 This is the current recovery point if development context is lost.
 
 **Safe EVTC checkpoint reached.**
+---
+
+# EVTC Damage Model Investigation
+
+## Condition / Buff Damage Path Verified
+
+Development continued beyond the original direct-damage EVTC checkpoint to determine how condition damage is represented in ArcDPS EVTC combat records.
+
+A fresh EVTC log was generated using the character **Blueglove** in the Special Forces Training Area.
+
+Dynamic player identification successfully resolved the player from the EVTC agent table:
+
+```text
+Src 2000 = Blueglove | Prof:4 Elite:55
+```
+
+This confirms that player identification is no longer dependent on a hard-coded agent address.
+
+The fresh combat log produced:
+
+```text
+Player Direct Damage: 149521
+Player Direct Damage Events: 29
+
+Player Buff Damage: 26881
+Player Buff Damage Events: 38
+
+First Player Damage Time: 127270206
+Last Player Damage Time: 127295768
+Player Damage Duration: 25562
+
+Player EVTC DPS: 5849.3
+```
+
+## Verified EVTC Damage Fields
+
+Testing has now independently confirmed two player-damage paths in EVTC combat records.
+
+### Direct / Strike Damage
+
+Direct player damage is represented by:
+
+```text
+event.value
+```
+
+and is identified using combat events where:
+
+```text
+isStateChange == 0
+isActivation == 0
+buff == 0
+value > 0
+srcAgent == playerAgentAddress
+```
+
+### Condition / Buff Damage
+
+Condition damage is represented by:
+
+```text
+event.buffDmg
+```
+
+Diagnostic output from the fresh Blueglove log showed repeated records such as:
+
+```text
+BUFF EVT: Src:2000 Dst:2155 Skill:736 BuffFlag:1 BuffDmg:543
+BUFF EVT: Src:2000 Dst:2155 Skill:736 BuffFlag:1 BuffDmg:776
+BUFF EVT: Src:2000 Dst:2155 Skill:736 BuffFlag:1 BuffDmg:620
+```
+
+These events were successfully attributed to the dynamically identified player source.
+
+The EVTC parser therefore successfully detects condition/buff damage independently from direct damage.
+
+## Important Representation Difference
+
+The parsed EVTC log currently exposes condition damage through `buffDmg` as positive values.
+
+Earlier live ArcDPS callback inspection showed `CombatRecord::buffDamage` values using a negative representation.
+
+These two data paths must not automatically be assumed to use identical sign conventions.
+
+MetricHUD will preserve this distinction until both representations have been fully validated.
+
+## Current Damage Model
+
+The existing EVTC DPS calculation is still intentionally based on direct damage only.
+
+The DPS formula has **not yet been changed** to include condition damage.
+
+This was deliberate so that the condition-damage path could be verified independently before modifying the previously validated direct-damage baseline.
+
+The next development step is:
+
+```text
+Total Player Damage
+    =
+Direct / Strike Damage
+    +
+Condition / Buff Damage
+```
+
+After total player damage is validated, EVTC-derived DPS can be recalculated using the combined damage model.
+
+## Latest Recovery Point
+
+MetricHUD currently has verified support for:
+
+- EVTC file loading
+- EVTC header parsing
+- Agent-table parsing
+- Skill-table parsing
+- Combat-event parsing
+- Dynamic player identification from the EVTC agent table
+- Player direct-damage attribution
+- Player condition/buff-damage attribution
+- Direct-damage event counting
+- Condition/buff-damage event counting
+- Player damage timestamp tracking
+- Player damage-duration calculation
+- Direct-damage-only EVTC DPS calculation
+- EVTC diagnostic output for individual damage records
+
+The latest verified Blueglove test produced:
+
+```text
+Direct Damage: 149521
+Direct Damage Events: 29
+
+Condition / Buff Damage: 26881
+Condition / Buff Damage Events: 38
+
+Damage Duration: 25562 ms
+Direct-Damage EVTC DPS: 5849.3
+```
+
+**Safe EVTC direct + condition damage detection checkpoint reached.**
+
+Next objective:
+
+> Combine verified direct and condition damage into total player damage and validate the resulting EVTC DPS before modifying the production CombatAnalyzer damage model.

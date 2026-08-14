@@ -593,7 +593,7 @@ void AddonOptions()
 		if (!evtcLoaded)
 		{
 			evtcLoaded = evtcAnalyzer.LoadFile(
-				R"(C:\Users\deadw\OneDrive\Documents\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\Standard Kitty Golem (16199)\20260813-132221.zevtc)"
+				R"(C:\Users\deadw\OneDrive\Documents\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\Special Forces Training Area (1154)\20260814-115037.zevtc)"
 			);
 		}
 
@@ -663,6 +663,7 @@ void AddonOptions()
 			{
 				++damageEventCount;
 			}
+
 		}
 
 		ImGui::Text(
@@ -746,6 +747,8 @@ void AddonOptions()
 		}
 		uint64_t playerDamage = 0;
 		size_t playerDamageEvents = 0;
+		uint64_t playerBuffDamage = 0;
+		size_t playerBuffDamageEvents = 0;
 		uint64_t firstPlayerDamageTime = 0;
 		uint64_t lastPlayerDamageTime = 0;
 
@@ -766,6 +769,31 @@ void AddonOptions()
 
 				lastPlayerDamageTime = event.time;
 			}
+			if (event.srcAgent == playerAgentAddress &&
+				event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buff != 0 &&
+				event.buffDmg > 0)
+			{
+				playerBuffDamage += static_cast<uint64_t>(event.buffDmg);
+				++playerBuffDamageEvents;
+			}
+			if (event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buffDmg != 0)
+			{
+				ImGui::Text(
+					"BUFF EVT: Src:%llu Dst:%llu Skill:%u BuffFlag:%u BuffDmg:%d SrcInst:%u SrcMaster:%u",
+					static_cast<unsigned long long>(event.srcAgent),
+					static_cast<unsigned long long>(event.dstAgent),
+					static_cast<unsigned int>(event.skillID),
+					static_cast<unsigned int>(event.buff),
+					event.buffDmg,
+					static_cast<unsigned int>(event.srcInstid),
+					static_cast<unsigned int>(event.srcMasterInstid)
+				);
+			}
+
 		}
 
 		ImGui::Text(
@@ -777,7 +805,15 @@ void AddonOptions()
 			"Player Direct Damage Events: %u",
 			static_cast<unsigned int>(playerDamageEvents)
 		);
-			
+		ImGui::Text(
+			"Player Buff Damage: %llu",
+			static_cast<unsigned long long>(playerBuffDamage)
+		);
+
+		ImGui::Text(
+			"Player Buff Damage Events: %u",
+			static_cast<unsigned int>(playerBuffDamageEvents)
+		);
 		ImGui::Text(
 				"First Player Damage Time: %llu",
 				static_cast<unsigned long long>(firstPlayerDamageTime)
