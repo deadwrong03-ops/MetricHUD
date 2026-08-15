@@ -50,8 +50,13 @@ public:
    
     uint64_t GetDamageEventCount() const;
     int64_t GetTotalDirectDamage() const;
+    int64_t GetTotalBuffDamage() const;
     double GetCombatDurationSeconds() const;
+    uint64_t GetFirstDamageTime() const;
+    uint64_t GetLastDamageTime() const;
     double GetDPS() const;
+    void SetPlayerInstanceID(uint16_t instanceID);
+    uint16_t GetPlayerInstanceID() const;
     int64_t GetLastFightDamage() const;
     double GetLastFightDurationSeconds() const;
     double GetLastFightDPS() const;
@@ -69,6 +74,7 @@ private:
     uint64_t eventCount = 0;
     uint64_t damageEventCount = 0;
     int64_t totalDirectDamage = 0;
+    int64_t totalBuffDamage = 0;
     uint64_t firstDamageTime = 0;
     uint64_t lastDamageTime = 0;
     int64_t lastFightDamage = 0;
@@ -76,6 +82,7 @@ private:
     double lastFightDPS = 0.0;
     uint32_t lastSkillID = 0;
     uint8_t lastActivation = 0;
+    uint16_t playerInstanceID = 0;
     
     std::vector<uint32_t> recentSkills;
     std::vector<CombatRecord> recentRecords;

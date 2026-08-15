@@ -134,7 +134,12 @@ void OnArcDPSCombat(void* eventArgs)
 		return;
 	}
 
-	if (combatData->src->IsSelf == 0)
+	if (combatData->src->IsSelf != 0)
+	{
+		combatAnalyzer.SetPlayerInstanceID(ev->SourceInstanceID);
+	}
+	if (combatData->src->IsSelf == 0 &&
+		ev->SrcMasterInstanceID != combatAnalyzer.GetPlayerInstanceID())
 	{
 		return;
 	}
@@ -265,6 +270,11 @@ void AddonRender()
 	if (isInCombat && !wasInCombat)
 	{
 		combatAnalyzer.ResetSession();
+	}
+
+	if (!isInCombat && wasInCombat)
+	{
+		combatAnalyzer.CaptureLastFight();
 	}
 	if (!isInCombat && wasInCombat)
 	{
@@ -474,6 +484,16 @@ void AddonOptions()
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
 
 		ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
+		ImGui::Text("Buff Damage: %lld", combatAnalyzer.GetTotalBuffDamage());
+		ImGui::Text(
+			"First Damage Time: %llu",
+			static_cast<unsigned long long>(combatAnalyzer.GetFirstDamageTime())
+		);
+
+		ImGui::Text(
+			"Last Damage Time: %llu",
+			static_cast<unsigned long long>(combatAnalyzer.GetLastDamageTime())
+		);
 
 		ImGui::Text(
 			"Analyzer Combat Time: %.2f",
@@ -1038,6 +1058,25 @@ void AddonOptions()
 		ImGui::Text(
 			"Player Total EVTC DPS: %.1f",
 			playerTotalEVTCDPS
+		);
+		double playerAndOwnedEVTCDPS = 0.0;
+
+		if (combinedFirstDamageTime != 0 &&
+			combinedLastDamageTime > combinedFirstDamageTime)
+		{
+			const double combinedDurationSeconds =
+				static_cast<double>(
+					combinedLastDamageTime - combinedFirstDamageTime
+					) / 1000.0;
+
+			playerAndOwnedEVTCDPS =
+				static_cast<double>(combinedTotalDamage) /
+				combinedDurationSeconds;
+		}
+
+		ImGui::Text(
+			"Player + Owned EVTC DPS: %.1f",
+			playerAndOwnedEVTCDPS
 		);
 
 

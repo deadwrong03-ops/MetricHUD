@@ -23,6 +23,7 @@ void CombatAnalyzer::ResetSession()
     eventCount = 0;
     damageEventCount = 0;
     totalDirectDamage = 0;
+    totalBuffDamage = 0;
     firstDamageTime = 0;
     lastDamageTime = 0;
     lastSkillID = 0;
@@ -109,12 +110,26 @@ void CombatAnalyzer::ProcessEvent(
         recentRecords.erase(recentRecords.begin());
     }
     eventCount++;
+
     if (event->SkillID != 0 &&
         event->Value < 0 &&
         event->BuffDamage == 0)
     {
         damageEventCount++;
         totalDirectDamage += -static_cast<int64_t>(event->Value);
+
+        if (firstDamageTime == 0)
+        {
+            firstDamageTime = event->Time;
+        }
+
+        lastDamageTime = event->Time;
+    }
+    if (event->SkillID != 0 &&
+        event->BuffDamage < 0)
+    {
+        damageEventCount++;
+        totalBuffDamage += -static_cast<int64_t>(event->BuffDamage);
 
         if (firstDamageTime == 0)
         {
@@ -153,6 +168,10 @@ int64_t CombatAnalyzer::GetTotalDirectDamage() const
 {
     return totalDirectDamage;
 }
+int64_t CombatAnalyzer::GetTotalBuffDamage() const
+{
+    return totalBuffDamage;
+}
 double CombatAnalyzer::GetCombatDurationSeconds() const
 {
     if (firstDamageTime == 0 || lastDamageTime <= firstDamageTime)
@@ -161,6 +180,15 @@ double CombatAnalyzer::GetCombatDurationSeconds() const
     }
 
     return static_cast<double>(lastDamageTime - firstDamageTime) / 1000.0;
+}
+uint64_t CombatAnalyzer::GetFirstDamageTime() const
+{
+    return firstDamageTime;
+}
+
+uint64_t CombatAnalyzer::GetLastDamageTime() const
+{
+    return lastDamageTime;
 }
 double CombatAnalyzer::GetDPS() const
 {
@@ -171,9 +199,18 @@ double CombatAnalyzer::GetDPS() const
         return 0.0;
     }
 
-    return static_cast<double>(totalDirectDamage) / duration;
+    return static_cast<double>(
+        totalDirectDamage + totalBuffDamage
+        ) / duration;
 }
-
+void CombatAnalyzer::SetPlayerInstanceID(uint16_t instanceID)
+{
+    playerInstanceID = instanceID;
+}
+uint16_t CombatAnalyzer::GetPlayerInstanceID() const
+{
+    return playerInstanceID;
+}
 int64_t CombatAnalyzer::GetLastFightDamage() const
 {
     return lastFightDamage;
