@@ -793,6 +793,7 @@ Condition / Buff Damage
 
 After total player damage is validated, EVTC-derived DPS can be recalculated using the combined damage model.
 
+
 ## Latest Recovery Point
 
 MetricHUD currently has verified support for:
@@ -830,3 +831,29 @@ Direct-Damage EVTC DPS: 5849.3
 Next objective:
 
 > Combine verified direct and condition damage into total player damage and validate the resulting EVTC DPS before modifying the production CombatAnalyzer damage model.
+
+
+
+
+
+---
+
+# Combined Direct + Condition Damage Checkpoint
+
+MetricHUD has successfully expanded its EVTC damage model beyond direct damage.
+
+Testing against the Blueglove EVTC log verified:
+
+```text
+Player Direct Damage: 149521
+Player Direct Damage Events: 29
+
+Player Buff Damage: 26881
+Player Buff Damage Events: 38
+
+Player Total Damage: 176402
+
+Player Damage Duration: 25562 ms
+
+Direct-only EVTC DPS: 5849.3
+Combined EVTC DPS: 6900.9

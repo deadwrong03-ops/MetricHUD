@@ -472,7 +472,7 @@ void AddonOptions()
 		ImGui::TextDisabled("Settings will be added during development.");
 		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
-		
+
 		ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 
 		ImGui::Text(
@@ -648,9 +648,9 @@ void AddonOptions()
 			"Parsed Combat Events: %u",
 			static_cast<unsigned int>(evtcCombatEvents.size())
 		);
-		
 
-		
+
+
 		// STEP 140 - Count damage-looking combat events.
 		size_t damageEventCount = 0;
 
@@ -670,7 +670,7 @@ void AddonOptions()
 			"Damage Combat Events: %u",
 			static_cast<unsigned int>(damageEventCount)
 		);
-	
+
 
 		size_t shownDamageEvents = 0;
 
@@ -749,9 +749,9 @@ void AddonOptions()
 		size_t playerDamageEvents = 0;
 		uint64_t playerBuffDamage = 0;
 		size_t playerBuffDamageEvents = 0;
+		uint64_t playerTotalDamage = 0;
 		uint64_t firstPlayerDamageTime = 0;
 		uint64_t lastPlayerDamageTime = 0;
-
 		for (const EVTCCombatEvent& event : evtcCombatEvents)
 		{
 			if (event.srcAgent == playerAgentAddress &&
@@ -796,6 +796,7 @@ void AddonOptions()
 
 		}
 
+		playerTotalDamage = playerDamage + playerBuffDamage;
 		ImGui::Text(
 			"Player Direct Damage: %llu",
 			static_cast<unsigned long long>(playerDamage)
@@ -809,15 +810,19 @@ void AddonOptions()
 			"Player Buff Damage: %llu",
 			static_cast<unsigned long long>(playerBuffDamage)
 		);
+		ImGui::Text(
+			"Player Total Damage: %llu",
+			static_cast<unsigned long long>(playerTotalDamage)
+		);
 
 		ImGui::Text(
 			"Player Buff Damage Events: %u",
 			static_cast<unsigned int>(playerBuffDamageEvents)
 		);
 		ImGui::Text(
-				"First Player Damage Time: %llu",
-				static_cast<unsigned long long>(firstPlayerDamageTime)
-			);
+			"First Player Damage Time: %llu",
+			static_cast<unsigned long long>(firstPlayerDamageTime)
+		);
 
 		ImGui::Text(
 			"Last Player Damage Time: %llu",
@@ -852,6 +857,23 @@ void AddonOptions()
 			"Player EVTC DPS: %.1f",
 			playerEVTCDPS
 		);
+		double playerTotalEVTCDPS = 0.0;
+
+		if (playerDamageDuration > 0)
+		{
+			const double durationSeconds =
+				static_cast<double>(playerDamageDuration) / 1000.0;
+
+			playerTotalEVTCDPS =
+				static_cast<double>(playerTotalDamage) / durationSeconds;
+		}
+
+		ImGui::Text(
+			"Player Total EVTC DPS: %.1f",
+			playerTotalEVTCDPS
+		);
+
+
 
 		if (!evtcCombatEvents.empty())
 		
