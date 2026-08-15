@@ -593,7 +593,7 @@ void AddonOptions()
 		if (!evtcLoaded)
 		{
 			evtcLoaded = evtcAnalyzer.LoadFile(
-				R"(C:\Users\deadw\OneDrive\Documents\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\Special Forces Training Area (1154)\20260814-115037.zevtc)"
+				R"(C:\Users\deadw\OneDrive\Documents\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\Standard Kitty Golem (16199)\20260814-235252.zevtc)"
 			);
 		}
 
@@ -665,6 +665,32 @@ void AddonOptions()
 			}
 
 		}
+		ImGui::Text("Owned-Agent Candidates:");
+
+		size_t shownOwnedCandidates = 0;
+
+		for (const EVTCCombatEvent& event : evtcCombatEvents)
+		{
+			if (event.srcMasterInstid != 0)
+			{
+				ImGui::Text(
+					"Src:%llu SrcInst:%u Master:%u Skill:%u Value:%d BuffDmg:%d",
+					static_cast<unsigned long long>(event.srcAgent),
+					static_cast<unsigned int>(event.srcInstid),
+					static_cast<unsigned int>(event.srcMasterInstid),
+					static_cast<unsigned int>(event.skillID),
+					event.value,
+					event.buffDmg
+				);
+
+				++shownOwnedCandidates;
+
+				if (shownOwnedCandidates >= 12)
+				{
+					break;
+				}
+			}
+		}
 
 		ImGui::Text(
 			"Damage Combat Events: %u",
@@ -701,6 +727,8 @@ void AddonOptions()
 
 		ImGui::Text("Damage Source Lookup:");
 
+		uint16_t playerInstanceID = 0;
+
 		if (!evtcCombatEvents.empty())
 		{
 			uint64_t damageSource = 0;
@@ -713,7 +741,8 @@ void AddonOptions()
 					event.value > 0)
 				{
 					damageSource = event.srcAgent;
-					break;
+					playerInstanceID = event.srcInstid;
+					break;;
 				}
 			}
 
@@ -733,6 +762,10 @@ void AddonOptions()
 				}
 			}
 		}
+		ImGui::Text(
+			"Player Instance ID: %u",
+			static_cast<unsigned int>(playerInstanceID)
+		);
 		uint64_t playerAgentAddress = 0;
 
 		for (const EVTCAgent& agent : evtcAgents)
@@ -752,14 +785,55 @@ void AddonOptions()
 		uint64_t playerTotalDamage = 0;
 		uint64_t firstPlayerDamageTime = 0;
 		uint64_t lastPlayerDamageTime = 0;
+		uint64_t ownedDirectDamage = 0;
+		size_t ownedDirectDamageEvents = 0;
+		uint64_t ownedBuffDamage = 0;
+		size_t ownedBuffDamageEvents = 0;
+		uint64_t combinedTotalDamage = 0;
+		double combinedDPS = 0.0;
+		uint64_t firstOwnedDamageTime = 0;
+		uint64_t lastOwnedDamageTime = 0;
+		uint64_t combinedFirstDamageTime = 0;
+		uint64_t combinedLastDamageTime = 0;
+		
 		for (const EVTCCombatEvent& event : evtcCombatEvents)
 		{
+			if (event.srcMasterInstid == playerInstanceID &&
+				event.isStateChange == 0 &&
+				event.isActivation == 0 &&
+				event.buff == 0 &&
+				event.value > 0)
+			{
+				ownedDirectDamage += static_cast<uint64_t>(event.value);
+				++ownedDirectDamageEvents;
+				if (firstOwnedDamageTime == 0)
+				{
+					firstOwnedDamageTime = event.time;
+				}
+
+				lastOwnedDamageTime = event.time;
+			}
 			if (event.srcAgent == playerAgentAddress &&
 				event.isStateChange == 0 &&
 				event.isActivation == 0 &&
 				event.buff == 0 &&
 				event.value > 0)
 			{
+				if (event.srcMasterInstid == playerInstanceID &&
+					event.isStateChange == 0 &&
+					event.isActivation == 0 &&
+					event.buff != 0 &&
+					event.buffDmg > 0)
+				{
+					ownedBuffDamage += static_cast<uint64_t>(event.buffDmg);
+					++ownedBuffDamageEvents;
+					if (firstOwnedDamageTime == 0)
+					{
+						firstOwnedDamageTime = event.time;
+					}
+
+					lastOwnedDamageTime = event.time;
+				}
 				playerDamage += static_cast<uint64_t>(event.value);
 				++playerDamageEvents;
 				if (firstPlayerDamageTime == 0)
@@ -797,6 +871,56 @@ void AddonOptions()
 		}
 
 		playerTotalDamage = playerDamage + playerBuffDamage;
+
+		combinedTotalDamage =
+			playerTotalDamage +
+			ownedDirectDamage +
+			ownedBuffDamage;
+
+		if (firstPlayerDamageTime != 0 && firstOwnedDamageTime != 0)
+		{
+			combinedFirstDamageTime =
+				(firstPlayerDamageTime < firstOwnedDamageTime)
+				? firstPlayerDamageTime
+				: firstOwnedDamageTime;
+		}
+		else if (firstPlayerDamageTime != 0)
+		{
+			combinedFirstDamageTime = firstPlayerDamageTime;
+		}
+		else
+		{
+			combinedFirstDamageTime = firstOwnedDamageTime;
+		}
+
+		if (lastPlayerDamageTime != 0 && lastOwnedDamageTime != 0)
+		{
+			combinedLastDamageTime =
+				(lastPlayerDamageTime > lastOwnedDamageTime)
+				? lastPlayerDamageTime
+				: lastOwnedDamageTime;
+		}
+		else if (lastPlayerDamageTime != 0)
+		{
+			combinedLastDamageTime = lastPlayerDamageTime;
+		}
+		else
+		{
+			combinedLastDamageTime = lastOwnedDamageTime;
+		}
+
+		if (combinedFirstDamageTime != 0 &&
+			combinedLastDamageTime > combinedFirstDamageTime)
+		{
+			double combinedDurationSeconds =
+				static_cast<double>(
+					combinedLastDamageTime - combinedFirstDamageTime
+					) / 1000.0;
+
+			combinedDPS =
+				static_cast<double>(combinedTotalDamage) /
+				combinedDurationSeconds;
+		}
 		ImGui::Text(
 			"Player Direct Damage: %llu",
 			static_cast<unsigned long long>(playerDamage)
@@ -827,6 +951,49 @@ void AddonOptions()
 		ImGui::Text(
 			"Last Player Damage Time: %llu",
 			static_cast<unsigned long long>(lastPlayerDamageTime)
+		);
+		ImGui::Separator();
+
+		ImGui::Text(
+			"Owned Direct Damage: %llu",
+			static_cast<unsigned long long>(ownedDirectDamage)
+		);
+
+		ImGui::Text(
+			"Owned Direct Damage Events: %u",
+			static_cast<unsigned int>(ownedDirectDamageEvents)
+		);
+
+		ImGui::Text(
+			"Owned Buff Damage: %llu",
+			static_cast<unsigned long long>(ownedBuffDamage)
+		);
+
+		ImGui::Text(
+			"Owned Buff Damage Events: %u",
+			static_cast<unsigned int>(ownedBuffDamageEvents)
+		);
+
+		ImGui::Text(
+			"Owned Total Damage: %llu",
+			static_cast<unsigned long long>(ownedDirectDamage + ownedBuffDamage)
+		);
+		ImGui::Text(
+			"Combined Player + Owned Damage: %llu",
+			static_cast<unsigned long long>(combinedTotalDamage)
+		);
+		ImGui::Text(
+			"Combined Player + Owned DPS: %.1f",
+			combinedDPS
+		);
+		ImGui::Text(
+			"Combined First Damage Time: %llu",
+			static_cast<unsigned long long>(combinedFirstDamageTime)
+		);
+
+		ImGui::Text(
+			"Combined Last Damage Time: %llu",
+			static_cast<unsigned long long>(combinedLastDamageTime)
 		);
 
 		uint64_t playerDamageDuration = 0;
