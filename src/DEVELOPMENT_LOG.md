@@ -1643,7 +1643,116 @@ After the DPS timing change, Last Fight Time still used the old first-damage -> 
 `CaptureLastFight()` was updated so Last Fight Time and Last Fight DPS now use the same verified timing model.
 
 Final runtime verification showed:
+---
 
+## Per-Skill Damage Investigation – Bleeding Source Verification
+
+A simplified golem test was used to compare ArcDPS and MetricHUD damage on a per-skill basis.
+
+Direct-damage skills compared closely between the two tools, including:
+
+- Ricochet
+- Bite
+- Smoke Assault
+- Takedown
+
+An apparent discrepancy was initially observed in Bleeding totals, particularly ArcDPS's `Bleeding (m)` minion-owned category.
+
+### Accepted Bleeding Source Diagnostic
+
+Temporary diagnostics separated accepted Bleeding damage into:
+
+- Self Bleeding
+- Owned-agent Bleeding
+
+One controlled test produced:
+
+ArcDPS:
+- Bleeding (m): 5943
+- Bleeding: 659
+
+MetricHUD:
+- Owned Bleeding: 4145
+- Self Bleeding: 657
+
+This initially suggested a shortage on the owned-agent side.
+
+### Null-Source Bleeding Test
+
+A temporary diagnostic was added before the existing:
+
+`combatData->src == nullptr`
+
+return to determine whether Bleeding events were being discarded because ArcDPS supplied no source-agent object.
+
+Controlled test:
+
+ArcDPS:
+- Bleeding (m): 4962
+- Bleeding: 641
+
+MetricHUD:
+- Owned Bleeding: 3436
+- Self Bleeding: 641
+- Null-Source Bleeding: 0
+
+Result:
+
+Null-source Bleeding did not explain the apparent discrepancy.
+
+### Ownership-Rejection Bleeding Test
+
+A temporary Bleeding-only counter was then added immediately before the existing ownership-filter return.
+
+The ownership rule itself was not changed.
+
+Final controlled test:
+
+ArcDPS:
+- Bleeding (m): 2900
+- Bleeding: 764
+
+MetricHUD:
+- Owned Bleeding: 2900
+- Self Bleeding: 764
+- Null-Source Bleeding: 0
+- Rejected Bleeding: 0
+
+The final controlled test matched exactly:
+
+- ArcDPS player Bleeding = MetricHUD Self Bleeding
+- ArcDPS minion Bleeding = MetricHUD Owned Bleeding
+
+Result:
+
+The earlier apparent Bleeding shortage was not reproducible.
+
+The tests provide additional confirmation that:
+
+- LOCAL_RAW receives player Bleeding.
+- LOCAL_RAW receives owned-agent / pet Bleeding.
+- Self Bleeding attribution is working.
+- Owned-agent Bleeding attribution is working.
+- Bleeding is not being lost through the null-source check.
+- Bleeding is not being lost through the verified ownership filter.
+
+No production ownership or damage-accounting changes were made.
+
+All temporary Bleeding diagnostics were removed after testing.
+
+Production callback restored exactly to the committed version.
+
+Clean Release x64 rebuild: PASS
+
+Git working tree after cleanup: CLEAN
+
+Status: BLEEDING PATH VERIFIED / NO PRODUCTION CHANGE REQUIRED
+
+### Next Investigation Direction
+
+Do not continue modifying Bleeding handling simply to force a match with an isolated ArcDPS display discrepancy.
+
+Any remaining ArcDPS-versus-MetricHUD damage difference should be reproduced first in a controlled test and then isolated to a specific skill or event category before production damage logic is changed.
 - Arc Start -> Last Damage: 38.60 seconds
 - Last Fight Time: 38.60 seconds
 - Analyzer DPS: 4182.6
