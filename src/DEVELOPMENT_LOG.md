@@ -1729,3 +1729,49 @@ The previous Live DPS Timing Refinement objective is now complete.
 Do not replace the verified ArcDPS ENTERCOMBAT -> Last Damage timing model without controlled runtime evidence demonstrating a more accurate model.
 
 Stable ArcDPS state-change + damage-accounting + DPS-timing checkpoint reached.
+
+
+---
+
+## Damage Discrepancy Investigation – Dual-Value Event Test
+
+A temporary diagnostic was added to test whether ArcDPS LOCAL_RAW produces damage events containing both:
+
+- `Value < 0`
+- `BuffDamage < 0`
+
+This was investigated because MetricHUD's direct-damage rule only counts negative `Value` when `BuffDamage == 0`.
+
+Controlled runtime testing produced:
+
+- Zero-Skill Damage Events: 0
+- Dual-Value Damage Events: 0
+- Dual-Value Direct Damage: 0
+
+Result:
+
+Dual-value damage events do not explain the remaining small ArcDPS-versus-MetricHUD damage difference observed in this test.
+
+The production direct-damage and buff/condition-damage rules were left unchanged.
+
+The temporary dual-value diagnostic was completely removed after testing.
+
+Build after cleanup: PASS
+
+Git working tree after cleanup: CLEAN
+
+Status: THEORY ELIMINATED
+
+### Next Investigation Target
+
+Do not repeat the already completed investigations for:
+
+- LOCAL_RAW pet condition reception
+- SQUAD_RAW
+- owned-agent filtering
+- rejected Bleeding
+- SkillID == 0 damage
+- dual-value damage events
+- DPS timing
+
+The next controlled investigation should compare ArcDPS and MetricHUD damage on a per-skill basis to identify which specific direct-damage skill or category accounts for any remaining difference.
