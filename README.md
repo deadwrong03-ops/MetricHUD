@@ -12,6 +12,8 @@ The goal is simple:
 
 MetricHUD is being developed as a Nexus addon with the long-term goal of providing useful combat metrics, encounter information, and optional player-training tools without overwhelming the screen.
 
+> **ArcDPS gives you the data. MetricHUD helps you learn from it.**
+
 ---
 
 ## Current Version
@@ -28,7 +30,11 @@ Features, interfaces, configuration formats, and internal systems may change as 
 
 MetricHUD currently has a working HUD framework, persistent configuration system, metric registry, game/map information, live ArcDPS combat integration, and an experimental EVTC combat-log analysis pipeline.
 
-The current development focus is building a reliable combat-data foundation from both live ArcDPS events and saved EVTC combat logs before expanding into advanced metrics, encounter analysis, rotation analysis, and training features.
+The live Combat Analyzer can currently identify player and player-owned agent combat events, process direct and condition/buff damage, track skill usage, attribute damage by skill, measure combat timing, and calculate live DPS.
+
+The EVTC analyzer can independently parse saved ArcDPS combat logs, identify the player, attribute direct and condition damage, identify player-owned agents, and calculate combined player + owned-agent damage and DPS.
+
+The current development focus is validating the remaining differences between MetricHUD's live calculations and ArcDPS before expanding the combat-analysis foundation into advanced metrics, encounter analysis, reliable rotation analysis, and training features.
 
 ---
 
@@ -79,27 +85,36 @@ Metrics can be individually enabled or disabled through the MetricHUD options pa
 
 ### ArcDPS Combat Integration
 
-MetricHUD has a working early ArcDPS combat-event pipeline.
+MetricHUD has a working live ArcDPS combat-event pipeline.
 
-Completed work includes:
+Completed and validated work includes:
 
-- ArcDPS local combat-event subscription
+- ArcDPS LOCAL_RAW combat-event subscription
 - Combat event forwarding into `CombatAnalyzer`
+- Player instance identification
+- Player/self event filtering
+- Player-owned agent attribution
+- Pet/minion event acceptance through source-master ownership
 - Direct damage tracking
+- Condition / buff damage tracking
+- Combined live damage calculation
 - Combat-event counting
 - Combat timer foundation
-- DPS calculation
+- Live DPS calculation
+- First/last damage timestamp tracking
 - Last-fight data foundation
 - Skill ID capture
 - ArcDPS skill-name capture
 - Skill ID → skill-name mapping
-- Recent skill tracking
+- Skill usage tracking
+- Damage-by-skill tracking
+- Recent combat-record tracking
 - Raw skill-event counting
 - Activation-event inspection
-- Combat-event debug information
-- Player/self event filtering
 - State-change event filtering
+- Combat-event debug information
 - Live verification against ArcDPS
+- Controlled pet-only combat validation
 
 The analyzer has successfully identified Guild Wars 2 skills including examples such as:
 
@@ -116,6 +131,13 @@ The analyzer has successfully identified Guild Wars 2 skills including examples 
 - "Chilled to the Bone!"
 - "You Are All Weaklings!"
 
+Owned-agent testing has also successfully identified pet-generated skills including:
+
+- Smoke Assault
+- Bite
+- Takedown
+- Bleeding
+
 Triggered effects such as **Chilling Nova** can also be observed separately from manually activated skills.
 
 ---
@@ -124,26 +146,39 @@ Triggered effects such as **Chilling Nova** can also be observed separately from
 
 The Combat Analyzer is currently a **development/debug system**.
 
-It is intentionally exposing raw ArcDPS data while the event model is being understood and validated.
+It intentionally exposes detailed ArcDPS data while the event model, damage attribution, timing model, and skill-activation behavior are being understood and validated.
 
 Current testing has confirmed that MetricHUD can:
 
-1. Receive ArcDPS combat events.
+1. Receive ArcDPS LOCAL_RAW combat events.
 2. Resolve ArcDPS-provided skill names.
 3. Associate names with skill IDs.
-4. Filter combat events to the player's own source.
-5. Ignore ArcDPS state-change events before analysis.
-6. Track recent player skills.
-7. Count raw skill-related events.
-8. Inspect activation events.
-9. Calculate live DPS from the combat stream.
-10. Continue operating without crashes during live combat testing.
+4. Identify the player's current ArcDPS instance.
+5. Accept combat events generated directly by the player.
+6. Attribute qualifying player-owned agent events back to the player.
+7. Ignore ArcDPS state-change events before damage analysis.
+8. Track direct damage.
+9. Track condition / buff damage.
+10. Attribute damage by skill.
+11. Track recent combat records.
+12. Track first and last qualifying damage timestamps.
+13. Calculate live combat time and DPS.
+14. Preserve last-fight information when a new combat session begins.
+15. Continue operating without crashes during controlled live combat testing.
+
+Controlled pet-only testing against a Standard Kitty Golem has successfully processed direct damage, Bleeding damage, skill attribution, combat timing, and DPS through the complete live pipeline.
+
+MetricHUD's live calculations are now substantially closer to ArcDPS during controlled testing.
+
+A small remaining DPS difference is still under investigation.
+
+No arbitrary correction factor will be used simply to force the values to match.
 
 ---
 
 ## EVTC Combat Log Analysis
 
-MetricHUD now includes an early working **EVTC combat-log analysis pipeline**.
+MetricHUD includes a working experimental **EVTC combat-log analysis pipeline**.
 
 This allows MetricHUD to analyze locally saved ArcDPS `.evtc` / `.zevtc` combat logs independently of the live ArcDPS event stream.
 
@@ -158,11 +193,17 @@ Current EVTC functionality includes:
 - Combat-event parsing
 - Damage-event identification
 - Dynamic player-agent identification
-- Player direct-damage filtering
-- Player damage-event counting
-- First/last player damage timestamp tracking
+- Dynamic player instance identification
+- Player direct-damage attribution
+- Player condition / buff-damage attribution
+- Player-owned agent attribution
+- Owned-agent direct-damage attribution
+- Direct-damage event counting
+- Condition/buff-damage event counting
+- First/last damage timestamp tracking
+- Combined player + owned-agent damage timing
 - Damage-duration calculation
-- Experimental EVTC-derived DPS calculation
+- Experimental combined EVTC-derived DPS calculation
 
 The current EVTC analysis pipeline is:
 
@@ -179,7 +220,11 @@ Parse Combat Events
       ↓
 Identify Player
       ↓
-Identify Player Damage
+Identify Player-Owned Agents
+      ↓
+Identify Direct + Condition Damage
+      ↓
+Combine Player + Owned-Agent Damage
       ↓
 Calculate Damage Duration
       ↓
@@ -188,25 +233,25 @@ Calculate DPS
 
 ### Current EVTC Status
 
-The complete pipeline has been successfully validated against a real ArcDPS combat log.
+The complete pipeline has been successfully validated against real ArcDPS combat logs.
 
-MetricHUD can currently load the log, reconstruct its core EVTC data structures, identify the player's character dynamically, isolate qualifying outgoing direct-damage events, determine the associated damage interval, and calculate an independent DPS value from those events.
+MetricHUD can currently load an EVTC log, reconstruct its core data structures, identify the player's character dynamically, identify player-owned agents through instance/master-instance relationships, attribute qualifying direct and condition damage, determine the combined damage interval, and calculate an independent player + owned-agent DPS value.
 
-**This EVTC DPS calculation is still experimental.**
+**EVTC-derived DPS is still experimental.**
 
-The current implementation is a validated foundation rather than the final production DPS model.
+The current implementation is a validated analysis foundation rather than the final production encounter-DPS model.
 
-Future refinement will investigate additional damage attribution including:
+Future refinement will continue investigating:
 
-- Condition / buff damage
-- Player-owned minion and pet damage
 - Triggered damage
 - Encounter boundaries
 - Target filtering
 - Multiple-target encounters
+- Invulnerability phases
 - Other EVTC damage-event classifications
+- Encounter-specific behavior
 
-The existing direct-damage calculation will remain as a known-good baseline while the EVTC damage model is expanded.
+The validated direct, condition, and owned-agent calculations will remain known-good baselines while the EVTC damage model is expanded.
 
 ---
 
@@ -224,30 +269,53 @@ Therefore:
 
 MetricHUD currently preserves the raw event information while development continues on reliable skill-activation detection.
 
-This distinction is important for future rotation analysis and training features.
+This distinction is especially important for future rotation analysis and training features.
 
 ---
 
 ## In Development
 
+### Live DPS Refinement
+
+The live Combat Analyzer now has a validated foundation for:
+
+- Player damage
+- Player-owned agent damage
+- Direct damage
+- Condition / buff damage
+- Damage-by-skill attribution
+- Combat timing
+- Live DPS
+
+Controlled testing has shown MetricHUD operating close to ArcDPS, but a small remaining difference is still being investigated.
+
+Areas under investigation include:
+
+- ArcDPS combat-window timing
+- Damage inclusion/exclusion rules
+- Triggered damage
+- Other condition-damage behavior
+- Multi-target behavior
+- Differences between first-to-last-damage timing and ArcDPS's internal DPS timing model
+
+The working damage model will not be modified simply to force MetricHUD to display the same number as ArcDPS.
+
+Changes will be based on controlled runtime evidence.
+
 ### EVTC Damage Model
 
 The EVTC parser has reached a working end-to-end milestone.
 
-Current development is expanding the validated direct-damage model to determine which EVTC events should contribute to accurate player and encounter DPS.
+The current model supports verified direct damage, condition/buff damage, player-owned agent attribution, combined player + owned-agent damage, combined timing, and experimental DPS calculation.
 
-Areas under investigation include:
+Further development will investigate:
 
-- Direct damage
-- Condition / buff damage
-- Player-owned agents
-- Pets and minions
 - Triggered damage
 - Target identification
 - Encounter boundaries
+- Invulnerability phases
 - Multi-target encounters
-
-The current direct-damage DPS calculation is being preserved as a validated baseline while additional EVTC event classifications are added.
+- Encounter-specific damage behavior
 
 ### Reliable Skill Activation Tracking
 
@@ -284,7 +352,7 @@ Skill B event
 Skill B event
 ```
 
-That reliable activation stream will become the foundation for rotation analysis.
+That reliable activation stream will become one of the foundations for rotation and priority analysis.
 
 ---
 
@@ -323,13 +391,46 @@ Future MetricHUD metrics and systems may include:
 
 A major long-term goal for MetricHUD is optional player training and performance analysis.
 
+Guild Wars 2 can allow players to progress through much of the early game by simply using skills as they become available. That can work perfectly well while leveling and exploring, but it does not necessarily teach the priorities that become increasingly important later in the game.
+
+As combat becomes more demanding, performance can depend on understanding things such as:
+
+- Skill priority
+- Rotation structure
+- Burst windows
+- Boon uptime
+- Positioning
+- Encounter phases
+- Execute phases
+- Resource management
+- Build and gear interactions
+
+The transition can be difficult because the game does not always clearly explain **why** one approach performs differently from another.
+
+MetricHUD's training systems are intended to help bridge that gap.
+
+The goal is not to tell a player that they played **wrong**.
+
+Instead, MetricHUD should help answer questions such as:
+
+- What happened during the fight?
+- Which skills contributed most?
+- Where was damage gained or lost?
+- Were important skills sitting unused?
+- Did priorities change during a particular phase?
+- How consistent was the player between attempts?
+- Is the player's build or gear aligned with the goal they selected?
+- What is the most useful thing to work on next?
+
+> **ArcDPS gives you the data. MetricHUD helps you learn from it.**
+
 Planned concepts include:
 
 - Rotation / priority coaching
 - Player skill rotation log
 - Phase coaching
 - DPS coaching
-- Goal-based optimization
+- Goal-based build and gear optimization
 - Boon uptime goals
 - Skill downtime analysis
 - Burst-window analysis
@@ -345,7 +446,7 @@ Potential training modes include:
 
 **Guided**
 
-Provides active guidance while learning a build or rotation.
+Provides active guidance while learning a build, priority system, or rotation.
 
 **Independent**
 
@@ -355,9 +456,43 @@ Tracks performance without constant instruction and provides analysis afterward.
 
 Provides structured performance comparison for controlled testing.
 
+Training should favor useful improvement opportunities over punishment or rigid judgments.
+
+Where appropriate, MetricHUD should recognize **priority and phase-based gameplay** rather than assuming that every build must follow one unchanging sequence.
+
+Personal improvement should also be emphasized over simply comparing every player against elite benchmark performance.
+
 The goal is not to force one universal way to play.
 
 MetricHUD should allow players to select the information and goals that matter to them.
+
+---
+
+## How the Pieces Fit Together
+
+MetricHUD's major systems are being developed as parts of the same long-term analysis pipeline:
+
+```text
+ArcDPS Live Combat Data
+        +
+Saved EVTC Combat Logs
+        ↓
+Reliable Combat Data
+        ↓
+Damage / Timing / Skills / Buffs
+        ↓
+Encounter Reconstruction
+        ↓
+Rotation & Priority Analysis
+        ↓
+Performance Analysis
+        ↓
+Optional Training & Coaching
+```
+
+The current Combat Analyzer and EVTC work are therefore not separate from the planned training system.
+
+They are the data foundation required to make future coaching accurate and useful.
 
 ---
 
@@ -378,6 +513,16 @@ The long-term target is approximately **five visible metrics at once** to preven
 ### Immediate Feedback
 
 Useful information should be available during or immediately after combat.
+
+### Constructive Analysis
+
+MetricHUD should identify useful opportunities for improvement without framing player performance as simply right or wrong.
+
+Training and analysis should explain **what happened, why it matters, and what the player could work on next**.
+
+### Personal Improvement
+
+Where possible, progress should be measured against the player's own previous performance and selected goals rather than treating elite benchmark performance as the only definition of success.
 
 ### Precision Over Repetition
 
