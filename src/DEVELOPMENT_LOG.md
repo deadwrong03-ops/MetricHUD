@@ -1884,3 +1884,137 @@ Do not repeat the already completed investigations for:
 - DPS timing
 
 The next controlled investigation should compare ArcDPS and MetricHUD damage on a per-skill basis to identify which specific direct-damage skill or category accounts for any remaining difference.
+
+
+---
+
+## Final Live Damage Accounting Baseline
+
+Additional controlled tests were performed after the Bleeding-source investigation to determine whether the remaining ArcDPS-versus-MetricHUD damage discrepancy could be reproduced reliably.
+
+### Player-Only Direct-Damage Baseline
+
+A Necromancer/Reaper was used with no minions and Greatsword autoattack only.
+
+No shroud, wells, utilities, minions, or other damage sources were used.
+
+Observed MetricHUD total:
+
+- Direct Damage: 141665
+- Buff Damage: 0
+- Total Damage: 141665
+
+MetricHUD per-skill totals:
+
+- Chilling Scythe: 59859
+- Fading Twilight: 43610
+- Dusk Strike: 30699
+- Chilling Nova: 7497
+
+These skill totals sum exactly to:
+
+`141665`
+
+ArcDPS displayed approximately:
+
+- Total Damage: 141.7k
+- DPS: 5640
+
+MetricHUD displayed:
+
+- DPS: 5642.5
+
+Per-skill values closely matched ArcDPS.
+
+Result:
+
+Player-only direct damage accounting is verified.
+
+Status: PASS
+
+### Pet-Only Baseline
+
+A Ranger/Smokescale test was then performed with the player dealing no damage.
+
+Initial comparisons were complicated by ArcDPS's completed-encounter display switching back to a previous Reaper fight after the golem was removed.
+
+For subsequent testing, ArcDPS Chat Skills and MetricHUD Damage By Skill were compared while the same pet-only encounter was still active.
+
+To prevent asynchronous display updates from producing false differences, the pet was placed into passive / Avoid Combat mode while the golem remained spawned, and the displays were allowed to become stationary before comparison.
+
+Final frozen pet-only comparison:
+
+ArcDPS Chat Skills:
+
+- Bite (m): approximately 25.2k
+- Smoke Assault (m): 7632
+- Takedown (m): 3769
+- Bleeding (m): 2897
+
+MetricHUD Damage By Skill:
+
+- Bite: 25226
+- Smoke Assault: 8942
+- Takedown: 3769
+- Bleeding: 2897
+
+MetricHUD totals:
+
+- Direct Damage: 37973
+- Buff Damage: 2897
+- Total Damage: 40870
+
+ArcDPS overall Damage window displayed approximately:
+
+- Total Damage: 40.8k
+
+Bite, Takedown, Bleeding, and the overall encounter total matched or closely matched MetricHUD.
+
+The only remaining per-skill difference appeared in ArcDPS Chat Skills for Smoke Assault.
+
+However, the ArcDPS Chat Skills rows themselves summed to less than ArcDPS's own overall Damage total by approximately the same amount as the Smoke Assault difference.
+
+Therefore the Smoke Assault discrepancy appears to be an ArcDPS skill-attribution / display difference rather than missing or extra MetricHUD damage.
+
+No production damage-accounting change was justified.
+
+### Final Damage Investigation Result
+
+Controlled runtime testing now verifies:
+
+- Player direct damage accounting: PASS
+- Player condition damage accounting: PASS
+- Owned-agent direct damage accounting: PASS
+- Owned-agent condition damage accounting: PASS
+- Bite attribution: PASS
+- Takedown attribution: PASS
+- Bleeding attribution: PASS
+- Player-only total damage: PASS
+- Pet-only total damage: PASS
+- ArcDPS ENTERCOMBAT -> Last Damage DPS timing: PASS
+- Last Fight Damage / Time / DPS capture: PASS
+
+Previously investigated and eliminated theories include:
+
+- Missing LOCAL_RAW pet Bleeding
+- Need for SQUAD_RAW
+- Ownership-filter rejection
+- Null-source Bleeding
+- SkillID == 0 damage
+- Dual-value damage events
+- Incorrect first-to-last-damage DPS timing
+
+The live CombatAnalyzer damage foundation should now be treated as stable.
+
+Do not modify working damage totals or ownership rules merely to force individual ArcDPS UI subviews to match when ArcDPS's own displayed breakdowns are internally inconsistent.
+
+Any future damage-accounting change must first reproduce a discrepancy in a controlled encounter where:
+
+1. Both tools are confirmed to be displaying the same encounter.
+2. Damage sources are isolated.
+3. Display values are stationary before comparison.
+4. The overall encounter totals disagree, not only a secondary skill-attribution view.
+
+Status: LIVE DAMAGE ACCOUNTING BASELINE COMPLETE
+
+Stable LOCAL_RAW + owned-agent + direct-damage + condition-damage + DPS-timing checkpoint reached.
