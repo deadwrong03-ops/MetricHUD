@@ -41,7 +41,7 @@ void CombatAnalyzer::ResetSession()
 void CombatAnalyzer::CaptureLastFight()
 {
     lastFightDamage = totalDirectDamage + totalBuffDamage;
-    lastFightDurationSeconds = GetCombatDurationSeconds();
+    lastFightDurationSeconds = GetArcStartToLastDamageSeconds();
     lastFightDPS = GetDPS();
 }
 
@@ -198,6 +198,17 @@ double CombatAnalyzer::GetCombatDurationSeconds() const
 
     return static_cast<double>(lastDamageTime - firstDamageTime) / 1000.0;
 }
+
+
+double CombatAnalyzer::GetArcStartToLastDamageSeconds() const
+{
+    if (combatStartTime == 0 || lastDamageTime <= combatStartTime)
+    {
+        return 0.0;
+    }
+
+    return static_cast<double>(lastDamageTime - combatStartTime) / 1000.0;
+}
 uint64_t CombatAnalyzer::GetFirstDamageTime() const
 {
     return firstDamageTime;
@@ -207,9 +218,15 @@ uint64_t CombatAnalyzer::GetLastDamageTime() const
 {
     return lastDamageTime;
 }
+void CombatAnalyzer::SetCombatStartTime(uint64_t time)
+{
+    combatStartTime = time;
+}
+
+
 double CombatAnalyzer::GetDPS() const
 {
-    const double duration = GetCombatDurationSeconds();
+    const double duration = GetArcStartToLastDamageSeconds();
 
     if (duration <= 0.0)
     {

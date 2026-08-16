@@ -43,7 +43,7 @@ HUDWindow hudWindow;
 ConfigManager configManager;
 CombatAnalyzer combatAnalyzer;
 EVTCAnalyzer evtcAnalyzer;
-static long long arcTotalDamage = 0;
+
 static bool arcPlayerInCombat = false;
 static unsigned int debugLastArcStateChange = 0;
 static float debugMumbleCombatTime = 0.0f;
@@ -134,8 +134,8 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
-	
-	
+
+
 
 	if (combatData->src == nullptr)
 	{
@@ -149,7 +149,7 @@ void OnArcDPSCombat(void* eventArgs)
 	if (combatData->src->IsSelf == 0 &&
 		ev->SrcMasterInstanceID != combatAnalyzer.GetPlayerInstanceID())
 	{
-		
+
 
 		return;
 	}
@@ -165,6 +165,8 @@ void OnArcDPSCombat(void* eventArgs)
 		{
 			arcPlayerInCombat = true;
 			combatAnalyzer.ResetSession();
+			combatAnalyzer.SetCombatStartTime(ev->Time);
+
 		}
 		if (ev->IsStatechange == 2 &&
 			combatData->src != nullptr &&
@@ -172,6 +174,7 @@ void OnArcDPSCombat(void* eventArgs)
 		{
 			arcPlayerInCombat = false;
 			combatAnalyzer.CaptureLastFight();
+			
 		}
 		return;
 	}
@@ -182,18 +185,10 @@ void OnArcDPSCombat(void* eventArgs)
 		combatData->id
 
 	);
-	
-
-	if (ev->Value > 0)
-	{
-		arcTotalDamage += ev->Value;
-	}
-
-	if (ev->BuffDamage > 0)
-	{
-		arcTotalDamage += ev->BuffDamage;
-	}
 }
+
+
+	
 
 
 ///----------------------------------------------------------------------------------------------------
@@ -498,11 +493,11 @@ void AddonOptions()
 
 
 	{
-		ImGui::Text("Arc Damage Debug: %lld", arcTotalDamage);
+		
 		ImGui::Text("Last Arc StateChange: %u", debugLastArcStateChange);
 		ImGui::Separator();
 
-		ImGui::Text("Version 0.1.0 - STATE TEST");
+		ImGui::Text("Version 0.1.0");
 		ImGui::TextDisabled("Settings will be added during development.");
 		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
@@ -526,6 +521,9 @@ void AddonOptions()
 			"Analyzer Combat Time: %.2f",
 			combatAnalyzer.GetCombatDurationSeconds()
 		);
+		ImGui::Text("Arc Start -> Last Damage: %.2f",
+			combatAnalyzer.GetArcStartToLastDamageSeconds());
+		
 		ImGui::Text("Mumble Combat Time: %.2f", debugMumbleCombatTime);
 		
 		ImGui::Text(

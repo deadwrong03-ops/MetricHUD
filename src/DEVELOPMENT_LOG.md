@@ -1522,3 +1522,210 @@ Do not modify the working damage totals merely to force MetricHUD to match ArcDP
 Any future change to the DPS model should be supported by controlled runtime evidence.
 
 Safe LOCAL_RAW + owned-agent + condition-damage + diagnostic-cleanup checkpoint reached.
+
+
+
+---
+
+## ArcDPS Combat-State and DPS Timing Investigation
+
+### ArcDPS State-Change Verification
+
+The LOCAL_RAW callback was tested for ArcDPS state-change records.
+
+Controlled runtime testing verified:
+
+- `IsStatechange == 1` = player ENTERCOMBAT
+- `IsStatechange == 2` = player EXITCOMBAT
+
+MetricHUD now uses these ArcDPS state changes for CombatAnalyzer session boundaries.
+
+On player ENTERCOMBAT:
+
+- `CombatAnalyzer::ResetSession()` is called.
+- The ArcDPS event timestamp is stored as the combat start time.
+
+On player EXITCOMBAT:
+
+- `CombatAnalyzer::CaptureLastFight()` is called.
+
+The previous Mumble-based CombatAnalyzer reset/capture behavior was removed.
+
+Mumble `IsInCombat` remains available for the HUD Combat Time metric, but it is no longer responsible for CombatAnalyzer session boundaries.
+
+Status: PASS
+
+### Last Fight Damage Correction
+
+`CaptureLastFight()` previously stored only direct damage:
+
+`lastFightDamage = totalDirectDamage`
+
+This was corrected to:
+
+`lastFightDamage = totalDirectDamage + totalBuffDamage`
+
+Controlled runtime testing verified that Last Fight Damage now exactly equals MetricHUD's Direct Damage + Buff Damage totals.
+
+Status: PASS
+
+### Raw Damage Diagnostic
+
+A temporary `arcTotalDamage` counter was added directly to the LOCAL_RAW callback to compare raw negative ArcDPS damage values against CombatAnalyzer totals.
+
+The diagnostic counted:
+
+- Negative `Value` as direct damage.
+- Negative `BuffDamage` as buff / condition damage.
+
+Controlled testing showed the raw callback total matched:
+
+`CombatAnalyzer Direct Damage + CombatAnalyzer Buff Damage`
+
+This confirmed that the analyzer's internally accepted damage records were being totaled consistently.
+
+The temporary `arcTotalDamage` diagnostic was removed after verification.
+
+Status: PASS
+
+### DPS Timing Model Investigation
+
+The previous CombatAnalyzer DPS duration was:
+
+`first damage timestamp -> last damage timestamp`
+
+Controlled testing showed that this duration was consistently slightly shorter than the timing represented by ArcDPS's Damage window.
+
+Several candidate timing windows were measured without initially changing the production DPS formula:
+
+1. First Damage -> Last Damage
+2. ArcDPS ENTERCOMBAT -> Last Damage
+3. ArcDPS ENTERCOMBAT -> EXITCOMBAT
+4. Mumble combat-state duration
+
+ENTERCOMBAT -> EXITCOMBAT was clearly too long because ArcDPS can keep the player in combat well after the final damaging event.
+
+Mumble combat time was also unsuitable for the DPS denominator.
+
+The strongest match was consistently:
+
+`ArcDPS ENTERCOMBAT -> Last Damage`
+
+Controlled examples included:
+
+- MetricHUD Arc Start -> Last Damage: 50.48 seconds
+- ArcDPS displayed fight time: approximately 50 seconds
+
+and:
+
+- MetricHUD Arc Start -> Last Damage: 45.80 seconds
+- ArcDPS damage/time values implied approximately 45.8 seconds
+
+After changing the DPS denominator to ArcDPS ENTERCOMBAT -> Last Damage, another runtime comparison produced:
+
+- MetricHUD Damage: 208352
+- MetricHUD DPS: 5096.7
+- ArcDPS Damage: approximately 209.8k
+- ArcDPS Damage-window DPS: approximately 5109/s
+
+The remaining difference was small and separate from the timing-model issue.
+
+Based on repeated controlled runtime evidence, MetricHUD now calculates DPS using:
+
+`ArcDPS ENTERCOMBAT timestamp -> last accepted damage timestamp`
+
+Status: PASS
+
+### Last Fight Timing Alignment
+
+After the DPS timing change, Last Fight Time still used the old first-damage -> last-damage duration while Last Fight DPS used the new Arc-start timing.
+
+`CaptureLastFight()` was updated so Last Fight Time and Last Fight DPS now use the same verified timing model.
+
+Final runtime verification showed:
+
+- Arc Start -> Last Damage: 38.60 seconds
+- Last Fight Time: 38.60 seconds
+- Analyzer DPS: 4182.6
+- Last Fight DPS: 4182.6
+
+Status: PASS
+
+### Timing Diagnostic Cleanup
+
+Temporary investigation-only code was removed after verification:
+
+- `arcTotalDamage`
+- ENTERCOMBAT -> EXITCOMBAT duration storage
+- `combatEndTime`
+- `SetCombatEndTime()`
+- `GetArcCombatDurationSeconds()`
+- Arc Combat Time debug display
+- Temporary `STATE TEST` version text
+
+The production timing pieces retained are:
+
+- ArcDPS ENTERCOMBAT session reset
+- `combatStartTime`
+- `SetCombatStartTime()`
+- `GetArcStartToLastDamageSeconds()`
+- ArcDPS EXITCOMBAT Last Fight capture
+
+### Final Post-Cleanup Runtime Verification
+
+Final runtime sanity testing after diagnostic cleanup verified:
+
+- No crash
+- ArcDPS state-change handling operational
+- `Last Arc StateChange: 2` after combat exit
+- Direct damage operational
+- Buff / condition damage operational
+- Arc Start -> Last Damage operational
+- Live DPS operational
+- Last Fight Damage operational
+- Last Fight Time operational
+- Last Fight DPS operational
+- Recent Skills / Skill Usage / Damage By Skill remained operational
+
+Final observed test:
+
+- Direct Damage: 322824
+- Buff Damage: 19591
+- Total / Last Fight Damage: 342415
+- Analyzer Combat Time: 57.15 seconds
+- Arc Start -> Last Damage: 57.16 seconds
+- Analyzer DPS: 5990.3
+- Last Fight Time: 57.16 seconds
+- Last Fight DPS: 5990.3
+- Last Arc StateChange: 2
+
+Build: PASS  
+Runtime: PASS  
+DPS timing refinement: PASS  
+Diagnostic cleanup: PASS
+
+### Current Stable DPS Pipeline
+
+LOCAL_RAW
+↓
+Player / Owned-Agent Filtering
+↓
+ArcDPS ENTERCOMBAT Session Start
+↓
+Direct Damage + Buff / Condition Damage
+↓
+Per-Skill Attribution
+↓
+Last Damage Timestamp
+↓
+Arc Start -> Last Damage Duration
+↓
+Live DPS
+↓
+ArcDPS EXITCOMBAT Last Fight Capture
+
+The previous Live DPS Timing Refinement objective is now complete.
+
+Do not replace the verified ArcDPS ENTERCOMBAT -> Last Damage timing model without controlled runtime evidence demonstrating a more accurate model.
+
+Stable ArcDPS state-change + damage-accounting + DPS-timing checkpoint reached.

@@ -58,8 +58,12 @@ public:
     int64_t GetTotalBuffDamage() const;
     double GetCombatDurationSeconds() const;
     
+    double GetArcStartToLastDamageSeconds() const;
+    
     uint64_t GetFirstDamageTime() const;
     uint64_t GetLastDamageTime() const;
+    void SetCombatStartTime(uint64_t time);
+    
     double GetDPS() const;
     void SetPlayerInstanceID(uint16_t instanceID);
     uint16_t GetPlayerInstanceID() const;
@@ -85,6 +89,8 @@ private:
     int64_t totalBuffDamage = 0;
     uint64_t firstDamageTime = 0;
     uint64_t lastDamageTime = 0;
+    uint64_t combatStartTime = 0;
+    
     int64_t lastFightDamage = 0;
     double lastFightDurationSeconds = 0.0;
     double lastFightDPS = 0.0;
