@@ -363,6 +363,7 @@ void AddonRender()
 	{
 		metricRegistry.SetDPS(0.0);
 	}
+	metricRegistry.SetLastFightDPS(combatAnalyzer.GetLastFightDPS());
 
 	if (configManager.ShowHUD())
 	{
@@ -414,6 +415,21 @@ void AddonOptions()
 		if (ImGui::Checkbox("Show DPS", &dpsEnabled))
 		{
 			metricRegistry.SetMetricEnabled(MetricID::DPS, dpsEnabled);
+		}
+	}
+	MetricDefinition* lastFightDpsMetric =
+		metricRegistry.GetMetric(MetricID::LastFightDPS);
+
+	if (lastFightDpsMetric != nullptr)
+	{
+		bool lastFightDpsEnabled = lastFightDpsMetric->enabled;
+
+		if (ImGui::Checkbox("Show Last Fight DPS", &lastFightDpsEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::LastFightDPS,
+				lastFightDpsEnabled
+			);
 		}
 	}
 

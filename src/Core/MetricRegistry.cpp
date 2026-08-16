@@ -21,6 +21,16 @@ void MetricRegistry::Initialize()
             "",
             MetricFormat::Milliseconds
         });
+    metrics.push_back(
+        {
+            MetricID::LastFightDPS,
+            "Last Fight DPS",
+            false,
+            7,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
 
     metrics.push_back(
         {
@@ -113,6 +123,16 @@ void MetricRegistry::SetDPS(double value)
 double MetricRegistry::GetDPS() const
 {
     return dps;
+}
+void MetricRegistry::SetLastFightDPS(double value)
+{
+    lastFightDPS = value;
+    SetMetricValue(MetricID::LastFightDPS, static_cast<float>(value));
+}
+
+double MetricRegistry::GetLastFightDPS() const
+{
+    return lastFightDPS;
 }
 
 const MetricDefinition& MetricRegistry::GetFPSMetric() const

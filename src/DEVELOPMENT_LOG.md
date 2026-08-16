@@ -1,4 +1,24 @@
-﻿EVTC Offline Combat Analysis
+﻿# MetricHUD Development Log
+
+This file preserves MetricHUD development, diagnostics, runtime tests, recovery points, and verified checkpoints.
+
+## Checkpoint Index
+
+1. **EVTC OFFLINE COMBAT ANALYSIS**
+2. **EVTC DAMAGE MODEL — DIRECT + CONDITION**
+3. **OWNED-AGENT DAMAGE AND LIVE COMBAT ANALYZER**
+4. **LIVE ARCDPS DAMAGE-STREAM INVESTIGATION AND ANALYZER VALIDATION**
+5. **ARCDPS COMBAT-STATE AND DPS TIMING**
+6. **PER-SKILL DAMAGE — BLEEDING SOURCE VERIFICATION**
+7. **DAMAGE DISCREPANCY — DUAL-VALUE EVENT TEST**
+8. **FINAL LIVE DAMAGE ACCOUNTING BASELINE**
+9. **LAST FIGHT DPS HUD METRIC**
+
+---
+
+# ============================================================
+# CHECKPOINT 1: EVTC OFFLINE COMBAT ANALYSIS
+# ============================================================
 
 Development expanded beyond the live ArcDPS callback pipeline into direct parsing of ArcDPS EVTC combat-log files.
 
@@ -30,7 +50,8 @@ Status:
 
 ACTIVE DEVELOPMENT / MAJOR FOUNDATION WORKING
 
-EVTCAnalyzer
+## 1. EVTCAnalyzer
+
 
 A dedicated EVTC analysis system was added.
 
@@ -67,7 +88,8 @@ Calculate DPS
 
 This incremental approach allowed each assumption about the EVTC format to be verified against an actual combat log before building additional analysis on top of it.
 
-EVTC File Loading
+## 2. EVTC File Loading
+
 
 MetricHUD successfully loads a real ArcDPS EVTC combat-log file.
 
@@ -90,7 +112,8 @@ Status:
 
 PASS
 
-EVTC Encounter Identification
+## 3. EVTC Encounter Identification
+
 
 The parser successfully reads the encounter identifier from the EVTC header.
 
@@ -104,7 +127,8 @@ Status:
 
 PASS
 
-EVTC Agent Table Parsing
+## 4. EVTC Agent Table Parsing
+
 
 The EVTC agent table is now parsed.
 
@@ -125,7 +149,8 @@ Status:
 
 PASS
 
-EVTC Skill Table Parsing
+## 5. EVTC Skill Table Parsing
+
 
 The EVTC skill table is now parsed.
 
@@ -141,7 +166,8 @@ Status:
 
 PASS
 
-EVTC Combat Event Extraction
+## 6. EVTC Combat Event Extraction
+
 
 MetricHUD successfully located the combat-event section of the EVTC file.
 
@@ -160,7 +186,8 @@ Status:
 
 PASS
 
-EVTC Damage Event Identification
+## 7. EVTC Damage Event Identification
+
 
 Initial EVTC debugging inspected the parsed combat events for damage-like records.
 
@@ -188,7 +215,8 @@ Status:
 
 PASS
 
-EVTC Damage Source Resolution
+## 8. EVTC Damage Source Resolution
+
 
 The next step was determining which agent generated the observed damage events.
 
@@ -214,7 +242,8 @@ Status:
 
 PASS
 
-Dynamic Player Identification
+## 9. Dynamic Player Identification
+
 
 The first player-damage test temporarily used the observed source address:
 
@@ -248,7 +277,8 @@ Status:
 
 PASS
 
-EVTC Player Direct Damage
+## 10. EVTC Player Direct Damage
+
 
 After resolving the player dynamically, MetricHUD filtered damage events to the player's outgoing direct damage.
 
@@ -265,7 +295,8 @@ Status:
 
 PASS
 
-Player Damage Timestamp Tracking
+## 11. Player Damage Timestamp Tracking
+
 
 The EVTC player-damage loop was expanded to record the timestamps of the first and last qualifying player damage events.
 
@@ -295,7 +326,8 @@ Status:
 
 PASS
 
-First EVTC-Derived Player DPS
+## 12. First EVTC-Derived Player DPS
+
 
 Using:
 
@@ -324,7 +356,8 @@ Status:
 
 PASS — FIRST EVTC DPS CALCULATION VERIFIED
 
-Important EVTC DPS Limitation
+## 13. Important EVTC DPS Limitation
+
 
 The current EVTC DPS calculation uses:
 
@@ -372,7 +405,8 @@ NOT
 
 Final production DPS model
 
-EVTC Debug Interface
+## 14. EVTC Debug Interface
+
 
 The Combat Analyzer Debug section currently exposes EVTC diagnostic information including:
 
@@ -403,7 +437,8 @@ This interface remains intentionally verbose.
 
 Its purpose is to validate EVTC parsing and combat-analysis assumptions before those systems are exposed through the normal MetricHUD interface.
 
-Current Dual Combat-Analysis Architecture
+## 15. Current Dual Combat-Analysis Architecture
+
 
 MetricHUD now has two developing sources of combat information.
 
@@ -437,7 +472,8 @@ The live ArcDPS pipeline is intended for immediate HUD feedback.
 
 The EVTC pipeline is intended for deeper encounter reconstruction, historical analysis, rotation analysis, and training data.
 
-Major Technical Milestone
+## 16. Major Technical Milestone
+
 
 MetricHUD can now independently perform the following operations on an ArcDPS EVTC combat log:
 
@@ -471,7 +507,8 @@ Every stage above has been validated against the current test EVTC file.
 
 This establishes the first working end-to-end EVTC combat-analysis pipeline in MetricHUD.
 
-Current Stable Checkpoint — EVTC Analyzer
+## 17. Current Stable Checkpoint — EVTC Analyzer
+
 
 At the end of this development checkpoint:
 
@@ -524,7 +561,8 @@ Player Damage Duration: 8957 ms
 
 Player EVTC DPS: 3075.9
 
-Resume Here — EVTC DPS Refinement
+## 18. Resume Here — EVTC DPS Refinement
+
 
 NEXT DEVELOPMENT STARTING POINT
 
@@ -568,7 +606,8 @@ Preserve the current verified direct-damage calculation as a baseline while addi
 
 Do not remove the EVTC debug output until the expanded damage model has been validated.
 
-Latest Verified State
+## 19. Latest Verified State
+
 
 MetricHUD now has a working end-to-end EVTC parsing foundation.
 
@@ -585,9 +624,20 @@ This is the current recovery point if development context is lost.
 
 Safe EVTC checkpoint reached.
 
-EVTC Damage Model Investigation
+# ============================================================
+# END CHECKPOINT 1: EVTC OFFLINE COMBAT ANALYSIS
+# ============================================================
 
-Condition / Buff Damage Path Verified
+
+---
+
+
+# ============================================================
+# CHECKPOINT 2: EVTC DAMAGE MODEL — DIRECT + CONDITION
+# ============================================================
+
+## 1. Condition / Buff Damage Path Verified
+
 
 Development continued beyond the original direct-damage EVTC checkpoint to determine how condition damage is represented in ArcDPS EVTC combat records.
 
@@ -613,7 +663,8 @@ Player Damage Duration: 25562
 
 Player EVTC DPS: 5849.3
 
-Verified EVTC Damage Fields
+## 2. Verified EVTC Damage Fields
+
 
 Testing has now independently confirmed two player-damage paths in EVTC combat records.
 
@@ -647,7 +698,8 @@ These events were successfully attributed to the dynamically identified player s
 
 The EVTC parser therefore successfully detects condition/buff damage independently from direct damage.
 
-Important Representation Difference
+## 3. Important Representation Difference
+
 
 The parsed EVTC log currently exposes condition damage through buffDmg as positive values.
 
@@ -657,7 +709,8 @@ These two data paths must not automatically be assumed to use identical sign con
 
 MetricHUD will preserve this distinction until both representations have been fully validated.
 
-Current Damage Model
+## 4. Current Damage Model
+
 
 The existing EVTC DPS calculation is still intentionally based on direct damage only.
 
@@ -675,7 +728,8 @@ Condition / Buff Damage
 
 After total player damage is validated, EVTC-derived DPS can be recalculated using the combined damage model.
 
-Latest Recovery Point
+## 5. Latest Recovery Point
+
 
 MetricHUD currently has verified support for:
 
@@ -724,11 +778,8 @@ Next objective:
 
 Combine verified direct and condition damage into total player damage and validate the resulting EVTC DPS before modifying the production CombatAnalyzer damage model.
 
+## 6. Combined Direct + Condition Damage Checkpoint
 
-
-
-
-Combined Direct + Condition Damage Checkpoint
 
 MetricHUD has successfully expanded its EVTC damage model beyond direct damage.
 
@@ -747,13 +798,22 @@ Player Damage Duration: 25562 ms
 Direct-only EVTC DPS: 5849.3
 Combined EVTC DPS: 6900.9
 
+# ============================================================
+# END CHECKPOINT 2: EVTC DAMAGE MODEL — DIRECT + CONDITION
+# ============================================================
+
+
 ---
 
-# Owned-Agent Damage and Live Combat Analyzer Checkpoint
+
+# ============================================================
+# CHECKPOINT 3: OWNED-AGENT DAMAGE AND LIVE COMBAT ANALYZER
+# ============================================================
 
 Development continued from the verified EVTC direct + condition damage model into player-owned agent attribution and the live CombatAnalyzer pipeline.
 
-## EVTC Owned-Agent Attribution
+## 1. EVTC Owned-Agent Attribution
+
 
 Testing with Blueglove confirmed that ArcDPS EVTC combat events expose the relationship between the player and player-owned agents through instance IDs.
 
@@ -772,6 +832,7 @@ This established the ownership rule:
 event.srcAgent == playerAgentAddress
     OR
 event.srcMasterInstid == playerInstanceID
+```
 
 The second condition allows damage generated by pets, minions, and other player-owned agents to be attributed back to the player.
 
@@ -779,7 +840,8 @@ Status:
 
 PASS
 
-EVTC Owned-Agent Damage
+## 2. EVTC Owned-Agent Damage
+
 
 Owned-agent damage was initially calculated separately from player damage so the existing verified player-damage calculation would remain untouched during validation.
 
@@ -806,7 +868,8 @@ Status:
 
 PASS
 
-Combined Player + Owned EVTC DPS
+## 3. Combined Player + Owned EVTC DPS
+
 
 The EVTC timing model was expanded to track the earliest and latest qualifying damage events across both the player and owned agents.
 
@@ -844,7 +907,8 @@ Status:
 
 PASS
 
-Live CombatAnalyzer Owned-Agent Integration
+## 4. Live CombatAnalyzer Owned-Agent Integration
+
 
 After validating owned-agent attribution using saved EVTC data, development moved into the live ArcDPS CombatAnalyzer pipeline.
 
@@ -866,7 +930,8 @@ metricRegistry.SetDPS(combatAnalyzer.GetDPS());
 
 This confirmed that owned-agent support needed to be integrated into CombatAnalyzer, rather than attempting to pass EVTC debug variables directly into the HUD.
 
-Live Player Instance Identification
+## 5. Live Player Instance Identification
+
 
 CombatAnalyzer was expanded to store the player's current ArcDPS instance ID.
 
@@ -888,7 +953,8 @@ Status:
 
 PASS
 
-Live Pet-Only Validation
+## 6. Live Pet-Only Validation
+
 
 Testing was performed in the Special Forces Training Area using a Standard Kitty Golem.
 
@@ -913,7 +979,8 @@ Status:
 
 PASS
 
-Live Buff / Condition Damage
+## 7. Live Buff / Condition Damage
+
 
 The live CombatAnalyzer previously tracked only direct damage.
 
@@ -951,7 +1018,8 @@ Status:
 
 PASS
 
-Live DPS Comparison Testing
+## 8. Live DPS Comparison Testing
+
 
 Multiple pet-only tests were performed against ArcDPS.
 
@@ -1001,7 +1069,8 @@ ArcDPS and MetricHUD may use slightly different damage inclusion or timing rules
 
 The current objective is to identify any remaining event categories before considering the live DPS model final.
 
-Live Combat Timing Diagnostics
+## 9. Live Combat Timing Diagnostics
+
 
 Additional debug accessors were added for:
 
@@ -1026,7 +1095,8 @@ Status:
 
 PASS
 
-Current Stable Checkpoint — Owned Agents and Live DPS
+## 10. Current Stable Checkpoint — Owned Agents and Live DPS
+
 
 At the end of this development session:
 
@@ -1068,7 +1138,8 @@ Triggered damage
 
 Other owned-agent behavior
 
-Resume Here — Live DPS Refinement
+## 11. Resume Here — Live DPS Refinement
+
 
 NEXT DEVELOPMENT STARTING POINT
 
@@ -1104,19 +1175,24 @@ Preserve the current debug output until the remaining damage/timing behavior has
 
 Safe owned-agent + live buff-damage + live DPS checkpoint reached.
 
-
-
+# ============================================================
+# END CHECKPOINT 3: OWNED-AGENT DAMAGE AND LIVE COMBAT ANALYZER
+# ============================================================
 
 
 ---
 
-# Live ArcDPS Damage-Stream Investigation and Analyzer Validation
+
+# ============================================================
+# CHECKPOINT 4: LIVE ARCDPS DAMAGE-STREAM INVESTIGATION AND ANALYZER VALIDATION
+# ============================================================
 
 Development continued from the stable owned-agent + live buff-damage checkpoint to investigate the remaining small difference between MetricHUD's live DPS calculation and ArcDPS.
 
 The purpose of this investigation was to determine whether MetricHUD was losing damage before events reached CombatAnalyzer, particularly condition damage generated by player-owned agents.
 
-## Live Bleeding Damage Investigation
+## 1. Live Bleeding Damage Investigation
+
 
 Pet-only testing against a Standard Kitty Golem continued using the Ranger pet.
 
@@ -1149,7 +1225,8 @@ rejected by MetricHUD's ownership filter,
 
 or available through a separate ArcDPS combat-event stream.
 
-## LOCAL_RAW Bleeding Verification
+## 2. LOCAL_RAW Bleeding Verification
+
 
 Controlled pet-only tests demonstrated that the existing:
 
@@ -1181,7 +1258,8 @@ Status:
 
 PASS
 
-## Ownership Filter Investigation
+## 3. Ownership Filter Investigation
+
 
 A temporary Rejected Bleeding Damage counter was added before the ownership-filter return.
 
@@ -1197,7 +1275,8 @@ Status:
 
 PASS
 
-## SQUAD_RAW Diagnostic Stream
+## 4. SQUAD_RAW Diagnostic Stream
+
 
 A temporary second ArcDPS callback was added using:
 
@@ -1227,7 +1306,8 @@ Status:
 
 PASS — SQUAD_RAW NOT REQUIRED
 
-## ArcDPS API Verification
+## 5. ArcDPS API Verification
+
 
 During the investigation, Nexus.h was inspected directly to verify the current Nexus event API.
 
@@ -1257,7 +1337,8 @@ Status:
 
 PASS
 
-## Diagnostic Cleanup
+## 6. Diagnostic Cleanup
+
 
 After the LOCAL_RAW versus SQUAD_RAW comparison was complete, all temporary Bleeding stream diagnostics were removed.
 
@@ -1293,7 +1374,8 @@ Build:
 
 PASS
 
-## Post-Cleanup Runtime Sanity Test
+## 7. Post-Cleanup Runtime Sanity Test
+
 
 A final controlled pet-only runtime test was performed after all temporary stream diagnostics were removed.
 
@@ -1373,7 +1455,8 @@ Status:
 
 PASS
 
-## Important Timing Observation
+## 8. Important Timing Observation
+
 
 The final sanity test displayed:
 
@@ -1391,7 +1474,8 @@ Do not introduce an arbitrary correction factor.
 
 Future work should continue to verify exactly which timing window ArcDPS uses for its displayed DPS and whether additional combat-event inclusion rules affect the result.
 
-## Current Live Damage Pipeline
+## 9. Current Live Damage Pipeline
+
 
 The verified production path remains:
 
@@ -1435,7 +1519,8 @@ DPS calculation
 
 Recent combat records
 
-## Current Stable Checkpoint — Live Analyzer Stream Investigation
+## 10. Current Stable Checkpoint — Live Analyzer Stream Investigation
+
 
 At the end of this checkpoint:
 
@@ -1479,7 +1564,8 @@ Production Analyzer Preserved: PASS
 
 Final Post-Cleanup Runtime Test: PASS
 
-## Resume Here — Live DPS Timing Refinement
+## 11. Resume Here — Live DPS Timing Refinement
+
 
 NEXT DEVELOPMENT STARTING POINT
 
@@ -1523,13 +1609,20 @@ Any future change to the DPS model should be supported by controlled runtime evi
 
 Safe LOCAL_RAW + owned-agent + condition-damage + diagnostic-cleanup checkpoint reached.
 
+# ============================================================
+# END CHECKPOINT 4: LIVE ARCDPS DAMAGE-STREAM INVESTIGATION AND ANALYZER VALIDATION
+# ============================================================
 
 
 ---
 
-## ArcDPS Combat-State and DPS Timing Investigation
 
-### ArcDPS State-Change Verification
+# ============================================================
+# CHECKPOINT 5: ARCDPS COMBAT-STATE AND DPS TIMING
+# ============================================================
+
+## 1. ArcDPS State-Change Verification
+
 
 The LOCAL_RAW callback was tested for ArcDPS state-change records.
 
@@ -1555,7 +1648,8 @@ Mumble `IsInCombat` remains available for the HUD Combat Time metric, but it is 
 
 Status: PASS
 
-### Last Fight Damage Correction
+## 2. Last Fight Damage Correction
+
 
 `CaptureLastFight()` previously stored only direct damage:
 
@@ -1569,7 +1663,8 @@ Controlled runtime testing verified that Last Fight Damage now exactly equals Me
 
 Status: PASS
 
-### Raw Damage Diagnostic
+## 3. Raw Damage Diagnostic
+
 
 A temporary `arcTotalDamage` counter was added directly to the LOCAL_RAW callback to compare raw negative ArcDPS damage values against CombatAnalyzer totals.
 
@@ -1588,7 +1683,8 @@ The temporary `arcTotalDamage` diagnostic was removed after verification.
 
 Status: PASS
 
-### DPS Timing Model Investigation
+## 4. DPS Timing Model Investigation
+
 
 The previous CombatAnalyzer DPS duration was:
 
@@ -1636,16 +1732,114 @@ Based on repeated controlled runtime evidence, MetricHUD now calculates DPS usin
 
 Status: PASS
 
-### Last Fight Timing Alignment
+## 5. Last Fight Timing Alignment
+
 
 After the DPS timing change, Last Fight Time still used the old first-damage -> last-damage duration while Last Fight DPS used the new Arc-start timing.
 
 `CaptureLastFight()` was updated so Last Fight Time and Last Fight DPS now use the same verified timing model.
 
 Final runtime verification showed:
+- Arc Start -> Last Damage: 38.60 seconds
+- Last Fight Time: 38.60 seconds
+- Analyzer DPS: 4182.6
+- Last Fight DPS: 4182.6
+
+Status: PASS
+
+## 6. Timing Diagnostic Cleanup
+
+
+Temporary investigation-only code was removed after verification:
+
+- `arcTotalDamage`
+- ENTERCOMBAT -> EXITCOMBAT duration storage
+- `combatEndTime`
+- `SetCombatEndTime()`
+- `GetArcCombatDurationSeconds()`
+- Arc Combat Time debug display
+- Temporary `STATE TEST` version text
+
+The production timing pieces retained are:
+
+- ArcDPS ENTERCOMBAT session reset
+- `combatStartTime`
+- `SetCombatStartTime()`
+- `GetArcStartToLastDamageSeconds()`
+- ArcDPS EXITCOMBAT Last Fight capture
+
+## 7. Final Post-Cleanup Runtime Verification
+
+
+Final runtime sanity testing after diagnostic cleanup verified:
+
+- No crash
+- ArcDPS state-change handling operational
+- `Last Arc StateChange: 2` after combat exit
+- Direct damage operational
+- Buff / condition damage operational
+- Arc Start -> Last Damage operational
+- Live DPS operational
+- Last Fight Damage operational
+- Last Fight Time operational
+- Last Fight DPS operational
+- Recent Skills / Skill Usage / Damage By Skill remained operational
+
+Final observed test:
+
+- Direct Damage: 322824
+- Buff Damage: 19591
+- Total / Last Fight Damage: 342415
+- Analyzer Combat Time: 57.15 seconds
+- Arc Start -> Last Damage: 57.16 seconds
+- Analyzer DPS: 5990.3
+- Last Fight Time: 57.16 seconds
+- Last Fight DPS: 5990.3
+- Last Arc StateChange: 2
+
+Build: PASS  
+Runtime: PASS  
+DPS timing refinement: PASS  
+Diagnostic cleanup: PASS
+
+## 8. Current Stable DPS Pipeline
+
+
+LOCAL_RAW
+↓
+Player / Owned-Agent Filtering
+↓
+ArcDPS ENTERCOMBAT Session Start
+↓
+Direct Damage + Buff / Condition Damage
+↓
+Per-Skill Attribution
+↓
+Last Damage Timestamp
+↓
+Arc Start -> Last Damage Duration
+↓
+Live DPS
+↓
+ArcDPS EXITCOMBAT Last Fight Capture
+
+The previous Live DPS Timing Refinement objective is now complete.
+
+Do not replace the verified ArcDPS ENTERCOMBAT -> Last Damage timing model without controlled runtime evidence demonstrating a more accurate model.
+
+Stable ArcDPS state-change + damage-accounting + DPS-timing checkpoint reached.
+
+# ============================================================
+# END CHECKPOINT 5: ARCDPS COMBAT-STATE AND DPS TIMING
+# ============================================================
+
+
 ---
 
-## Per-Skill Damage Investigation – Bleeding Source Verification
+
+# ============================================================
+# CHECKPOINT 6: PER-SKILL DAMAGE — BLEEDING SOURCE VERIFICATION
+# ============================================================
 
 A simplified golem test was used to compare ArcDPS and MetricHUD damage on a per-skill basis.
 
@@ -1658,7 +1852,8 @@ Direct-damage skills compared closely between the two tools, including:
 
 An apparent discrepancy was initially observed in Bleeding totals, particularly ArcDPS's `Bleeding (m)` minion-owned category.
 
-### Accepted Bleeding Source Diagnostic
+## 1. Accepted Bleeding Source Diagnostic
+
 
 Temporary diagnostics separated accepted Bleeding damage into:
 
@@ -1677,7 +1872,8 @@ MetricHUD:
 
 This initially suggested a shortage on the owned-agent side.
 
-### Null-Source Bleeding Test
+## 2. Null-Source Bleeding Test
+
 
 A temporary diagnostic was added before the existing:
 
@@ -1700,7 +1896,8 @@ Result:
 
 Null-source Bleeding did not explain the apparent discrepancy.
 
-### Ownership-Rejection Bleeding Test
+## 3. Ownership-Rejection Bleeding Test
+
 
 A temporary Bleeding-only counter was then added immediately before the existing ownership-filter return.
 
@@ -1748,101 +1945,24 @@ Git working tree after cleanup: CLEAN
 
 Status: BLEEDING PATH VERIFIED / NO PRODUCTION CHANGE REQUIRED
 
-### Next Investigation Direction
+## 4. Next Investigation Direction
+
 
 Do not continue modifying Bleeding handling simply to force a match with an isolated ArcDPS display discrepancy.
 
 Any remaining ArcDPS-versus-MetricHUD damage difference should be reproduced first in a controlled test and then isolated to a specific skill or event category before production damage logic is changed.
-- Arc Start -> Last Damage: 38.60 seconds
-- Last Fight Time: 38.60 seconds
-- Analyzer DPS: 4182.6
-- Last Fight DPS: 4182.6
 
-Status: PASS
-
-### Timing Diagnostic Cleanup
-
-Temporary investigation-only code was removed after verification:
-
-- `arcTotalDamage`
-- ENTERCOMBAT -> EXITCOMBAT duration storage
-- `combatEndTime`
-- `SetCombatEndTime()`
-- `GetArcCombatDurationSeconds()`
-- Arc Combat Time debug display
-- Temporary `STATE TEST` version text
-
-The production timing pieces retained are:
-
-- ArcDPS ENTERCOMBAT session reset
-- `combatStartTime`
-- `SetCombatStartTime()`
-- `GetArcStartToLastDamageSeconds()`
-- ArcDPS EXITCOMBAT Last Fight capture
-
-### Final Post-Cleanup Runtime Verification
-
-Final runtime sanity testing after diagnostic cleanup verified:
-
-- No crash
-- ArcDPS state-change handling operational
-- `Last Arc StateChange: 2` after combat exit
-- Direct damage operational
-- Buff / condition damage operational
-- Arc Start -> Last Damage operational
-- Live DPS operational
-- Last Fight Damage operational
-- Last Fight Time operational
-- Last Fight DPS operational
-- Recent Skills / Skill Usage / Damage By Skill remained operational
-
-Final observed test:
-
-- Direct Damage: 322824
-- Buff Damage: 19591
-- Total / Last Fight Damage: 342415
-- Analyzer Combat Time: 57.15 seconds
-- Arc Start -> Last Damage: 57.16 seconds
-- Analyzer DPS: 5990.3
-- Last Fight Time: 57.16 seconds
-- Last Fight DPS: 5990.3
-- Last Arc StateChange: 2
-
-Build: PASS  
-Runtime: PASS  
-DPS timing refinement: PASS  
-Diagnostic cleanup: PASS
-
-### Current Stable DPS Pipeline
-
-LOCAL_RAW
-↓
-Player / Owned-Agent Filtering
-↓
-ArcDPS ENTERCOMBAT Session Start
-↓
-Direct Damage + Buff / Condition Damage
-↓
-Per-Skill Attribution
-↓
-Last Damage Timestamp
-↓
-Arc Start -> Last Damage Duration
-↓
-Live DPS
-↓
-ArcDPS EXITCOMBAT Last Fight Capture
-
-The previous Live DPS Timing Refinement objective is now complete.
-
-Do not replace the verified ArcDPS ENTERCOMBAT -> Last Damage timing model without controlled runtime evidence demonstrating a more accurate model.
-
-Stable ArcDPS state-change + damage-accounting + DPS-timing checkpoint reached.
+# ============================================================
+# END CHECKPOINT 6: PER-SKILL DAMAGE — BLEEDING SOURCE VERIFICATION
+# ============================================================
 
 
 ---
 
-## Damage Discrepancy Investigation – Dual-Value Event Test
+
+# ============================================================
+# CHECKPOINT 7: DAMAGE DISCREPANCY — DUAL-VALUE EVENT TEST
+# ============================================================
 
 A temporary diagnostic was added to test whether ArcDPS LOCAL_RAW produces damage events containing both:
 
@@ -1871,7 +1991,8 @@ Git working tree after cleanup: CLEAN
 
 Status: THEORY ELIMINATED
 
-### Next Investigation Target
+## 1. Next Investigation Target
+
 
 Do not repeat the already completed investigations for:
 
@@ -1885,14 +2006,22 @@ Do not repeat the already completed investigations for:
 
 The next controlled investigation should compare ArcDPS and MetricHUD damage on a per-skill basis to identify which specific direct-damage skill or category accounts for any remaining difference.
 
+# ============================================================
+# END CHECKPOINT 7: DAMAGE DISCREPANCY — DUAL-VALUE EVENT TEST
+# ============================================================
+
 
 ---
 
-## Final Live Damage Accounting Baseline
+
+# ============================================================
+# CHECKPOINT 8: FINAL LIVE DAMAGE ACCOUNTING BASELINE
+# ============================================================
 
 Additional controlled tests were performed after the Bleeding-source investigation to determine whether the remaining ArcDPS-versus-MetricHUD damage discrepancy could be reproduced reliably.
 
-### Player-Only Direct-Damage Baseline
+## 1. Player-Only Direct-Damage Baseline
+
 
 A Necromancer/Reaper was used with no minions and Greatsword autoattack only.
 
@@ -1932,7 +2061,8 @@ Player-only direct damage accounting is verified.
 
 Status: PASS
 
-### Pet-Only Baseline
+## 2. Pet-Only Baseline
+
 
 A Ranger/Smokescale test was then performed with the player dealing no damage.
 
@@ -1978,7 +2108,8 @@ Therefore the Smoke Assault discrepancy appears to be an ArcDPS skill-attributio
 
 No production damage-accounting change was justified.
 
-### Final Damage Investigation Result
+## 3. Final Damage Investigation Result
+
 
 Controlled runtime testing now verifies:
 
@@ -2018,3 +2149,104 @@ Any future damage-accounting change must first reproduce a discrepancy in a cont
 Status: LIVE DAMAGE ACCOUNTING BASELINE COMPLETE
 
 Stable LOCAL_RAW + owned-agent + direct-damage + condition-damage + DPS-timing checkpoint reached.
+
+# ============================================================
+# END CHECKPOINT 8: FINAL LIVE DAMAGE ACCOUNTING BASELINE
+# ============================================================
+
+
+---
+
+
+# ============================================================
+# CHECKPOINT 9: LAST FIGHT DPS HUD METRIC
+# ============================================================
+
+The verified CombatAnalyzer `Last Fight DPS` value was promoted from the debug panel into the normal MetricHUD metric system.
+
+## 1. Implementation
+
+
+Added:
+
+- `MetricID::LastFightDPS`
+- `MetricRegistry` storage for Last Fight DPS
+- `SetLastFightDPS()`
+- `GetLastFightDPS()`
+- `Last Fight DPS` metric registration
+- `Show Last Fight DPS` Options checkbox
+- Continuous registry update from `CombatAnalyzer::GetLastFightDPS()`
+
+The metric is disabled by default so existing HUD layouts are not changed automatically.
+
+The normal HUD uses `MetricFormat::Integer`.
+
+## 2. Runtime Verification
+
+
+Initial state:
+
+- Last Fight DPS displayed `0` before a completed encounter.
+
+Completed fight test:
+
+Combat Analyzer:
+
+- Last Fight Time: 28.23 seconds
+- Last Fight DPS: 3744.6
+- Last Arc StateChange: 2
+
+HUD:
+
+- DPS: 0
+- Last Fight DPS: 3745
+
+The HUD integer value correctly rounded the stored analyzer value.
+
+## 3. Previous-Fight Retention Test
+
+
+During the next encounter:
+
+- Live DPS updated normally.
+- Last Fight DPS remained at 3745 from the previous completed encounter.
+- Last Arc StateChange changed to 1.
+
+This confirmed that starting a new combat session does not erase the previous completed-fight result.
+
+## 4. Rollover Test
+
+
+After completing the second encounter:
+
+Combat Analyzer:
+
+- Last Fight Time: 23.78 seconds
+- Last Fight DPS: 2755.9
+- Last Arc StateChange: 2
+
+HUD:
+
+- DPS: 0
+- Last Fight DPS: 2756
+
+The previous 3745 result was correctly replaced by the newest completed fight.
+
+## 5. Result
+
+
+- Options checkbox: PASS
+- Generic HUD rendering: PASS
+- Initial zero state: PASS
+- Completed-fight capture: PASS
+- Previous-fight retention during new combat: PASS
+- New-fight rollover: PASS
+- Live DPS independence: PASS
+- Integer formatting / rounding: PASS
+- Runtime stability: PASS
+
+Status: LAST FIGHT DPS HUD METRIC COMPLETE
+
+# ============================================================
+# END CHECKPOINT 9: LAST FIGHT DPS HUD METRIC
+# ============================================================
