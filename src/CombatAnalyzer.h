@@ -57,6 +57,7 @@ public:
     int64_t GetTotalDirectDamage() const;
     int64_t GetTotalBuffDamage() const;
     double GetCombatDurationSeconds() const;
+    
     uint64_t GetFirstDamageTime() const;
     uint64_t GetLastDamageTime() const;
     double GetDPS() const;

@@ -44,6 +44,9 @@ ConfigManager configManager;
 CombatAnalyzer combatAnalyzer;
 EVTCAnalyzer evtcAnalyzer;
 static long long arcTotalDamage = 0;
+static bool arcPlayerInCombat = false;
+static unsigned int debugLastArcStateChange = 0;
+static float debugMumbleCombatTime = 0.0f;
 
 
 
@@ -153,6 +156,23 @@ void OnArcDPSCombat(void* eventArgs)
 
 	if (ev->IsStatechange != 0)
 	{
+		debugLastArcStateChange =
+			static_cast<unsigned int>(ev->IsStatechange);
+
+		if (ev->IsStatechange == 1 &&
+			combatData->src != nullptr &&
+			combatData->src->IsSelf != 0)
+		{
+			arcPlayerInCombat = true;
+			combatAnalyzer.ResetSession();
+		}
+		if (ev->IsStatechange == 2 &&
+			combatData->src != nullptr &&
+			combatData->src->IsSelf != 0)
+		{
+			arcPlayerInCombat = false;
+			combatAnalyzer.CaptureLastFight();
+		}
 		return;
 	}
 
@@ -279,16 +299,8 @@ void AddonRender()
 
 	if (isInCombat && !wasInCombat)
 	{
-		combatAnalyzer.ResetSession();
-	}
-
-	if (!isInCombat && wasInCombat)
-	{
-		combatAnalyzer.CaptureLastFight();
-	}
-	if (!isInCombat && wasInCombat)
-	{
-		combatAnalyzer.CaptureLastFight();
+		// CombatAnalyzer session boundaries are handled
+		// by ArcDPS ENTERCOMBAT / EXITCOMBAT state changes.
 	}
 
 	if (isInCombat)
@@ -345,8 +357,9 @@ void AddonRender()
 			characterName.c_str()
 		);
 	}
-
+	debugMumbleCombatTime = combatTime;
 	metricRegistry.SetMetricValue(MetricID::CombatTime, combatTime);
+	
 	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
 	{
 		metricRegistry.SetDPS(combatAnalyzer.GetDPS());
@@ -486,9 +499,10 @@ void AddonOptions()
 
 	{
 		ImGui::Text("Arc Damage Debug: %lld", arcTotalDamage);
+		ImGui::Text("Last Arc StateChange: %u", debugLastArcStateChange);
 		ImGui::Separator();
 
-		ImGui::Text("Version 0.1.0");
+		ImGui::Text("Version 0.1.0 - STATE TEST");
 		ImGui::TextDisabled("Settings will be added during development.");
 		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
@@ -512,7 +526,8 @@ void AddonOptions()
 			"Analyzer Combat Time: %.2f",
 			combatAnalyzer.GetCombatDurationSeconds()
 		);
-
+		ImGui::Text("Mumble Combat Time: %.2f", debugMumbleCombatTime);
+		
 		ImGui::Text(
 			"Analyzer DPS: %.1f",
 			combatAnalyzer.GetDPS()
