@@ -40,7 +40,7 @@ void CombatAnalyzer::ResetSession()
 }
 void CombatAnalyzer::CaptureLastFight()
 {
-    lastFightDamage = totalDirectDamage;
+    lastFightDamage = totalDirectDamage + totalBuffDamage;
     lastFightDurationSeconds = GetCombatDurationSeconds();
     lastFightDPS = GetDPS();
 }
