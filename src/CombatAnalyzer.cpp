@@ -22,6 +22,7 @@ void CombatAnalyzer::ResetSession()
 {
     eventCount = 0;
     damageEventCount = 0;
+    zeroSkillDamageEventCount = 0;
     totalDirectDamage = 0;
     totalBuffDamage = 0;
     firstDamageTime = 0;
@@ -31,6 +32,7 @@ void CombatAnalyzer::ResetSession()
     recentSkills.clear();
     recentRecords.clear();
     skillUseCounts.clear();
+    damageBySkill.clear();
     lastSkillEventTimes.clear();
     
     
@@ -97,6 +99,10 @@ void CombatAnalyzer::ProcessEvent(
     record.destinationInstanceID = event->DestinationInstanceID;
     record.value = event->Value;
     record.buffDamage = event->BuffDamage;
+    record.overstackValue = event->OverstackValue;
+    record.buff = event->Buff;
+    record.result = event->Result;
+    record.iff = event->IFF;
     record.isActivation = event->IsActivation;
     record.isBuffRemove = event->IsBuffRemove;
     record.isNinety = event->IsNinety;
@@ -105,11 +111,16 @@ void CombatAnalyzer::ProcessEvent(
 
     recentRecords.push_back(record);
 
-    if (recentRecords.size() > 20)
+    if (recentRecords.size() > 100)
     {
         recentRecords.erase(recentRecords.begin());
     }
     eventCount++;
+    if (event->SkillID == 0 &&
+        (event->Value < 0 || event->BuffDamage < 0))
+    {
+        zeroSkillDamageEventCount++;
+    }
 
     if (event->SkillID != 0 &&
         event->Value < 0 &&
@@ -117,6 +128,7 @@ void CombatAnalyzer::ProcessEvent(
     {
         damageEventCount++;
         totalDirectDamage += -static_cast<int64_t>(event->Value);
+        damageBySkill[event->SkillID] += -static_cast<int64_t>(event->Value);
 
         if (firstDamageTime == 0)
         {
@@ -130,6 +142,7 @@ void CombatAnalyzer::ProcessEvent(
     {
         damageEventCount++;
         totalBuffDamage += -static_cast<int64_t>(event->BuffDamage);
+        damageBySkill[event->SkillID] += -static_cast<int64_t>(event->BuffDamage);
 
         if (firstDamageTime == 0)
         {
@@ -163,6 +176,10 @@ uint64_t CombatAnalyzer::GetEventCount() const
 uint64_t CombatAnalyzer::GetDamageEventCount() const
 {
     return damageEventCount;
+}
+uint64_t CombatAnalyzer::GetZeroSkillDamageEventCount() const
+{
+    return zeroSkillDamageEventCount;
 }
 int64_t CombatAnalyzer::GetTotalDirectDamage() const
 {
@@ -259,4 +276,11 @@ const std::unordered_map<uint32_t, uint32_t>& CombatAnalyzer::GetSkillUseCounts(
 {
     return skillUseCounts;
 }
+
+const std::unordered_map<uint32_t, int64_t>& CombatAnalyzer::GetDamageBySkill() const
+{
+    return damageBySkill;
+}
+    
+
 

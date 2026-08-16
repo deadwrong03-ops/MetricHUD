@@ -31,6 +31,7 @@ void AddonRender();
 void AddonOptions();
 void OnArcDPSCombat(void* eventArgs);
 
+
 /* globals */
 AddonDefinition_t AddonDef  = {};
 HMODULE hSelf               = nullptr;
@@ -43,6 +44,7 @@ ConfigManager configManager;
 CombatAnalyzer combatAnalyzer;
 EVTCAnalyzer evtcAnalyzer;
 static long long arcTotalDamage = 0;
+
 
 
 ///----------------------------------------------------------------------------------------------------
@@ -109,9 +111,11 @@ void AddonLoad(AddonAPI_t* aApi)
 		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
 		OnArcDPSCombat
 	);
+	
 
 	// Add an options window and a regular render callback
-	APIDefs->GUI_Register(RT_Render, AddonRender);
+	APIDefs->GUI_Register(RT_Render, AddonRender); const auto& skillUseCounts =
+		combatAnalyzer.GetSkillUseCounts();
 	APIDefs->GUI_Register(RT_OptionsRender, AddonOptions);
 
 	APIDefs->Log(LOGL_DEBUG, "MetricHUD", "My <c=#00ff00>first addon</c> loaded successfully.");
@@ -128,6 +132,7 @@ void OnArcDPSCombat(void* eventArgs)
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
 	
+	
 
 	if (combatData->src == nullptr)
 	{
@@ -141,6 +146,8 @@ void OnArcDPSCombat(void* eventArgs)
 	if (combatData->src->IsSelf == 0 &&
 		ev->SrcMasterInstanceID != combatAnalyzer.GetPlayerInstanceID())
 	{
+		
+
 		return;
 	}
 
@@ -155,6 +162,7 @@ void OnArcDPSCombat(void* eventArgs)
 		combatData->id
 
 	);
+	
 
 	if (ev->Value > 0)
 	{
@@ -167,6 +175,7 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 }
 
+
 ///----------------------------------------------------------------------------------------------------
 /// AddonUnload:
 /// 	Everything you registered in AddonLoad, you should "undo" here.
@@ -177,6 +186,7 @@ void AddonUnload()
 		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
 		OnArcDPSCombat
 	);
+	
 
 	metricRegistry.Shutdown();
 	configManager.Shutdown();
@@ -482,9 +492,12 @@ void AddonOptions()
 		ImGui::TextDisabled("Settings will be added during development.");
 		ImGui::Text("Combat Events: %llu", combatAnalyzer.GetEventCount());
 		ImGui::Text("Damage Events: %llu", combatAnalyzer.GetDamageEventCount());
+		ImGui::Text("Zero-Skill Damage Events: %llu", combatAnalyzer.GetZeroSkillDamageEventCount());
 
 		ImGui::Text("Direct Damage: %lld", combatAnalyzer.GetTotalDirectDamage());
 		ImGui::Text("Buff Damage: %lld", combatAnalyzer.GetTotalBuffDamage());
+		
+		
 		ImGui::Text(
 			"First Damage Time: %llu",
 			static_cast<unsigned long long>(combatAnalyzer.GetFirstDamageTime())
@@ -559,6 +572,29 @@ void AddonOptions()
 			);
 		}
 
+		ImGui::Separator();
+
+		ImGui::Text("Damage By Skill:");
+
+		const auto& damageBySkill =
+			combatAnalyzer.GetDamageBySkill();
+
+		for (const auto& entry : damageBySkill)
+		{
+			const uint32_t skillID = entry.first;
+			const int64_t damage = entry.second;
+
+			const std::string skillName =
+				combatAnalyzer.GetSkillName(skillID);
+
+			ImGui::Text(
+				"  %s (%u): %lld",
+				skillName.c_str(),
+				skillID,
+				static_cast<long long>(damage)
+			);
+		}
+
 		const auto& recentRecords =
 			combatAnalyzer.GetRecentRecords();
 
@@ -568,7 +604,7 @@ void AddonOptions()
 		for (const CombatRecord& record : recentRecords)
 		{
 			ImGui::Text(
-				"Time:%llu Event:%llu ID:%u Src:%llu SrcInst:%u Dst:%llu DstInst:%u Master:%u Val:%d Buff:%d Act:%u 90:%u 50:%u Move:%u",
+				"Time:%llu Event:%llu ID:%u Src:%llu SrcInst:%u Dst:%llu DstInst:%u Master:%u Val:%d BuffDmg:%d Over:%u Buff:%u Result:%u IFF:%u Act:%u 90:%u 50:%u Move:%u",
 				record.time,
 				record.eventID,
 				record.skillID,
@@ -579,6 +615,10 @@ void AddonOptions()
 				record.sourceMasterInstanceID,
 				record.value,
 				record.buffDamage,
+				record.overstackValue,
+				record.buff,
+				record.result,
+				record.iff,
 				record.isActivation,
 				record.isNinety,
 				record.isFifty,

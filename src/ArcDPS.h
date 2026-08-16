@@ -12,7 +12,7 @@ namespace ArcDPS
         int32_t Value;
         int32_t BuffDamage;
         uint32_t OverstackValue;
-        uint32_t SkillID;
+        uint32_t SkillID; 
         uint16_t SourceInstanceID;
         uint16_t DestinationInstanceID;
         uint16_t SrcMasterInstanceID;
