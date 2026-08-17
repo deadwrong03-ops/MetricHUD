@@ -358,10 +358,18 @@ void AddonRender()
 	if (MumbleLink != nullptr && MumbleLink->Context.IsInCombat)
 	{
 		metricRegistry.SetDPS(combatAnalyzer.GetDPS());
+
+		metricRegistry.SetDamage(
+			static_cast<double>(
+				combatAnalyzer.GetTotalDirectDamage() +
+				combatAnalyzer.GetTotalBuffDamage()
+				)
+		);
 	}
 	else
 	{
 		metricRegistry.SetDPS(0.0);
+		metricRegistry.SetDamage(0.0);
 	}
 	metricRegistry.SetLastFightDPS(combatAnalyzer.GetLastFightDPS());
 	metricRegistry.SetLastFightTime(
@@ -420,6 +428,21 @@ void AddonOptions()
 		if (ImGui::Checkbox("Show DPS", &dpsEnabled))
 		{
 			metricRegistry.SetMetricEnabled(MetricID::DPS, dpsEnabled);
+		}
+	}
+	MetricDefinition* damageMetric =
+		metricRegistry.GetMetric(MetricID::Damage);
+
+	if (damageMetric != nullptr)
+	{
+		bool damageEnabled = damageMetric->enabled;
+
+		if (ImGui::Checkbox("Show Damage", &damageEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::Damage,
+				damageEnabled
+			);
 		}
 	}
 	MetricDefinition* lastFightDpsMetric =

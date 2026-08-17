@@ -71,6 +71,16 @@ void MetricRegistry::Initialize()
             "",
             MetricFormat::Integer
         });
+    metrics.push_back(
+        {
+            MetricID::Damage,
+            "Damage",
+            false,
+            4,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
 
     metrics.push_back(
         {
@@ -142,6 +152,16 @@ void MetricRegistry::SetDPS(double value)
 double MetricRegistry::GetDPS() const
 {
     return dps;
+}
+void MetricRegistry::SetDamage(double value)
+{
+    damage = value;
+    SetMetricValue(MetricID::Damage, static_cast<float>(value));
+}
+
+double MetricRegistry::GetDamage() const
+{
+    return damage;
 }
 void MetricRegistry::SetLastFightDPS(double value)
 {

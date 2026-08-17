@@ -9,6 +9,7 @@ enum class MetricID
     Ping,
     CombatTime,
     DPS,
+    Damage,
     LastFightDPS,
     LastFightTime,
     LastFightDamage,
@@ -51,6 +52,8 @@ public:
     float GetFPS() const;
     void SetDPS(double dps);
     double GetDPS() const;
+    void SetDamage(double damage);
+    double GetDamage() const;
     void SetLastFightDPS(double dps);
     double GetLastFightDPS() const;
     void SetLastFightTime(double seconds);
@@ -69,6 +72,7 @@ public:
 private:
     std::vector<MetricDefinition> metrics;
     double dps = 0.0;
+    double damage = 0.0;
     double lastFightDPS = 0.0;
     double lastFightTime = 0.0;
     double lastFightDamage = 0.0;

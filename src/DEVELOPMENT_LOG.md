@@ -2518,3 +2518,190 @@ MetricHUD can now retain and display all three core summary values from the most
 # ============================================================
 # END CHECKPOINT 11: LAST FIGHT DAMAGE HUD METRIC
 # ============================================================
+
+
+
+
+---
+
+# ============================================================
+# CHECKPOINT 12: CURRENT FIGHT DAMAGE HUD METRIC
+# ============================================================
+
+**Status:** COMPLETE  
+**Build:** PASS  
+**Runtime:** PASS
+
+---
+
+## 1. Purpose
+
+A live `Damage` metric was added to the normal MetricHUD HUD.
+
+The goal is to show the total damage accumulated during the current combat encounter while preserving the existing completed-fight summary metrics separately.
+
+The live value uses the already-verified CombatAnalyzer damage totals:
+
+`Direct Damage + Buff / Condition Damage`
+
+No CombatAnalyzer damage-accounting logic was changed.
+
+---
+
+## 2. Implementation
+
+Added:
+
+- `MetricID::Damage`
+- `MetricRegistry` storage for current Damage
+- `SetDamage()`
+- `GetDamage()`
+- `Damage` metric registration
+- `Show Damage` Options checkbox
+- Live registry update using CombatAnalyzer direct + buff damage
+
+During combat:
+
+`Damage = Total Direct Damage + Total Buff Damage`
+
+Outside combat:
+
+`Damage = 0`
+
+The metric is disabled by default.
+
+The normal HUD uses:
+
+`MetricFormat::Integer`
+
+---
+
+## 3. Options and HUD Verification
+
+Runtime testing confirmed:
+
+- `Show Damage` appeared in MetricHUD Options.
+- Enabling it caused `Damage` to appear in the normal HUD.
+- Outside combat, the initial value displayed as `0`.
+
+Status: PASS
+
+---
+
+## 4. Live Combat Verification
+
+A Standard Kitty Golem encounter was used to verify the live value while combat was active.
+
+Observed CombatAnalyzer values:
+
+- Direct Damage: 86779
+- Buff Damage: 5905
+- Analyzer DPS: 4213.3
+- Last Arc StateChange: 1
+
+Calculated total:
+
+`86779 + 5905 = 92684`
+
+Normal HUD:
+
+- Damage: 92684
+- DPS: 4213
+
+The HUD Damage value exactly matched the CombatAnalyzer direct + buff total.
+
+Status: PASS
+
+---
+
+## 5. Post-Combat Reset Verification
+
+The same encounter was allowed to continue and was then ended by removing the golem.
+
+After ArcDPS EXITCOMBAT:
+
+### Normal HUD
+
+- DPS: 0
+- Damage: 0
+
+### Combat Analyzer
+
+- Last Arc StateChange: 2
+- Direct Damage: 212122
+- Buff Damage: 7779
+- Last Fight Damage: 219901
+- Last Fight Time: 74.56 seconds
+- Last Fight DPS: 2949.3
+
+The completed total was:
+
+`212122 + 7779 = 219901`
+
+This confirmed that Current Fight Damage resets independently after combat while the completed-fight summary remains preserved.
+
+---
+
+## 6. Verified Combat Metric Lifecycle
+
+During combat:
+
+- DPS = current live DPS
+- Damage = current accumulated damage
+
+After combat:
+
+- DPS = 0
+- Damage = 0
+- Last Fight DPS = completed encounter DPS
+- Last Fight Time = completed encounter duration
+- Last Fight Damage = completed encounter damage
+
+This separation allows MetricHUD to expose both live combat information and completed-fight summaries without mixing the two states.
+
+---
+
+## 7. Final Verification
+
+- Metric ID: PASS
+- Registry storage: PASS
+- Setter / getter: PASS
+- Metric registration: PASS
+- Options checkbox: PASS
+- Generic HUD rendering: PASS
+- Initial zero state: PASS
+- Live direct damage inclusion: PASS
+- Live buff / condition damage inclusion: PASS
+- Live total exact match: PASS
+- Live DPS compatibility: PASS
+- Post-combat Damage reset: PASS
+- Post-combat DPS reset: PASS
+- Last Fight Damage preservation: PASS
+- Last Fight Time preservation: PASS
+- Last Fight DPS preservation: PASS
+- ArcDPS EXITCOMBAT behavior: PASS
+- Runtime stability: PASS
+
+---
+
+## 8. Final Status
+
+**CURRENT FIGHT DAMAGE HUD METRIC: COMPLETE**
+
+MetricHUD now exposes a complete basic combat-summary set:
+
+### Live
+
+- DPS
+- Damage
+- Combat Time
+
+### Previous Completed Fight
+
+- Last Fight DPS
+- Last Fight Time
+- Last Fight Damage
+
+# ============================================================
+# END CHECKPOINT 12: CURRENT FIGHT DAMAGE HUD METRIC
+# ============================================================
