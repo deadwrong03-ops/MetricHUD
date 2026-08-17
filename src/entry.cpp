@@ -367,6 +367,9 @@ void AddonRender()
 	metricRegistry.SetLastFightTime(
 		combatAnalyzer.GetLastFightDurationSeconds()
 	);
+	metricRegistry.SetLastFightDamage(
+		combatAnalyzer.GetLastFightDamage()
+	);
 	if (configManager.ShowHUD())
 	{
 		hudWindow.Render(configManager, metricRegistry);
@@ -446,6 +449,21 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(
 				MetricID::LastFightTime,
 				lastFightTimeEnabled
+			);
+		}
+	}
+	MetricDefinition* lastFightDamageMetric =
+		metricRegistry.GetMetric(MetricID::LastFightDamage);
+
+	if (lastFightDamageMetric != nullptr)
+	{
+		bool lastFightDamageEnabled = lastFightDamageMetric->enabled;
+
+		if (ImGui::Checkbox("Show Last Fight Damage", &lastFightDamageEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::LastFightDamage,
+				lastFightDamageEnabled
 			);
 		}
 	}

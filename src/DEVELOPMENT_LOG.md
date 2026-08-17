@@ -2375,3 +2375,146 @@ The normal MetricHUD HUD can now retain both the DPS and duration of the most re
 # ============================================================
 # END CHECKPOINT 10: LAST FIGHT TIME HUD METRIC
 # ============================================================
+
+
+---
+
+# ============================================================
+# CHECKPOINT 11: LAST FIGHT DAMAGE HUD METRIC
+# ============================================================
+
+**Status:** COMPLETE  
+**Build:** PASS  
+**Runtime:** PASS
+
+---
+
+## 1. Purpose
+
+The verified CombatAnalyzer `Last Fight Damage` value was promoted from the debug panel into the normal MetricHUD metric system.
+
+The goal was to retain and display the total damage dealt during the most recently completed combat encounter.
+
+The stored value includes both:
+
+- Direct / strike damage
+- Buff / condition damage
+
+---
+
+## 2. Implementation
+
+Added:
+
+- `MetricID::LastFightDamage`
+- `MetricRegistry` storage for Last Fight Damage
+- `SetLastFightDamage()`
+- `GetLastFightDamage()`
+- `Last Fight Damage` metric registration
+- `Show Last Fight Damage` Options checkbox
+- Continuous registry update from `CombatAnalyzer::GetLastFightDamage()`
+
+The metric is disabled by default so existing HUD layouts are not changed automatically.
+
+The normal HUD uses:
+
+`MetricFormat::Integer`
+
+---
+
+## 3. Options and HUD Verification
+
+Runtime testing confirmed:
+
+- `Show Last Fight Damage` appeared in MetricHUD Options.
+- Enabling the option caused the metric to appear in the normal HUD.
+- Before a completed encounter, the value displayed as `0`.
+
+Status: PASS
+
+---
+
+## 4. Real-World Completed-Fight Test
+
+A long open-world combat encounter was used for final runtime verification.
+
+This provided a stronger validation than a simple training-golem test because the encounter contained both direct damage and buff / condition damage over an extended combat window.
+
+### Combat Analyzer
+
+- Last Arc StateChange: 2
+- Direct Damage: 676123
+- Buff Damage: 7757
+- Last Fight Damage: 683880
+- Last Fight Time: 346.60 seconds
+- Last Fight DPS: 1973.1
+
+The stored damage total was exactly:
+
+`676123 + 7757 = 683880`
+
+### Normal HUD
+
+- Last Fight Damage: 683880
+
+The normal HUD value exactly matched the CombatAnalyzer's stored completed-fight damage.
+
+---
+
+## 5. Damage Composition Verification
+
+The test confirms that Last Fight Damage is not storing direct damage alone.
+
+It correctly includes:
+
+`Direct Damage + Buff / Condition Damage`
+
+Verified example:
+
+`676123 + 7757 = 683880`
+
+CombatAnalyzer Last Fight Damage:
+
+`683880`
+
+Normal HUD Last Fight Damage:
+
+`683880`
+
+Status: PASS
+
+---
+
+## 6. Final Verification
+
+- Metric ID: PASS
+- Registry storage: PASS
+- Setter / getter: PASS
+- Metric registration: PASS
+- Options checkbox: PASS
+- Generic HUD rendering: PASS
+- Initial zero state: PASS
+- Completed-fight capture: PASS
+- Direct damage inclusion: PASS
+- Buff / condition damage inclusion: PASS
+- CombatAnalyzer value match: PASS
+- Normal HUD value match: PASS
+- ArcDPS EXITCOMBAT capture: PASS
+- Long-duration open-world encounter: PASS
+- Runtime stability: PASS
+
+---
+
+## 7. Final Status
+
+**LAST FIGHT DAMAGE HUD METRIC: COMPLETE**
+
+MetricHUD can now retain and display all three core summary values from the most recently completed encounter:
+
+- Last Fight DPS
+- Last Fight Time
+- Last Fight Damage
+
+# ============================================================
+# END CHECKPOINT 11: LAST FIGHT DAMAGE HUD METRIC
+# ============================================================
