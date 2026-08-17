@@ -2250,3 +2250,128 @@ Status: LAST FIGHT DPS HUD METRIC COMPLETE
 # ============================================================
 # END CHECKPOINT 9: LAST FIGHT DPS HUD METRIC
 # ============================================================
+
+
+
+---
+
+# ============================================================
+# CHECKPOINT 10: LAST FIGHT TIME HUD METRIC
+# ============================================================
+
+**Status:** COMPLETE  
+**Build:** PASS  
+**Runtime:** PASS
+
+---
+
+## 1. Purpose
+
+The verified CombatAnalyzer `Last Fight Time` value was promoted from the debug panel into the normal MetricHUD metric system.
+
+The goal was to preserve and display the duration of the most recently completed combat encounter alongside Last Fight DPS.
+
+---
+
+## 2. Implementation
+
+Added:
+
+- `MetricID::LastFightTime`
+- `MetricRegistry` storage for Last Fight Time
+- `SetLastFightTime()`
+- `GetLastFightTime()`
+- `Last Fight Time` metric registration
+- `Show Last Fight Time` Options checkbox
+- Continuous registry update from `CombatAnalyzer::GetLastFightDurationSeconds()`
+
+The metric is disabled by default so existing HUD layouts are not changed automatically.
+
+The normal HUD uses:
+
+`MetricFormat::Time`
+
+---
+
+## 3. Registration Issue Found During Testing
+
+The first runtime build did not display the `Show Last Fight Time` checkbox.
+
+Source inspection showed that `MetricRegistry::Initialize()` accidentally contained two identical `LastFightDPS` registration blocks.
+
+As a result:
+
+`metricRegistry.GetMetric(MetricID::LastFightTime)`
+
+returned `nullptr`, preventing the Last Fight Time checkbox from rendering.
+
+The duplicate `LastFightDPS` registration was replaced with the intended:
+
+`MetricID::LastFightTime`
+
+registration.
+
+The project was rebuilt successfully after the correction.
+
+---
+
+## 4. Options and HUD Verification
+
+After the registration fix:
+
+- `Show Last Fight Time` appeared in MetricHUD Options.
+- The metric rendered successfully through the generic HUD system.
+- The initial value displayed as `00:00`.
+
+Status: PASS
+
+---
+
+## 5. Completed-Fight Runtime Test
+
+A normal Standard Kitty Golem fight was completed and the golem was removed to trigger ArcDPS EXITCOMBAT.
+
+### Combat Analyzer
+
+- Last Arc StateChange: 2
+- Last Fight Time: 36.88 seconds
+- Last Fight DPS: 3848.3
+
+### Normal HUD
+
+- DPS: 0
+- Last Fight DPS: 3848
+- Last Fight Time: 00:36
+
+The normal HUD correctly formatted the stored `36.88` second encounter duration using `MetricFormat::Time`.
+
+Live DPS independently returned to `0` after combat.
+
+---
+
+## 6. Final Verification
+
+- Metric ID: PASS
+- Registry storage: PASS
+- Setter / getter: PASS
+- Metric registration: PASS
+- Options checkbox: PASS
+- Generic HUD rendering: PASS
+- Initial zero state: PASS
+- Completed-fight capture: PASS
+- Time formatting: PASS
+- Last Fight DPS compatibility: PASS
+- Live DPS independence: PASS
+- Runtime stability: PASS
+
+---
+
+## 7. Final Status
+
+**LAST FIGHT TIME HUD METRIC: COMPLETE**
+
+The normal MetricHUD HUD can now retain both the DPS and duration of the most recently completed fight.
+
+# ============================================================
+# END CHECKPOINT 10: LAST FIGHT TIME HUD METRIC
+# ============================================================
