@@ -15,6 +15,7 @@ void CombatAnalyzer::Initialize()
     lastSkillID = 0;
     lastActivation = 0;
     downedCount = 0;
+    deathCount = 0;
     recentSkills.clear();
     recentRecords.clear();
    
@@ -31,6 +32,7 @@ void CombatAnalyzer::ResetSession()
     lastSkillID = 0;
     lastActivation = 0;
     downedCount = 0;
+    deathCount = 0;
     recentSkills.clear();
     recentRecords.clear();
     skillUseCounts.clear();
@@ -254,6 +256,15 @@ void CombatAnalyzer::IncrementDownedCount()
 uint32_t CombatAnalyzer::GetDownedCount() const
 {
     return downedCount;
+}
+void CombatAnalyzer::IncrementDeathCount()
+{
+    deathCount++;
+}
+
+uint32_t CombatAnalyzer::GetDeathCount() const
+{
+    return deathCount;
 }
 int64_t CombatAnalyzer::GetLastFightDamage() const
 {

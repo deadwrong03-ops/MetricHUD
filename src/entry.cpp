@@ -216,6 +216,14 @@ void OnArcDPSSquadCombat(void* eventArgs)
 			combatAnalyzer.IncrementDownedCount();
 		}
 	}
+	if (ev->IsStatechange == 4)
+	{
+		if (combatData->src != nullptr &&
+			combatData->src->IsSelf != 0)
+		{
+			combatAnalyzer.IncrementDeathCount();
+		}
+	}
 }
 
 
@@ -400,18 +408,24 @@ void AddonRender()
 				combatAnalyzer.GetTotalBuffDamage()
 				)
 		);
-		metricRegistry.SetDownedCount(
-			static_cast<double>(
-				combatAnalyzer.GetDownedCount()
-				)
-		);
 	}
 	else
 	{
 		metricRegistry.SetDPS(0.0);
 		metricRegistry.SetDamage(0.0);
-		metricRegistry.SetDownedCount(0.0);
 	}
+
+	metricRegistry.SetDownedCount(
+		static_cast<double>(
+			combatAnalyzer.GetDownedCount()
+			)
+	);
+
+	metricRegistry.SetDeathCount(
+		static_cast<double>(
+			combatAnalyzer.GetDeathCount()
+			)
+	);
 	metricRegistry.SetLastFightDPS(combatAnalyzer.GetLastFightDPS());
 	metricRegistry.SetLastFightTime(
 		combatAnalyzer.GetLastFightDurationSeconds()
@@ -500,6 +514,21 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(
 				MetricID::DownedCount,
 				downedCountEnabled
+			);
+		}
+	}
+	MetricDefinition* deathCountMetric =
+		metricRegistry.GetMetric(MetricID::DeathCount);
+
+	if (deathCountMetric != nullptr)
+	{
+		bool deathCountEnabled = deathCountMetric->enabled;
+
+		if (ImGui::Checkbox("Show Death Count", &deathCountEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::DeathCount,
+				deathCountEnabled
 			);
 		}
 	}
@@ -633,6 +662,7 @@ void AddonOptions()
 			"Analyzer Downed Count: %u",
 			combatAnalyzer.GetDownedCount()
 		);
+		
 		
 		
 		ImGui::Separator();

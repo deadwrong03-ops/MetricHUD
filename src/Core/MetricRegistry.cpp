@@ -93,6 +93,16 @@ void MetricRegistry::Initialize()
         });
     metrics.push_back(
         {
+            MetricID::DeathCount,
+            "Death Count",
+            false,
+            6,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
+    metrics.push_back(
+        {
             MetricID::MapName,
             "Map",
             true,
@@ -183,6 +193,19 @@ void MetricRegistry::SetDownedCount(double count)
 double MetricRegistry::GetDownedCount() const
 {
     return downedCount;
+}
+void MetricRegistry::SetDeathCount(double count)
+{
+    deathCount = count;
+    SetMetricValue(
+        MetricID::DeathCount,
+        static_cast<float>(count)
+    );
+}
+
+double MetricRegistry::GetDeathCount() const
+{
+    return deathCount;
 }
 void MetricRegistry::SetLastFightDPS(double value)
 {

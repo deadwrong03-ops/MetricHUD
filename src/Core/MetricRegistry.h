@@ -11,6 +11,7 @@ enum class MetricID
     DPS,
     Damage,
     DownedCount,
+    DeathCount,
     LastFightDPS,
     LastFightTime,
     LastFightDamage,
@@ -57,6 +58,8 @@ public:
     double GetDamage() const;
     void SetDownedCount(double count);
     double GetDownedCount() const;
+    void SetDeathCount(double count);
+    double GetDeathCount() const;
     void SetLastFightDPS(double dps);
     double GetLastFightDPS() const;
     void SetLastFightTime(double seconds);
@@ -77,6 +80,7 @@ private:
     double dps = 0.0;
     double damage = 0.0;
     double downedCount = 0.0;
+    double deathCount = 0.0;
     double lastFightDPS = 0.0;
     double lastFightTime = 0.0;
     double lastFightDamage = 0.0;

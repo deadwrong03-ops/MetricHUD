@@ -2823,3 +2823,113 @@ Therefore the current Downed Count implementation should be considered squad-dep
 # ============================================================
 # END CHECKPOINT 13
 # ============================================================
+
+
+
+
+# ============================================================
+# CHECKPOINT 14: DEATH COUNT
+# ============================================================
+
+## 14.1 Goal
+
+Add a live Death Count metric that tracks how many times the player fully dies during the current combat encounter.
+
+## 14.2 ArcDPS Death-State Integration
+
+Death detection was added to the existing:
+
+EV_ARCDPS_COMBATEVENT_SQUAD_RAW
+
+callback that had already been verified for player Downed-state detection.
+
+The self-only death condition is:
+
+- IsStatechange == 4
+- combatData->src is valid
+- combatData->src->IsSelf != 0
+
+When those conditions are met:
+
+CombatAnalyzer::IncrementDeathCount()
+
+is called.
+
+The existing Downed Count path using state-change 5 remains unchanged.
+
+## 14.3 CombatAnalyzer Integration
+
+CombatAnalyzer now owns the current-fight Death Count.
+
+Added:
+
+- deathCount storage
+- IncrementDeathCount()
+- GetDeathCount()
+
+deathCount is initialized to 0 and reset by ResetSession() when a new combat encounter begins.
+
+## 14.4 HUD Metric Integration
+
+Added:
+
+MetricID::DeathCount
+
+Metric name:
+
+Death Count
+
+Format:
+
+Integer
+
+Default visibility:
+
+Disabled
+
+A new option was added:
+
+Show Death Count
+
+Death Count is fed from CombatAnalyzer into MetricRegistry.
+
+## 14.5 Encounter Result Retention
+
+Initial testing showed that both Downed Count and Death Count were being forced back to 0 immediately when Mumble reported that combat had ended.
+
+This prevented the player from seeing the final encounter values after dying.
+
+The HUD update logic was changed so that:
+
+- DPS resets to 0 outside combat.
+- Damage resets to 0 outside combat.
+- Downed Count retains the analyzer value after combat.
+- Death Count retains the analyzer value after combat.
+- Downed Count and Death Count reset when the next ArcDPS combat session begins through CombatAnalyzer::ResetSession().
+
+This allows the completed fight's down/death result to remain visible until the next encounter starts.
+
+## 14.6 Runtime Verification
+
+Verified in Guild Wars 2:
+
+- Show Death Count checkbox appears correctly.
+- Outside combat before an encounter -> Death Count: 0
+- Player enters Downed state -> Downed Count: 1, Death Count: 0
+- Player becomes fully defeated -> Downed Count: 1, Death Count: 1
+- Analyzer confirmed Downed Count: 1 and Death Count: 1 after full defeat.
+- Completed-fight Downed Count and Death Count remain visible after combat ends.
+- Beginning a new combat encounter resets both counts to 0.
+- Existing DPS, Damage, combat timing, and other HUD metrics continued functioning normally.
+
+## 14.7 Known Limitation
+
+The current Death Count implementation uses EV_ARCDPS_COMBATEVENT_SQUAD_RAW.
+
+Therefore the implemented realtime Death Count path is currently squad-dependent.
+
+Death-state availability through LOCAL_RAW has not been separately verified and should not be assumed.
+
+# ============================================================
+# END CHECKPOINT 14
+# ============================================================
