@@ -10,6 +10,7 @@ enum class MetricID
     CombatTime,
     DPS,
     Damage,
+    DownedCount,
     LastFightDPS,
     LastFightTime,
     LastFightDamage,
@@ -54,6 +55,8 @@ public:
     double GetDPS() const;
     void SetDamage(double damage);
     double GetDamage() const;
+    void SetDownedCount(double count);
+    double GetDownedCount() const;
     void SetLastFightDPS(double dps);
     double GetLastFightDPS() const;
     void SetLastFightTime(double seconds);
@@ -73,6 +76,7 @@ private:
     std::vector<MetricDefinition> metrics;
     double dps = 0.0;
     double damage = 0.0;
+    double downedCount = 0.0;
     double lastFightDPS = 0.0;
     double lastFightTime = 0.0;
     double lastFightDamage = 0.0;

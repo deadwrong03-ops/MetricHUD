@@ -30,7 +30,7 @@ void AddonUnload();
 void AddonRender();
 void AddonOptions();
 void OnArcDPSCombat(void* eventArgs);
-
+void OnArcDPSSquadCombat(void* eventArgs);
 
 /* globals */
 AddonDefinition_t AddonDef  = {};
@@ -46,6 +46,10 @@ EVTCAnalyzer evtcAnalyzer;
 
 static bool arcPlayerInCombat = false;
 static unsigned int debugLastArcStateChange = 0;
+
+
+
+
 static float debugMumbleCombatTime = 0.0f;
 
 
@@ -114,6 +118,10 @@ void AddonLoad(AddonAPI_t* aApi)
 		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
 		OnArcDPSCombat
 	);
+	APIDefs->Events_Subscribe(
+		"EV_ARCDPS_COMBATEVENT_SQUAD_RAW",
+		OnArcDPSSquadCombat
+	);
 	
 
 	// Add an options window and a regular render callback
@@ -134,6 +142,7 @@ void OnArcDPSCombat(void* eventArgs)
 	}
 
 	ArcDPS::CombatEvent* ev = combatData->ev;
+	
 
 
 
@@ -186,6 +195,28 @@ void OnArcDPSCombat(void* eventArgs)
 
 	);
 }
+void OnArcDPSSquadCombat(void* eventArgs)
+{
+	EvCombatData* combatData =
+		static_cast<EvCombatData*>(eventArgs);
+
+	if (combatData == nullptr || combatData->ev == nullptr)
+	{
+		return;
+	}
+
+	ArcDPS::CombatEvent* ev = combatData->ev;
+
+	if (ev->IsStatechange == 5)
+	{
+		if (combatData->src != nullptr &&
+			combatData->src->IsSelf != 0)
+		{
+			
+			combatAnalyzer.IncrementDownedCount();
+		}
+	}
+}
 
 
 	
@@ -200,6 +231,10 @@ void AddonUnload()
 	APIDefs->Events_Unsubscribe(
 		"EV_ARCDPS_COMBATEVENT_LOCAL_RAW",
 		OnArcDPSCombat
+	);
+	APIDefs->Events_Unsubscribe(
+		"EV_ARCDPS_COMBATEVENT_SQUAD_RAW",
+		OnArcDPSSquadCombat
 	);
 	
 
@@ -365,11 +400,17 @@ void AddonRender()
 				combatAnalyzer.GetTotalBuffDamage()
 				)
 		);
+		metricRegistry.SetDownedCount(
+			static_cast<double>(
+				combatAnalyzer.GetDownedCount()
+				)
+		);
 	}
 	else
 	{
 		metricRegistry.SetDPS(0.0);
 		metricRegistry.SetDamage(0.0);
+		metricRegistry.SetDownedCount(0.0);
 	}
 	metricRegistry.SetLastFightDPS(combatAnalyzer.GetLastFightDPS());
 	metricRegistry.SetLastFightTime(
@@ -447,6 +488,21 @@ void AddonOptions()
 	}
 	MetricDefinition* lastFightDpsMetric =
 		metricRegistry.GetMetric(MetricID::LastFightDPS);
+	MetricDefinition* downedCountMetric =
+		metricRegistry.GetMetric(MetricID::DownedCount);
+
+	if (downedCountMetric != nullptr)
+	{
+		bool downedCountEnabled = downedCountMetric->enabled;
+
+		if (ImGui::Checkbox("Show Downed Count", &downedCountEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::DownedCount,
+				downedCountEnabled
+			);
+		}
+	}
 
 	if (lastFightDpsMetric != nullptr)
 	{
@@ -569,6 +625,16 @@ void AddonOptions()
 	{
 		
 		ImGui::Text("Last Arc StateChange: %u", debugLastArcStateChange);
+		
+
+		
+		
+		ImGui::Text(
+			"Analyzer Downed Count: %u",
+			combatAnalyzer.GetDownedCount()
+		);
+		
+		
 		ImGui::Separator();
 
 		ImGui::Text("Version 0.1.0");

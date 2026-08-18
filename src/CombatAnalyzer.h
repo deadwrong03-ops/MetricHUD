@@ -67,6 +67,8 @@ public:
     double GetDPS() const;
     void SetPlayerInstanceID(uint16_t instanceID);
     uint16_t GetPlayerInstanceID() const;
+    void IncrementDownedCount();
+    uint32_t GetDownedCount() const;
     int64_t GetLastFightDamage() const;
     double GetLastFightDurationSeconds() const;
     double GetLastFightDPS() const;
@@ -97,6 +99,7 @@ private:
     uint32_t lastSkillID = 0;
     uint8_t lastActivation = 0;
     uint16_t playerInstanceID = 0;
+    uint32_t downedCount = 0;
     
     std::vector<uint32_t> recentSkills;
     std::vector<CombatRecord> recentRecords;

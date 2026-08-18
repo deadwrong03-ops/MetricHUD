@@ -2705,3 +2705,121 @@ MetricHUD now exposes a complete basic combat-summary set:
 # ============================================================
 # END CHECKPOINT 12: CURRENT FIGHT DAMAGE HUD METRIC
 # ============================================================
+
+
+
+
+# ============================================================
+# CHECKPOINT 13: DOWNED COUNT
+# ============================================================
+
+## 13.1 Goal
+
+Add a live HUD metric that tracks how many times the player enters the Downed state during the current combat encounter.
+
+## 13.2 ArcDPS Down-State Investigation
+
+Initial testing attempted to detect the ArcDPS down-state event through:
+
+EV_ARCDPS_COMBATEVENT_LOCAL_RAW
+
+ArcDPS state-change value 5 was monitored before all existing source and ownership filtering.
+
+Results:
+
+- Player visibly entered the Downed state.
+- LOCAL_RAW did not produce state-change 5.
+- A persistent raw state-5 counter remained at 0.
+- Repeating the test while in a squad produced the same result through LOCAL_RAW.
+
+A separate diagnostic callback was then created for:
+
+EV_ARCDPS_COMBATEVENT_SQUAD_RAW
+
+Results:
+
+- SQUAD_RAW produced state-change 5 when the player entered the Downed state.
+- A self-only test using combatData->src->IsSelf correctly identified the player's own down-state event.
+- Other squad state-change traffic did not affect the self-only counter.
+
+## 13.3 Reliability Testing
+
+The self-only SQUAD_RAW down-state event was tested across multiple downs.
+
+Results:
+
+- First down -> count 1
+- Second down in the same fight -> count 2
+- No duplicate down events were observed.
+- Starting a new combat encounter reset the analyzer Downed Count to 0.
+
+This confirmed one self state-change 5 event per observed player down.
+
+## 13.4 CombatAnalyzer Integration
+
+CombatAnalyzer now owns the current-fight Downed Count.
+
+Added:
+
+- downedCount storage
+- IncrementDownedCount()
+- GetDownedCount()
+
+downedCount is initialized to 0 and reset by ResetSession() at the beginning of each combat encounter.
+
+The SQUAD_RAW callback increments CombatAnalyzer only when:
+
+- IsStatechange == 5
+- combatData->src is valid
+- combatData->src->IsSelf != 0
+
+Temporary diagnostic counters were removed after verification.
+
+## 13.5 HUD Metric Integration
+
+Added:
+
+MetricID::DownedCount
+
+Metric name:
+
+Downed Count
+
+Format:
+
+Integer
+
+Default visibility:
+
+Disabled
+
+The live HUD receives the current analyzer Downed Count while in combat and displays 0 outside combat.
+
+A new option was added:
+
+Show Downed Count
+
+## 13.6 Runtime Verification
+
+Verified in Guild Wars 2:
+
+- Downed Count checkbox appears correctly.
+- Outside combat -> Downed Count: 0
+- Start of fight -> Downed Count: 0
+- First player down -> Downed Count: 1
+- Second player down in the same fight -> Downed Count: 2
+- New combat encounter -> Downed Count resets to 0
+- Existing MetricHUD combat metrics continued functioning normally.
+- Final Release x64 rebuild succeeded.
+
+## 13.7 Known Limitation
+
+Realtime down-state detection was verified through SQUAD_RAW while the player was in a squad.
+
+LOCAL_RAW did not provide the state-change 5 event during the solo or squad tests.
+
+Therefore the current Downed Count implementation should be considered squad-dependent. Solo/open-world down detection without squad data is not currently supported by this event path.
+
+# ============================================================
+# END CHECKPOINT 13
+# ============================================================

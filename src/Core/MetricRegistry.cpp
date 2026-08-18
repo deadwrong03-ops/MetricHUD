@@ -81,7 +81,16 @@ void MetricRegistry::Initialize()
             "",
             MetricFormat::Integer
         });
-
+    metrics.push_back(
+        {
+            MetricID::DownedCount,
+            "Downed Count",
+            false,
+            5,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
     metrics.push_back(
         {
             MetricID::MapName,
@@ -162,6 +171,18 @@ void MetricRegistry::SetDamage(double value)
 double MetricRegistry::GetDamage() const
 {
     return damage;
+}
+void MetricRegistry::SetDownedCount(double count)
+{
+    downedCount = count;
+    SetMetricValue(
+        MetricID::DownedCount,
+        static_cast<float>(count)
+    );
+}
+double MetricRegistry::GetDownedCount() const
+{
+    return downedCount;
 }
 void MetricRegistry::SetLastFightDPS(double value)
 {
