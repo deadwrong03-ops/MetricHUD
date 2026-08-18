@@ -47,6 +47,8 @@ void CombatAnalyzer::CaptureLastFight()
     lastFightDamage = totalDirectDamage + totalBuffDamage;
     lastFightDurationSeconds = GetArcStartToLastDamageSeconds();
     lastFightDPS = GetDPS();
+    lastFightDownedCount = downedCount;
+    lastFightDeathCount = deathCount;
 }
 
 void CombatAnalyzer::Shutdown()
@@ -265,6 +267,20 @@ void CombatAnalyzer::IncrementDeathCount()
 uint32_t CombatAnalyzer::GetDeathCount() const
 {
     return deathCount;
+}
+uint32_t CombatAnalyzer::GetLastFightDownedCount() const
+{
+    return lastFightDownedCount;
+}
+
+uint32_t CombatAnalyzer::GetLastFightDeathCount() const
+{
+    return lastFightDeathCount;
+}
+void CombatAnalyzer::RefreshLastFightSurvivalCounts()
+{
+    lastFightDownedCount = downedCount;
+    lastFightDeathCount = deathCount;
 }
 int64_t CombatAnalyzer::GetLastFightDamage() const
 {

@@ -222,6 +222,11 @@ void OnArcDPSSquadCombat(void* eventArgs)
 			combatData->src->IsSelf != 0)
 		{
 			combatAnalyzer.IncrementDeathCount();
+
+			if (!arcPlayerInCombat)
+			{
+				combatAnalyzer.RefreshLastFightSurvivalCounts();
+			}
 		}
 	}
 }
@@ -433,6 +438,17 @@ void AddonRender()
 	metricRegistry.SetLastFightDamage(
 		combatAnalyzer.GetLastFightDamage()
 	);
+	metricRegistry.SetLastFightDownedCount(
+		static_cast<double>(
+			combatAnalyzer.GetLastFightDownedCount()
+			)
+	);
+
+	metricRegistry.SetLastFightDeathCount(
+		static_cast<double>(
+			combatAnalyzer.GetLastFightDeathCount()
+			)
+	);
 	if (configManager.ShowHUD())
 	{
 		hudWindow.Render(configManager, metricRegistry);
@@ -572,6 +588,37 @@ void AddonOptions()
 			metricRegistry.SetMetricEnabled(
 				MetricID::LastFightDamage,
 				lastFightDamageEnabled
+			);
+		}
+	}
+	MetricDefinition* lastFightDownedMetric =
+		metricRegistry.GetMetric(MetricID::LastFightDownedCount);
+
+	if (lastFightDownedMetric != nullptr)
+	{
+		bool lastFightDownedEnabled = lastFightDownedMetric->enabled;
+
+		if (ImGui::Checkbox("Show Last Fight Downs", &lastFightDownedEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::LastFightDownedCount,
+				lastFightDownedEnabled
+			);
+		}
+	}
+
+	MetricDefinition* lastFightDeathMetric =
+		metricRegistry.GetMetric(MetricID::LastFightDeathCount);
+
+	if (lastFightDeathMetric != nullptr)
+	{
+		bool lastFightDeathEnabled = lastFightDeathMetric->enabled;
+
+		if (ImGui::Checkbox("Show Last Fight Deaths", &lastFightDeathEnabled))
+		{
+			metricRegistry.SetMetricEnabled(
+				MetricID::LastFightDeathCount,
+				lastFightDeathEnabled
 			);
 		}
 	}

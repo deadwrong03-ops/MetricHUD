@@ -15,6 +15,8 @@ enum class MetricID
     LastFightDPS,
     LastFightTime,
     LastFightDamage,
+    LastFightDownedCount,
+    LastFightDeathCount,
     MapName,
     MapID,
     CharacterName,
@@ -66,6 +68,11 @@ public:
     double GetLastFightTime() const;
     void SetLastFightDamage(double damage);
     double GetLastFightDamage() const;
+    void SetLastFightDownedCount(double count);
+    double GetLastFightDownedCount() const;
+
+    void SetLastFightDeathCount(double count);
+    double GetLastFightDeathCount() const;
     const MetricDefinition& GetFPSMetric() const;
     void SetFPSEnabled(bool enabled);
 
@@ -84,6 +91,8 @@ private:
     double lastFightDPS = 0.0;
     double lastFightTime = 0.0;
     double lastFightDamage = 0.0;
+    double lastFightDownedCount = 0.0;
+    double lastFightDeathCount = 0.0;
     MetricDefinition fpsMetric =
     {
         MetricID::FPS,

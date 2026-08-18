@@ -2933,3 +2933,114 @@ Death-state availability through LOCAL_RAW has not been separately verified and 
 # ============================================================
 # END CHECKPOINT 14
 # ============================================================
+
+
+
+
+
+# ============================================================
+# CHECKPOINT 15: LAST FIGHT DOWNED / DEATH COUNTS
+# ============================================================
+
+## 15.1 Goal
+
+Add completed-fight Downed Count and Death Count metrics so the player can review survival results from the previous combat encounter.
+
+## 15.2 CombatAnalyzer Integration
+
+Added completed-fight storage for:
+
+- lastFightDownedCount
+- lastFightDeathCount
+
+Added getters:
+
+- GetLastFightDownedCount()
+- GetLastFightDeathCount()
+
+CaptureLastFight() now stores the current fight's Downed Count and Death Count alongside Last Fight Damage, Time, and DPS.
+
+The completed-fight values are not cleared by ResetSession(), allowing them to remain available while the next fight begins.
+
+## 15.3 Metric Registry Integration
+
+Added:
+
+- MetricID::LastFightDownedCount
+- MetricID::LastFightDeathCount
+
+HUD labels:
+
+- Last Fight Downs
+- Last Fight Deaths
+
+Both use Integer formatting and are disabled by default.
+
+Added matching MetricRegistry storage, setters, and getters.
+
+## 15.4 HUD Options
+
+Added:
+
+- Show Last Fight Downs
+- Show Last Fight Deaths
+
+Both metrics can be independently enabled from the MetricHUD options panel.
+
+## 15.5 ArcDPS Event Ordering Issue
+
+Initial runtime testing produced:
+
+Downed Count: 1
+Death Count: 1
+Last Fight Downs: 1
+Last Fight Deaths: 0
+
+The underlying Death Count was correct, but the completed-fight Death Count was captured too early.
+
+Testing showed that LOCAL_RAW EXITCOMBAT could trigger CaptureLastFight() before the SQUAD_RAW death state-change event arrived.
+
+This created an event-ordering race:
+
+1. EXITCOMBAT captured the fight while deathCount was still 0.
+2. SQUAD_RAW state-change 4 then incremented deathCount to 1.
+
+A RefreshLastFightSurvivalCounts() method was added to CombatAnalyzer.
+
+When a self state-change 4 death event arrives after arcPlayerInCombat has already become false, the completed-fight Downed and Death counts are refreshed from the current analyzer counters.
+
+This supports either callback ordering without changing the already verified damage/timing capture path.
+
+## 15.6 Runtime Verification
+
+Verified in Guild Wars 2:
+
+Completed fight with one down and one death:
+
+- Downed Count: 1
+- Death Count: 1
+- Last Fight Downs: 1
+- Last Fight Deaths: 1
+
+After starting a new combat encounter:
+
+- Downed Count reset to 0.
+- Death Count reset to 0.
+- Last Fight Downs remained 1.
+- Last Fight Deaths remained 1.
+
+The completed-fight values therefore remain available while the live counters correctly reset for the new encounter.
+
+Existing DPS, Damage, combat timing, Last Fight DPS, Last Fight Time, and Last Fight Damage behavior remained functional.
+
+## 15.7 Known Limitation
+
+The underlying realtime Downed and Death detection currently uses:
+
+EV_ARCDPS_COMBATEVENT_SQUAD_RAW
+
+Therefore Last Fight Downs and Last Fight Deaths inherit the same current squad-dependent limitation as the live Downed Count and Death Count metrics.
+
+# ============================================================
+# END CHECKPOINT 15
+# ============================================================

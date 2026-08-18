@@ -53,6 +53,27 @@ void MetricRegistry::Initialize()
         });
     metrics.push_back(
         {
+            MetricID::LastFightDownedCount,
+            "Last Fight Downs",
+            false,
+            10,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
+
+    metrics.push_back(
+        {
+            MetricID::LastFightDeathCount,
+            "Last Fight Deaths",
+            false,
+            11,
+            0.0f,
+            "",
+            MetricFormat::Integer
+        });
+    metrics.push_back(
+        {
             MetricID::CombatTime,
             "Combat Time",
             true,
@@ -231,6 +252,33 @@ void MetricRegistry::SetLastFightDamage(double damage)
 {
     lastFightDamage = damage;
     SetMetricValue(MetricID::LastFightDamage, static_cast<float>(damage));
+}
+void MetricRegistry::SetLastFightDownedCount(double count)
+{
+    lastFightDownedCount = count;
+    SetMetricValue(
+        MetricID::LastFightDownedCount,
+        static_cast<float>(count)
+    );
+}
+
+double MetricRegistry::GetLastFightDownedCount() const
+{
+    return lastFightDownedCount;
+}
+
+void MetricRegistry::SetLastFightDeathCount(double count)
+{
+    lastFightDeathCount = count;
+    SetMetricValue(
+        MetricID::LastFightDeathCount,
+        static_cast<float>(count)
+    );
+}
+
+double MetricRegistry::GetLastFightDeathCount() const
+{
+    return lastFightDeathCount;
 }
 
 double MetricRegistry::GetLastFightDamage() const
